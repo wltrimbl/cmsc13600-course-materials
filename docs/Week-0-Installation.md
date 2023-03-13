@@ -39,10 +39,24 @@ $ source venv/bin/activate
 ```
 To finish, you can simply run
 ```
-$ deactivate
+(venv) $ deactivate
 ```
 
 ## Step 3. Setting Up Version Control
 We will be using Git for version control in this class. Set up git by following the instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 
+## Step 4. Installing Django
+TODO
+As a first step, install the following packages to your environment
+```
+(venv) $ pip install Django pytest
+```
+
+https://docs.djangoproject.com/en/4.1/intro/tutorial01/
+
+$ python manage.py runserver
+
+https://docs.pytest.org/en/7.1.x/getting-started.html
+
+http://127.0.0.1:8000/app/
