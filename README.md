@@ -3,6 +3,8 @@ We will use a running quarter-long course project to reinforce the material taug
 
 Note the scenario below is completely fake, it is just designed to be simple enough that students can fully understand the application design requirements in the span of a quarter.
 
+You may work on this project individually or with a partner.
+
 ## AttendanceChimp: An Electronic Class Attendance Tool
 AttendanceChimp is a web application that is designed to help college instructors keep track of attendance in their classes. The application uses a unique method to track attendance, which involves the use of a random QR code projected on a screen at the start of each class.
 
