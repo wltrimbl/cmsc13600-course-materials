@@ -45,6 +45,19 @@ To finish, you can simply run
 ## Step 3. Setting Up Version Control
 We will be using Git for version control in this class. Set up git by following the instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
+Complete the following steps:
+1. Create a [github.com] account if you don't have one already.
+2. Follow the github classrooms link [] to associate your github username with the course, and it will create a repository for you. If you are working in a team, only one of your team members needs to do this.
+3. Make sure to add all of your team members as collaborators on the new repository.
+4. Clone the repository to the folder you made above. You can cut and paste the repo url from the github web interface.
+```
+(venv) $ git clone <repo url>
+```
+
+## Step 4. Doing Weekly Assignments
+You will be working on the same code repository throughout the quarter. 
+* Pull requests
+
 
 ## Step 4. Installing Django
 TODO
