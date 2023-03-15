@@ -115,8 +115,14 @@ Follow the instructions in the termina. Finally, you can test to see if your Dja
 ```
 While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
 
-## Step 6. Deliverables (EDIT BELOW)
+## Step 6. Understanding the Database (TODO)
 Stop the `runserver` process above. You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. Follow the instructions [https://www.sqlite.org/download.html] to get one and how to use it. Answer the following questions in this file.
 
 1. List all of the database tables currently in your database and what command you used to find them
 2. Cut and paste the first row from the user table with the user you created above.
+
+## Step 7. Modifying The Front-End (TODO)
+While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `templates/app/index.html` to have the following:
+1. The webpage contains a brief bio of you and your teammates at the top
+2. The webpage bolds and highlights the name of the current logged in user 
+3. All content is neatly centered on the page.
