@@ -99,9 +99,24 @@ Now we will get ready to do some actual work. As a first step, install the follo
 ```
 (venv) $ pip install Django pytest
 ```
-It is worth using this first week to read up on Django as we will be using it throughout the class [https://docs.djangoproject.com/en/4.1/intro/tutorial01/]. You can test to see if your Django installation worked by running the following command:
+It is worth using this first week to read up on Django as we will be using it throughout the class [https://docs.djangoproject.com/en/4.1/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
 ```
 (venv) $ cd attendancechimp/
+(venv) $ python manage.py migrate
+```
+This will create a file call db.sqlite3 in your folder. Do not add this file to your repository. It is a running database of all the state that
+your application manages. Next, you will create a user account in Django
+```
+(venv) $ python manage.py createsuperuser
+```
+Follow the instructions in the termina. Finally, you can test to see if your Django installation worked by running the following command:
+```
 (venv) $ python manage.py runserver
 ```
-While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "it works".
+While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
+
+## Step 6. Deliverables (EDIT BELOW)
+Stop the `runserver` process above. You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. Follow the instructions [https://www.sqlite.org/download.html] to get one and how to use it. Answer the following questions in this file.
+
+1. List all of the database tables currently in your database and what command you used to find them
+2. Cut and paste the first row from the user table with the user you created above.
