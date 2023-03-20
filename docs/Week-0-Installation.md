@@ -42,6 +42,25 @@ To finish, you can simply run
 (venv) $ deactivate
 ```
 
+### Windows Users
+If you are using windows, follow the following steps. Install Python from [https://www.python.org/downloads/]. Open your "terminal" app and create a folder:
+```
+$ mkdir cmsc13600-materials
+```
+Create a virtual environment:
+```
+$ cd cmsc13600-materials
+$ python -m venv venv
+```
+To activate the virtual environment run:
+```
+$ venv\Scripts\Activate.ps1
+```
+To finish, you can simply run
+```
+(venv) $ deactivate
+```
+
 ## Step 3. Setting Up Version Control
 We will be using Git for version control in this class. Set up git by following the instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
