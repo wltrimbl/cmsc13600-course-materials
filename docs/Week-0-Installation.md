@@ -82,6 +82,14 @@ Your branch is up to date with 'origin/main'.
 nothing to commit, working tree clean
 ```
 
+### Common Issues on MacOSx
+If you haven't taken a class before that uses github classrooms, you will have to set up ssh authentication. On MacOSX, these instructions will work:
+https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
+
+### Common Issues on Windows
+If you haven't taken a class before that uses github classrooms, you will have to set up ssh authentication. On Windows, these instructions will work:
+https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
+
 ## Step 4. Doing Weekly Assignments
 Each week, you will complete the following steps to finish and submit your assignments.
 1. Make sure you are working on the "main" branch and that it is up-to-date
@@ -135,7 +143,18 @@ Follow the instructions in the termina. Finally, you can test to see if your Dja
 While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
 
 ## Step 6. Understanding the Database (TODO)
-Stop the `runserver` process above. You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. Follow the instructions [https://www.sqlite.org/download.html] to get one and how to use it. Answer the following questions in this file.
+Stop the `runserver` process above. You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. 
+
+For SQLITE. Here's what you can do. Two options:
+(1) https://sqlitebrowser.org/
+- You can install that to your applications and simply open your
+db.sqlite3 file from that GUI. This is easy and it worked for me just
+fine on an old mac
+
+(2) You can use the command line. Run the command:
+$ sqlite3 db.sqlite
+SQLite version 3.39.4 2022-09-07 20:51:41
+Enter ".help" for usage hints.
 
 1. List all of the database tables currently in your database and what command you used to find them
 
