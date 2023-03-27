@@ -1,0 +1,15 @@
+
+
+<form method="post">
+  {% csrf_token %}
+
+  <label for="isbn">ISBN:</label><br>
+  <input type="text" id="isbn" name="isbn"><br>
+  <label for="Title">Title:</label><br>
+  <input type="text" id="title" name="title"><br>
+  <label for="Author">Author:</label><br>
+  <input type="text" id="author" name="author"><br>
+  <label for="qty">Quantity:</label><br>
+  <input type="number" id="qty" name="qty" min="1" max="10"><br>
+  <input type="submit" value="Submit">
+</form>
