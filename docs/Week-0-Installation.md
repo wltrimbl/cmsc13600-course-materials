@@ -152,10 +152,13 @@ db.sqlite3 file from that GUI. This is easy and it worked for me just
 fine on an old mac
 
 (2) You can use the command line. Run the command:
+```
 $ sqlite3 db.sqlite
 SQLite version 3.39.4 2022-09-07 20:51:41
 Enter ".help" for usage hints.
+```
 
+You can edit this file here (there is one in your repository) with the answers to the following questions:
 1. List all of the database tables currently in your database and what command you used to find them
 
 ## Step 7. Modifying The Front-End (TODO)
