@@ -22,12 +22,17 @@ handler = logging.StreamHandler(sys.stdout)
 from library.models import *
 
 
-addBook('9781497438095','Romeo and Juliet','William Shakespeare', 1597)
-addBook('9780446310789','To Kill a Mockingbird','Harper Lee', 1962)
+#addBook('9781497438095','Romeo and Juliet','William Shakespeare', 1597)
+#addInventory('9781497438095',5)
 
-addInventory('9781497438095',5)
-addInventory('9780446310789',3)
+#addBook('9780446310789','To Kill a Mockingbird','Harper Lee', 1962)
 
-checkout('9780446310789')
-checkout('9780446310789')
-checkout('9781497438095')
+#addInventory('9781497438095',5)
+#addInventory('9780446310789',3)
+
+
+#checkout('9780446310789')
+#checkout('9780446310789')
+#checkout('9781497438095')
+
+checkin(1)

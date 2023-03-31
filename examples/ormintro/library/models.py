@@ -190,5 +190,37 @@ def checkout(isbn):
 
     logging.info('Trying to checkout ' + str((isbn)) + ' with inv id ' + str(book_to_checkout.id))
 
-#exercisse
-#def checkin()
+
+def checkin(inv_id):
+    '''Checks in a book upon return to the library:
+    - Check to see if the inv_id actually exists.
+    - Checks to see if that inv_id was actually borrowed
+    '''
+
+    if Inventory.objects.filter(id=inv_id).count() == 0:
+        raise ValueError('That inventory id does not exist')
+
+
+    if Inventory.objects.filter(id=inv_id, borrowed=True).count() == 0:
+        raise ValueError('That inventory id was never checked out')
+
+    inv_ob = Inventory.objects.filter(id=inv_id)[0]
+    inv_ob.borrowed = False
+    inv_ob.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

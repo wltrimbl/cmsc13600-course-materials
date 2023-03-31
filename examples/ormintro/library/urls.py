@@ -18,8 +18,8 @@ from django.urls import path, include
 from library import views
 
 urlpatterns = [
-    path('list/', views.list, name='list'),
-    path('addbook/', views.addb, name='addBook'),
-    #path('checkout/', views.checkout, name='checkout'),
-    #path('checkin/', views.checkin, name='checkout'),
+    path('addBook', views.service_addBook),
+    path('getBooks', views.service_getBooks),
+    path('getInv', views.service_getInv),
+    path('addInv', views.service_addInv),
 ]
