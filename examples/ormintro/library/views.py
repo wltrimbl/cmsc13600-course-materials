@@ -43,7 +43,7 @@ def service_addBook(request):
         of the request.
 
         You can test it out with:
-        $ curl -i -X POST -H 'Content-Type: application/json' -d '{"isbn": "9781497438099", "title": "Pokemon: The Novel", "author": "Nintendo", "year": 2009}' http://127.0.0.1:8000/tasks/addBook
+        $ curl -i -X POST -H 'Content-Type: application/json' -d '{"isbn": "9781497438019", "title": "Pokemon: The Novel", "author": "Nintendo", "year": 2009}' http://127.0.0.1:8000/tasks/addBook
     '''
 
     #First return an error if there it isn't a post:
