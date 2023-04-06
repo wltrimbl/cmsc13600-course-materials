@@ -15,9 +15,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from library import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('tasks/', include('app.urls'))
+
+    #topic 1
+    path('addBook', views.addBookForm),
+    path('handleAddBook', views.handleBookForm),
+
+    #topic 2
+    path('listBooks', views.listBooks), #tasks/listBooks
+
+    #topic 3
+    path('upload', views.uploadForm),
+    path('handleUpload', views.handleUploadForm),
 ]
