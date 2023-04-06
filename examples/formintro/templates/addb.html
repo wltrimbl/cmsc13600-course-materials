@@ -1,0 +1,27 @@
+
+
+<!-- This is an HTML Form. Forms can be used to generate POST requests from your browser -->
+
+<form method="post" action="handleAddBook">
+
+  <!-- This is a token the prevents outside websites from generating POST requests -->
+  {% csrf_token %}
+
+
+  <!-- This is the actual form -->
+  <label for="isbn">ISBN:</label><br>
+  <input type="text" name="isbn" ><br>
+
+  <label for="title">Title:</label><br>
+  <input type="text" name="title"><br>
+
+  <label for="author">Author:</label><br>
+  <input type="text" name="author"><br>
+
+  <label for="year">Year:</label><br>
+  <input type="number" name="year" min="1000" max="2023"><br><br>
+
+  <input type="submit" value="Submit">
+</form>
+
+{{error}}
