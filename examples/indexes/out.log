@@ -1,0 +1,12 @@
+2023-04-12 12:17:24,310 - root - INFO - Load_Tweets took 0.10240355399999995 seconds
+2023-04-12 12:17:24,310 - root - INFO - Load_Tweets found 14640 Tweets
+2023-04-12 12:17:25,545 - root - INFO - build_index_tweets_1word took 1.1760168069999999 seconds
+2023-04-12 12:17:25,546 - root - INFO - build_index_tweets_1word found 15089 distinct words
+2023-04-12 12:17:25,547 - root - INFO - index_find_tweets_phrase_v2 searching for bad weather
+2023-04-12 12:17:25,547 - root - INFO - index_find_tweets_phrase_v2 considering 41 candidates
+2023-04-12 12:17:25,548 - root - INFO - index_find_tweets_phrase_v2 took 0.0012581730000000846 seconds
+2023-04-12 12:17:25,548 - root - INFO - index_find_tweets_phrase_v2 found 34 tweets
+2023-04-12 12:17:25,550 - root - INFO - index_find_tweets_phrase_v2 searching for landing gear failure
+2023-04-12 12:17:25,550 - root - INFO - index_find_tweets_phrase_v2 considering 2 candidates
+2023-04-12 12:17:25,550 - root - INFO - index_find_tweets_phrase_v2 took 0.0004710580000000242 seconds
+2023-04-12 12:17:25,551 - root - INFO - index_find_tweets_phrase_v2 found 2 tweets

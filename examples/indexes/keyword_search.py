@@ -184,36 +184,47 @@ def index_find_tweets_phrase_v2(data, index, phrase):
 
 '''keywords
 '''
-"""
+
 #naive
-df = load_tweets('Tweets.csv')
+#df = load_tweets('Tweets.csv')
+#print(df.head())
+
+"""
 print(naive_find_tweets_1word(df, 'landing')['text'])
 print(naive_find_tweets_1word(df, 'lax')['text'])
 print(naive_find_tweets_1word(df, 'pilot')['text'])
+"""
+
+
+
+
 
 #with index
-df = load_tweets('Tweets.csv')
-index = build_index_tweets_1word(df)
-print(index_find_tweets_1word(df, index, 'landing')['text'])
-print(index_find_tweets_1word(df, index,'lax')['text'])
-print(index_find_tweets_1word(df, index, 'pilot')['text'])
-"""
+#df = load_tweets('Tweets.csv')
+#index = build_index_tweets_1word(df)
+#print(index_find_tweets_1word(df, index, 'landing')['text'])
+#print(index_find_tweets_1word(df, index,'lax')['text'])
+#print(index_find_tweets_1word(df, index, 'pilot')['text'])
+
 
 
 '''phrases
 '''
 #naive
-df = load_tweets('Tweets.csv')
-print(naive_find_tweets_phrase(df, 'bad weather')['text'])
-print(naive_find_tweets_phrase(df, 'landing gear failure')['text'])
+#df = load_tweets('Tweets.csv')
+#print(df.head())
+
+#print(naive_find_tweets_phrase(df, 'bad weather')['text'])
+#print(naive_find_tweets_phrase(df, 'landing gear failure')['text'])
+
 
 print('----')
 
 #v1
-df = load_tweets('Tweets.csv')
-index = build_index_tweets_1word(df)
-print(index_find_tweets_phrase_v1(df, index, 'bad weather')['text'])
-print(index_find_tweets_phrase_v1(df, index, 'landing gear failure')['text'])
+#df = load_tweets('Tweets.csv')
+#index = build_index_tweets_1word(df)
+#print(index_find_tweets_phrase_v1(df, index, 'bad weather')['text'])
+#print(index_find_tweets_phrase_v1(df, index, 'landing gear failure')['text'])
 
 
 #v2
@@ -221,3 +232,4 @@ df = load_tweets('Tweets.csv')
 index = build_index_tweets_1word(df)
 print(index_find_tweets_phrase_v2(df, index, 'bad weather')['text'])
 print(index_find_tweets_phrase_v2(df, index, 'landing gear failure')['text'])
+
