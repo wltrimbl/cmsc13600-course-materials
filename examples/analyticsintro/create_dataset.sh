@@ -1,0 +1,2 @@
+curl -X GET http://127.0.0.1:8000/tasks/getBooks -o '/Users/sanjaykrishnan/.CMVolumes/Sanjay Krishnan/LibraryDataLake/books.json'
+curl -X GET http://127.0.0.1:8000/tasks/getInv -o '/Users/sanjaykrishnan/.CMVolumes/Sanjay Krishnan/LibraryDataLake/inv.json'
