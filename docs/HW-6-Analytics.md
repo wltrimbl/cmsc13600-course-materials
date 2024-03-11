@@ -1,4 +1,4 @@
-# 3. Data Analytics
+# H
 This week you will be querying the data in the database to build a basic analytics dashboard for this application. Again, let's not worry about verifying the QR codes just yet (that's next week's project).
 
 ## Step 1. The `/app/overview?course=xyz` View
