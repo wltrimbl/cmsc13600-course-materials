@@ -30,8 +30,8 @@ Cloning creates a local copy of the code and you can now work on it!
 
 6. Step 5, will create a folder named "app" which will contain all of your code. You can test this out by running:
 ```
-(venv) $ cd app/
-(venv) $ git status
+ $ cd app/
+ $ git status
 On branch main
 Your branch is up to date with 'origin/main'.
 ```
@@ -54,19 +54,19 @@ $ git checkout -b hw_0
 
 4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
 ```
-(venv) $ git add <files go here>
+ $ git add <files go here>
 ```
 5. (TODO) For this assignment, I want you to create a file called `names.txt` with all of your project partners names listed in a text file separated by new lines. Create this file and:
 ```
-(venv) $ git add names.txt
+ $ git add names.txt
 ```
 5. Commit your changes, this creates a log of what you did. 
 ```
-(venv) $ git commit -m 'We added names to the repository'
+ $ git commit -m 'We added names to the repository'
 ```
 6. Push your changes
 ```
-(venv) $ git push --set-upstream origin hw_0
+ $ git push --set-upstream origin hw_0
 ```
 7. After pushing your changes visit the repository in github. For example, mine is [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/] Replace sjyk with your github username. Click on "pull requests". [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pulls]. Create a new pull request that compares your "week_i" branch to main. 
 8. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pull/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
