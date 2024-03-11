@@ -10,14 +10,4 @@
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
 {% endif %}
-
-
-<form action="/app/handleform" method="post">
-  <label for="cname">Course Name:</label>
-  <input type="text" id="cname2" name="cname2"><br><br>
-  <label for="cnum">Course Number:</label>
-  <input type="text" id="cnum2" name="cnum2"><br><br>
-  <input type="submit" value="Submit">
-</form>
-
 {% endblock %}
