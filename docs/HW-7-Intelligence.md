@@ -1,4 +1,4 @@
-# 4. Adding Intelligence
+# HW 7. Adding Intelligence
 This week we will start adding some basic intelligence to the application. For this week, it might be useful to look into `opencv`, which is an open source computer vision library. You can install it with `pip install python-opencv`. This will be another 2 week project.
 
 ## Step 1. Create a "Red Flag" Model
