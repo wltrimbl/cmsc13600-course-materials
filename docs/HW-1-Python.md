@@ -33,4 +33,34 @@ Here you'll play around a bit with this organization so we get a feel for how fi
 
 1. Use your terminal to navigate to the `app` folder we created in the last assignment.
 2. Follow the assignment initialization steps in the previous homework using the branch name `hw1` this time.
-3. Create a new file called `test.py` in the `app` folder
+3. Create a new file called `data13600.py` in the `app` folder with the following content:
+```
+def foo():
+  print('foo()')
+
+BAZ = 'baz'
+```
+4. Save this file, and run the python shell like we did above:
+```
+$ python
+Python 3.x.y
+[GCC 4.x] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import data13600
+>>> data13600.foo()
+'foo()'
+>>> data13600.BAZ
+'baz'
+```
+5. We can also try something different here:
+```
+$ python
+Python 3.x.y
+[GCC 4.x] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from data13600 import *
+>>> foo()
+'foo()'
+>>> BAZ
+'baz'
+```
