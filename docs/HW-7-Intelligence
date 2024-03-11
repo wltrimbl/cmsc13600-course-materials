@@ -16,7 +16,7 @@ One way that students can cheat this application is to share images. Write a scr
 It is easy to break a duplicate check over images by simply applying image compression. Design a module that extends Step 3 above to identify images that are "near" duplicates. It is up to you to decide how you will do that. This package might be helpful [https://pypi.org/project/image-similarity-measures/]. If you find near duplicates add them to the Red Flag table.
 
 ## Step 5. Image Metadata and Location Data
-Step 4 can be circumvented by the same student taking multiple picturess.
+Step 4 can be circumvented by the same student taking multiple pictures.
 Exchangeable image file (exif) format is a standard that specifies formats for images, sound, and ancillary tags used by digital cameras, scanners and other systems handling image and sound files recorded by digital cameras. Images contain a wealth of metadata that can be used to understand where, when, and how an image was taken.
 
 Extract the EXIF metadata from each image uploaded. You might find this post useful [https://stackoverflow.com/questions/4764932/in-python-how-do-i-read-the-exif-data-for-an-image]. Examine this data and try to write some heuristics to determine whether the an image was likely taken with the same camera. Add these to the Red Flag table as well.
