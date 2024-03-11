@@ -60,13 +60,24 @@ $ git checkout -b hw_0
 ```
  $ git add names.txt
 ```
-5. Commit your changes, this creates a log of what you did. 
+6. Commit your changes, this creates a log of what you did. 
 ```
  $ git commit -m 'We added names to the repository'
 ```
-6. Push your changes
+7. Push your changes
 ```
  $ git push --set-upstream origin hw_0
 ```
-7. After pushing your changes visit the repository in github. For example, mine is [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/] Replace sjyk with your github username. Click on "pull requests". [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pulls]. Create a new pull request that compares your "week_i" branch to main. 
-8. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pull/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
+8. After pushing your changes visit the repository in github. For example, mine is [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/] Replace sjyk with your github username. Click on "pull requests". [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pulls]. Create a new pull request that compares your "week_i" branch to main.
+   
+9. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/week-0-setup-sjyk/pull/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
+
+10. EVERY project partner must submit on Canvas even if you are working from the same repository.
+
+## Grading
+Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
+
+1. Successfully added a file to the repository named `names.txt`
+2. Successfully created a pull request
+
+Full credit 2/2 tests passed, No credit else.
