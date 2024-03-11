@@ -64,3 +64,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> BAZ
 'baz'
 ```
+6. Add `data13600.py` to your repository, commit, and push it to submit (following the previous assignment's instructions).
+
+## Grading
+1. A correctly formed pull request is submitted to canvass
+2. The pull request correctly contains data13600.py
+
+Full Credit 2/2 Tests Pass, 0 Otherwise
