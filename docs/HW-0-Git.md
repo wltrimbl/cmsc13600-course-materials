@@ -74,6 +74,8 @@ $ git checkout -b hw_0
 
 10. EVERY project partner must submit on Canvas even if you are working from the same repository.
 
+11. Before you start the next week's assignment, you need to merge in the pull request you submitted.
+
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
