@@ -117,7 +117,7 @@ auth_user                   django_session
 auth_user_groups   
 ```
 ## Submission
-Follow the submission instructions of the previous weeks. There should be a pull request with: models.py, gpt.txt, my-data-model.png, gpt-model.png.
+Follow the submission instructions of the previous weeks. There should be a pull request with: `models.py`, `gpt.txt`, `my-data-model.png`, `gpt-model.png`.
 
 ## Grading
 1 pt for each of the 4 files that need to be included in the PR.
