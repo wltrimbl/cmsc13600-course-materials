@@ -10,7 +10,7 @@ Go into your app folder that you have cloned in the previous assignment.
 ```
 $ cd app
 ```
-Then inside the folder, create a virutal environment
+Then inside the folder, create a virtual environment
 ```
 $ virtualenv venv
 ```

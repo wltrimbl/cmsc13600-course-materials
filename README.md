@@ -1,5 +1,5 @@
 # CMSC 13600 Course Project
-We will use a running quarter-long course project to reinforce the material taught in the class. One of the hardesst aspects of data engineering is understanding all of the software tooling and why it exists. In this project, you will design a working web-application from start to finish. Each week you will have to build a different component. We will try our best to simulate the development practices you would see in the software industry in terms of version control, unit testing, and documentation. 
+We will use a running quarter-long course project to reinforce the material taught in the class. One of the hardest aspects of data engineering is understanding all of the software tooling and why it exists. In this project, you will design a working web-application from start to finish. Each week you will have to build a different component. We will try our best to simulate the development practices you would see in the software industry in terms of version control, unit testing, and documentation. 
 
 Note the scenario below is completely fake, it is just designed to be simple enough that students can fully understand the application design requirements in the span of a quarter.
 

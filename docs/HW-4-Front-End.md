@@ -6,7 +6,7 @@ While we understand that this class is not a web-application design course, it w
 1. The webpage contains a brief bio of you and your teammates at the top
 2. The webpage bolds and highlights the name of the current logged in user 
 3. All content is neatly centered on the page.
-4. Add a variable to the dictionary in `app/views.py` that is displayed on the page. It is your reponsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/4.1/ref/templates/language/, https://docs.djangoproject.com/en/4.1/intro/tutorial03/
+4. Add a variable to the dictionary in `app/views.py` that is displayed on the page. It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/4.1/ref/templates/language/, https://docs.djangoproject.com/en/4.1/intro/tutorial03/
 
 Note, https://github.com/sjyk/cmsc13600-course-project/blob/main/attendancechimp/app/views.py#L8. You can add variables to the empty dictionary
 ```

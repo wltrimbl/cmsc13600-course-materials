@@ -17,7 +17,7 @@ This form contains:
 5. A meeting time/frequency of the course
 6. A "create" button that will create this course and add it to the database
 
-When the intrustor hits "create", the form data is sent to Django via a POST request. The following error checking logic must be implemented. You must return some error state if one of these conditions is met.
+When the instructor hits "create", the form data is sent to Django via a POST request. The following error checking logic must be implemented. You must return some error state if one of these conditions is met.
 1. There is no identical course in the database.
 2. An instructor is not teaching another course at the same time.
 3. The end date is before the start date.
@@ -32,16 +32,16 @@ If there are no errors, then the instructor is redirected to a success page. Thi
 A student can access the `/app/join?course_id=xyz` to join a course. This view should only load if the user is logged in and they are a student. If not logged in, redirect the user too the login view `/accounts/login`. This view should have
 
 1. The course name printed at the top of the page.
-2. The coure number printed underneath it.
+2. The course number printed underneath it.
 3. A large button that says "join".
 
 When a user hits "join" it triggers an HTTP POST request that associates a student with a course with code `xyz`. This request should check the following conditions:
 1. The student must not be associated with another course meeting at the same time.
 
-If succesful, the view should redirect to a success page.
+If successful, the view should redirect to a success page.
 
 ## Step 3. The `/app/attendance?course_id=xyz` View (TODO)
-An instructor can visit the `/app/attendance?course_id=xyz` view (i.e., visits), this page display's a QR code that can be used for attendance.  This view should only load if the user is logged in and they are an instructor. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the instructor is not asssociated with course `xyz`, then you should redirect to an error page.
+An instructor can visit the `/app/attendance?course_id=xyz` view (i.e., visits), this page display's a QR code that can be used for attendance.  This view should only load if the user is logged in and they are an instructor. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the instructor is not associated with course `xyz`, then you should redirect to an error page.
 
 This view should have the following logic:
 1. Generate a random string let's call this `class_code` and store this string in the database. 
@@ -50,7 +50,7 @@ This view should have the following logic:
 4. Generate a QR code based on `class_code` see examples here https://davidshimjs.github.io/qrcodejs/
 
 ## Step 4. The `/app/upload?course_id=xyz` View (TODO)
-A student can access the `/app/upload?course_id=xyz` to upload a QR code. This view should only load if the user is logged in and they are a student. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the student is not asssociated with course `xyz`, then you should redirect to an error page.
+A student can access the `/app/upload?course_id=xyz` to upload a QR code. This view should only load if the user is logged in and they are a student. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the student is not associated with course `xyz`, then you should redirect to an error page.
 Let's not worry about validating the QR code this week. Let's just get the mechanics of storing the data appropriately. The view should have the following form:
 
 1. A file upload dialog (takes an image)
