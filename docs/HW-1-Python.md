@@ -48,7 +48,7 @@ Python 3.x.y
 Type "help", "copyright", "credits" or "license" for more information.
 >>> import data13600
 >>> data13600.foo()
-'foo()'
+foo()
 >>> data13600.BAZ
 'baz'
 ```
@@ -60,7 +60,7 @@ Python 3.x.y
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from data13600 import *
 >>> foo()
-'foo()'
+foo()
 >>> BAZ
 'baz'
 ```
