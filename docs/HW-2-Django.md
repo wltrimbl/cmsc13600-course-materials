@@ -75,7 +75,7 @@ fine on an old mac
 
 (2) You can use the command line. Run the command:
 ```
-$ sqlite3 db.sqlite
+$ sqlite3 db.sqlite3
 SQLite version 3.39.4 2022-09-07 20:51:41
 Enter ".help" for usage hints.
 ```
