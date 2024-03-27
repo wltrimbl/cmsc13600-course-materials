@@ -83,3 +83,21 @@ Test-driven development (TDD) is a software development process relying on softw
 2. Successfully created a pull request
 
 Full credit 2/2 tests passed, No credit else.
+
+## FAQ
+1.) I'm having github ssh problems on MacOSX
+
+Follow this post:
+https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
+
+2. I don't know if what I'm seeing is correct? 
+
+Watch these screen recordingsas an example on my laptop
+* https://uchicago.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d81fd73a-cc49-4bdc-be38-b13700e9f2c5
+* https://uchicago.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=297e7b66-1758-4184-81ef-b13700e9f2a9
+
+3. How do I get started on Windows:
+* https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
+
+4. Can I use the CSIL machines?
+* I would avoid those, we've had some versioning issues with them in the past.
