@@ -6,13 +6,12 @@ The venv module supports creating lightweight “virtual environments”, each w
 site directories. A virtual environment is created on top of an existing Python installation, known as the virtual environment’s “base” Python, 
 and may optionally be isolated from the packages in the base environment, so only those explicitly installed in the virtual environment are available.
 
-Create a new folder to put all of your course files
+Go into your app folder that you have cloned in the previous assignment.
 ```
-$ mkdir cmsc13600-materials
+$ cd app
 ```
 Then inside the folder, create a virutal environment
 ```
-$ cd cmsc13600-materials
 $ virtualenv venv
 ```
 
@@ -27,24 +26,16 @@ To finish, you can simply run
 (venv) $ deactivate
 ```
 
-### Windows Users
-If you are using windows, follow the following steps. Install Python from [https://www.python.org/downloads/]. Open your "terminal" app and create a folder:
+### If This Doesn't Work
+Here are some links to help you:
+* https://docs.python.org/3/library/venv.html#creating-virtual-environments
+
+Or, if you are using `conda` from a previous class:
 ```
-$ mkdir cmsc13600-materials
+conda create --name venv
+conda activate venv
 ```
-Create a virtual environment:
-```
-$ cd cmsc13600-materials
-$ python -m venv venv
-```
-To activate the virtual environment run:
-```
-$ venv\Scripts\Activate.ps1
-```
-To finish, you can simply run
-```
-(venv) $ deactivate
-```
+
 ## Step 2. Installing Django (TODO)
 First, navigate the `app` folder as before.
 
@@ -52,6 +43,11 @@ Now we will get ready to do some actual work. As a first step, install the follo
 ```
 (venv) $ pip install Django pytest
 ```
+If you are using conda, this should be:
+```
+conda install -y Django pytest
+```
+
 It is worth using this first week to read up on Django as we will be using it throughout the class [https://docs.djangoproject.com/en/4.1/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
 ```
 (venv) $ cd attendancechimp/
