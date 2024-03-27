@@ -9,30 +9,54 @@ The main advantages of the relational data model are its simplicity, flexibility
 Before you begin, you should read up on Django Models [https://docs.djangoproject.com/en/4.1/topics/db/models/], and Django Model Forms [https://docs.djangoproject.com/en/4.1/topics/forms/modelforms/].
 Django models define the basic data model which is then compiled to the database. Django Model Forms allow the front end to populate such a database.
 
-## User Experience
-Next, we will describe the desired user experience. We don't particularly care how you implement this functionality, but all groups should have this functionality.
+## Functionality (in English)
+An important part of data engineering development is to interpret and understand application specifications. Here we spec out what the attendance chip application needs to support.
 
-1. **User Management** There will be two classes of users: students and instructorss. Both students and instructors should be Django users and should be able to login through `/accounts/login`. Neither one should be a super-user, that should be reserved for you.
-2. **Course Management** Instructor can create courses at `/app/create`, which should open a form that creates a course in the database. For simplicity, courses have only a single instructor, but instructors can teach multiple courses. After creation, the page should generate three unique URLS tied to the course:
-   - `/app/join?course_id=xyz` A logged in student can join the course
-   - `/app/attendance?course_id=xyz` A logged in instructor can display a QR code
-   - `/app/upload?course_id=xyz` A logged in student can upload a picture of the QR code
+1. **User Management** There will be two classes of users: students and instructors. 
+   a. Students represent students who can take one or more course. Students have a student id number.
+   b. Instructors represent course staff who can teach one or more course. Instructors have an instructor id number.
+   c. The application should be able to add new students and instructors.
+   
+2. **Course Management** For simplicity, courses have only a single instructor, but instructors can teach multiple courses.
+   a. Each course should have a course id number.
+   b. The application should allow students to join a particular course.
+   c. The application should allow an instructor to display a QR code for a particular course
+   d. The application should create a custom upload dialog for pictures of the QR code.
 
-## Data Model (TODO)
-Don't worry about implementing the full functionality yet. Instead think about the data model, what data needs to be stored and how it needs to be linked. You will edit the file `models.py` to have your data model. Your data model should
+3. **Post-hoc Analytics** All of the data in (1) and (2) should be stored in the database.
+   a. Offline, we should be able to determine whether a student uploaded a valid QR code for a particular lecture
+   b. Offline, we should be able to determine attendance for a particular lecture.
 
-1. Associate users with a category: instructors and students
-2. Associate students and instructors with courses
-3. Keep track of the QR codes an instructor generate (include the time!)
-4. Keep track of the QR codes student in a class upload (include the time!)
+## Data Model
+Don't worry about implementing the full functionality yet. Instead we want you to think about the data model, what data needs to be stored and how it needs to be linked. You will edit the file `models.py` to have your data model. 
 
-Complete `models.py` with this data model. After completion run:
+At a high level here are all the entities that you have:
+* Users (of type either instructor or students)
+* Courses (instructors teach these and students take these)
+* Lectures (particular days for each course)
+* QR Codes (uploads that are associated with lectures and students)
+
+### Implementing the Data Model (TODO)
+Your data model should implment these associations between these entities. Complete `models.py` with this data model. After completion run:
 ```
-(venv) $python manage.py migrate
+(venv) $ python manage.py makemigrations app
+(venv) $ python manage.py migrate
 ```
-This should run with no errors if your model is consistent. Like the diagrams discussed in class. Draw out your data model and save it to the docs folder in `app/docs/my-data-model.png`.
+This should run with no errors if your model is consistent. 
 
-5. Add, commit, and push models.py and app/docs/my-data-model.png.
+Sometimes the database will end up in a weird state if you make contradictory changes. In this assignment, it is safe to just remove the database file and re-run the code above.
+```
+rm -Rf migrations db.sqlite 
+```
+
+While this is an open-ended assignment, here are some things to think about.
+
+1. Before you write any code, draw out the ER diagram. Note, you may have to create helper tables to implement certain types of relationships.
+2. Start with the User/Courses tables and specify those in Django. These are the primary entities you need to think about.
+3. Then, think about Lectures.
+4. Then, finally think about QR Codes both how they are created and how they are uploaded. Hint, again you may need multiple tables here.
+   
+Save your ER diagram in `app/docs/my-data-model.png`. It's fine if it's hand-drawn! This will be useful for you and us to understand what you are doing.
 
 ## Ask Chat-GPT to generate a data model (TODO)
 Chat-GPT can generate suprisingly good data models. Experiemnt with Chat-GPT to generate a data model. Use the text in this doc and the readme to generate a prompt. Ask it to do it as a django models.py file or as more abstract sql tables.
