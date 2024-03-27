@@ -87,3 +87,57 @@ Create a new file called `tables.txt` in the app folder:
 1. Does tables.txt exist and is it accurate?
 
 Full credit 1/1 passed, no credit otherwise.
+
+## FAQ
+1. Do I need to merge in previous PRs before I do anything?
+
+Yes, please do merge your previous assignments in. We will give you more detailed instructions about merging in later assignments.
+
+2. What's the deal with virtual environments?
+
+Virtual environments allows you to manage separate package installations for different projects. It creates a “virtual” isolated Python installation. When you switch projects, you can create a new virtual environment which is isolated from other virtual environments. You benefit from the virtual environment since packages can be installed confidently and will not interfere with another project’s environment.
+
+In short, it's a way for us to make sure that nothing you do in this class affects code from other classes.
+
+You should be able to create a new virtual environment (named venv):
+```
+$ virtualenv venv
+```
+
+or
+```
+$ python3 -m virtualenv venv
+```
+
+An ALTERNATIVE to virtual environments is to use a packaging framework called conda. Some of you may already have this installed for your previous classes. Here's how you do the above in conda.
+```
+conda create --name venv
+```
+
+3) What is "activating"?
+
+Activating a virtual environment means that we are putting ourselves into that isolated python environment (i.e. ,we can install whatever we want inside it!)
+
+With a virtual environment this is (run it in the same folder you created the environment):
+```
+$ source venv/bin/activate
+```
+You are successful if you see the prompt change:
+```
+(venv) $
+```
+
+With conda, there is similar syntax:
+```
+conda activate venv
+```
+4) How do I install new packages?
+
+Activate your virtual environment first and then run:
+```
+pip install ...
+```
+or if you are using conda run:
+```
+conda install -y ...
+```
