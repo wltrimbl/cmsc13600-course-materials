@@ -15,7 +15,7 @@ Then inside the folder, create a virutal environment
 $ virtualenv venv
 ```
 
-Before you do any work, you must activate this virtual environment from the `cmsc13600-materials` folder. You know the environment is active when there
+Before you do any work, you must activate this virtual environment from the `app` folder. You know the environment is active when there
 is a parenthesized "venv" in front of the terminal prompt
 ```
 $ source venv/bin/activate
