@@ -77,11 +77,11 @@ Here's a basic overview of how Django templates work:
 Django templates are powerful and flexible, allowing developers to create dynamic web pages efficiently. They are a key component in separating the logic from the presentation layer in Django applications.
 
 ## Step 1. Creating a Front-End Element (TODO)
-While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `templates/app/index.html` to have the following:
+While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `attendancechimp/templates/app/index.html` to have the following:
 1. The webpage contains a brief bio of you and your teammates at the top
 2. The webpage bolds and highlights the name of the current logged in user 
 3. All content is neatly centered on the page.
-4. Add a variable to the dictionary in `app/views.py` that is displayed on the page. It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
+4. Add a variable to the dictionary in `attendancechimp/app/views.py` that is displayed on the page. It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
 
 Note, app/views.py#L8. You can add variables to the empty dictionary
 ```
@@ -144,6 +144,7 @@ Now it's your turn to create a new view and template pair that can load and coll
      c. A radio button instructor/student
      d. A password
      e. A "Sign Up" button that will create this student/instructor
+     f. Note that this requires creating a new template! 
    - `/app/new` should only accept GET requests and should error if there is a POST request
    - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/createUser`.
      a. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
@@ -152,10 +153,11 @@ Now it's your turn to create a new view and template pair that can load and coll
      
 Note: to be able to log in you have to create a "Django" user (which might be different than the user in your data model frm HW3!). Check out the documentation for https://docs.djangoproject.com/en/5.0/ref/contrib/auth/ , this step needs to create two database objects one is a student/instructor and one is a django auth user. 
 
-## What do you need to change?
+## What do you need to change for Step 2?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
-1. `attendancechimp/urls.py` You modify this file to create the two new views/urls in Step 2.
-2. `app/views.py` You modify this file to create 
+1. `attendancechimp/attendancechimp/urls.py` You modify this file to create the two new views/urls in Step 2.
+2. `attendancechimp/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
+3. `attendancechimp/templates/app/...` You need to create a new template for `/app/new` to handle the web form.
 
 ## Grading
 1. Step 1 successfully completed.
