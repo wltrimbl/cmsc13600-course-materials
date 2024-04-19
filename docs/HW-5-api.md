@@ -1,68 +1,59 @@
-# HW5. Implementing the API
-This week you will be implementing the basic API in AttendanceChimp. At the end of this week's work, you should be able to upload data and manually query it from the database. Each one of these API components will be implemented as a a simple web-form. You can pretty it up if you want to, but for now let's keep it simple. You will have two weeks to complete this part of the project.
+# HW5. Analytics and Data Science
+This week you will be querying the data in the database to build a basic analytics dashboard for this application. This assignment "closes the loop" with data science classes that you might have taken before. It will help you understand how to create datasets from live applications that can be analyzed with the tools that you are familiar with.
 
-## Reading
-Before you begin, you should read up on Django Views [https://docs.djangoproject.com/en/4.1/topics/http/views/] and [https://docs.djangoproject.com/en/4.1/topics/forms/]. Remember to add these views to `app/urls.py` when you are done.
+## (TODO) Step 1. Download the instructor HW4 solutions from CANVAS
+Once homework 4 is done, you will be able to download the solutions from CANVAS. We would like you to replace all of your files with these solutions. This includes:
+*  attendancechimp/app/urls.py
+*  attendancechimp/app/views.py
+*  attendancechimp/app/models.py 
+*  attendancechimp/templates/app/* (all of the files in here)
+*  attendancechimp/templates/base.html
 
-As you implement this functionality, you may have to change your data model in `models.py`. Remember to run `python manage.py migrate` if you do. Also, you may have to create new templates as necessary. It is your responsibility to learn enough about Django to make it all work -- please do use online resources, the internet is your friend here.
+You can actually safely replace all of the files in attendancechimp. See Ed for details if this doesn't work as you expect.
 
-## Step 1. The `/app/create` View (TODO)
-An instructor can visit the `/app/create` view, this loads a page with a webform that allows an instructor to create a course.  This view should only load if the user is logged in and they are an instructor. If not logged in, redirect the user too the login view `/accounts/login`.
+Our instructor solution contains code that does some visual processing of the qr codes. You will have to have to install some other libraries to make this work.
+First, make sure that you are in your virtual environment.
+```
+$ source venv/bin/activate
+(venv) $
+```
+Then, install the following packages:
+```
+(venv) $ pip install python-opencv pillow
+```
+If you are using a conda environment:
+```
+(base) $ conda install opencv pillow
+```
 
-This form contains:
-1. A field for a course name
-2. A field for a course number or code
-3. An start date of the course
-4. An end date of the course
-5. A meeting time/frequency of the course
-6. A "create" button that will create this course and add it to the database
+## (TODO) Step 2. Write A Helper Function getUploadsForCourse
+In `attendancechimp/app/models.py`, you will add a new helper function. This function will return all of the valid uploads for a particular course. Here is how the function will be called:
+```
+def getUploadsForCourse(id):
+```
+* Input: id is a course id referring to the auto_increment_id in the Course model.
+* Output: A list of QRCodeUpload objects for that course.
 
-When the instructor hits "create", the form data is sent to Django via a POST request. The following error checking logic must be implemented. You must return some error state if one of these conditions is met.
-1. There is no identical course in the database.
-2. An instructor is not teaching another course at the same time.
-3. The end date is before the start date.
+The function should have the following behavior:
+* Check to see if the id argument refers to a valid course (i.e., there exists a course with that id in the database), if not return an empty list.
+* If there is a course, get all of the QRCodeUpload objects associated with that course. Do not return it yet!
+* You must write logic to find those QRCodeUpload objects that are valid uploads (that means they were uploaded while the class was meeting):
+  - Each Course has a start and end time, and a list of days on which it meets.
+  - Each QRCodeUpload has a uploaded timestamp of when the object was created
+  - You must find all QRCodeUploads whose timestamp is contained in it's course's start and end time AND is uploaded on a valid course meeting day.
+* You need to return all of the QRCodeUpload objects that are valid as a list.
 
-If there are no errors, then the instructor is redirected to a success page. This success page will contain three personalized URLs. 
-   - `/app/join?course_id=xyz` A logged in student can join the course
-   - `/app/attendance?course_id=xyz` A logged in instructor can display a QR code
-   - `/app/upload?course_id=xyz` A logged in student can upload a picture of the QR code
-`xyz` is a code unique to the course. It should be long enough/opaque enough that it can't be easily guessed. Hint you should generate this when you save a new course and associate it with the course. 
+## (TODO) Step 2. Create A `/app/getUploads?course=id` API End Point
+You will create a new API endpoint accessed with the URL `http://localhost:8000/app/getUploads`. An instructor can visit the `/app/getUploads?course=id`, this should load all of the data class attendance for the course associated with the code `id`. 
 
-## Step 2. The `/app/join?course_id=xyz` View (TODO)
-A student can access the `/app/join?course_id=xyz` to join a course. This view should only load if the user is logged in and they are a student. If not logged in, redirect the user too the login view `/accounts/login`. This view should have
+This can be done in `attendancechimp/app/urls.py` and should trigger a view function called getUploads in `attendancechimp/app/views.py`.
+ 
+## (TODO) Step 3. The getUploads(request) View
+This view function processes an HTTP GET request to the url `http://localhost:8000/app/getUploads`. This function should have the following behavior:
+1. Check to see if there is a URL argument ?course=id
+2. If not, return an error (see other functions in our solution views.py on how to do that).
+3. If it does have the parameter, call getUploadsForCourse(id) on the id passed in via the URL.
+4. You should return the results in a JSON format.
 
-1. The course name printed at the top of the page.
-2. The course number printed underneath it.
-3. A large button that says "join".
 
-When a user hits "join" it triggers an HTTP POST request that associates a student with a course with code `xyz`. This request should check the following conditions:
-1. The student must not be associated with another course meeting at the same time.
-
-If successful, the view should redirect to a success page.
-
-## Step 3. The `/app/attendance?course_id=xyz` View (TODO)
-An instructor can visit the `/app/attendance?course_id=xyz` view (i.e., visits), this page display's a QR code that can be used for attendance.  This view should only load if the user is logged in and they are an instructor. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the instructor is not associated with course `xyz`, then you should redirect to an error page.
-
-This view should have the following logic:
-1. Generate a random string let's call this `class_code` and store this string in the database. 
-2. Along with this string, store the time this code was generated in the database. The course should also be associated with this string.
-3. Send `class_code` as a variable to a Django template
-4. Generate a QR code based on `class_code` see examples here https://davidshimjs.github.io/qrcodejs/
-
-## Step 4. The `/app/upload?course_id=xyz` View (TODO)
-A student can access the `/app/upload?course_id=xyz` to upload a QR code. This view should only load if the user is logged in and they are a student. If not logged in, redirect the user too the login view `/accounts/login`. Furthermore, if the student is not associated with course `xyz`, then you should redirect to an error page.
-Let's not worry about validating the QR code this week. Let's just get the mechanics of storing the data appropriately. The view should have the following form:
-
-1. A file upload dialog (takes an image)
-2. A upload button.
-
-When a user hits "upload" it triggers an HTTP POST request that stores the file contents in the database.
-
-## Grading
-Step 1-4 successful.
-
-1 point for each.
-
-## Step 5. Demo
-Next week, we will get a bit better about systematically testing this application. For this assignment, take a screen recording of you performing all of the tasks described here. Show the functionality and then show that the database has been updated appropriately (e.g., via SQLite Query).
 
