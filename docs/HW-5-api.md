@@ -49,7 +49,7 @@ $ source venv/bin/activate
 ```
 Then, install the following packages:
 ```
-(venv) $ pip install python-opencv pillow
+(venv) $ pip install opencv-python pillow
 ```
 If you are using a conda environment:
 ```
