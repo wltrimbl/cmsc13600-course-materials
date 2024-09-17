@@ -61,7 +61,7 @@ At a high level here are all the entities that you have:
 * QR Codes (uploads that are associated with lectures and students)
 
 ### Implementing the Data Model (TODO)
-Your data model should implment these associations between these entities. Complete `models.py` with this data model. After completion run:
+Your data model should implement these associations between these entities. Complete `models.py` with this data model. After completion run:
 ```
 (venv) $ python manage.py makemigrations app
 (venv) $ python manage.py migrate

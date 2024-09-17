@@ -52,7 +52,7 @@ $ git pull
 ```
 $ git checkout -b hw_0
 ```
-3. Read the project spec for the homework assignment (for this week it is https://github.com/sjyk/cmsc13600-course-project/blob/main/docs/HW-0-Git.md). This will describe what you have to do and how you need to test it.
+3. Read the project spec for the homework assignment (for this week it is https://github.com/wiltrimbl/cmsc13600-course-materials/blob/main/docs/HW-0-Git.md). This will describe what you have to do and how you need to test it.
 
 4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
 ```
@@ -70,7 +70,7 @@ $ git checkout -b hw_0
 ```
  $ git push --set-upstream origin hw_0
 ```
-8. After pushing your changes visit the repository in github. For example, mine is [https://github.com/CMSC-13600-Data-Engineering/project-sjyk] Replace sjyk with your github username. Click on "pull requests". [https://github.com/CMSC-13600-Data-Engineering/project-sjyk/pulls]. Create a new pull request that compares your "week_i" branch to main.
+8. After pushing your changes visit the repository in github. This url should have your github username in it.  Click on "pull requests".  Create a new pull request that compares your "week_i" branch to main.
 
 9. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/project-sjyk/pulls/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
 
@@ -89,7 +89,10 @@ Full credit 2/2 tests passed, No credit else.
 ## FAQ
 1.) I'm having github ssh problems on MacOSX
 
-Follow this post:
+The official documentation is here:
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github
+
+This Medium post describes creating an SSH key pair and configuring it for use with github:
 https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
 
 2. I don't know if what I'm seeing is correct?
