@@ -20,8 +20,8 @@ If you haven't taken a class before that uses github classrooms, you will have t
 ### Common Issues on Windows
 If you haven't taken a class before that uses github classrooms, you will have to set up ssh authentication. On Windows, these instructions will work: https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
 
-## Step 2. Retrieve the Course Files
-Use the command line interface to to ``clone'' the 
+## Step 2. Retrieve the Course Files  (TODO:  check authetnication steps)
+Use the command line interface to to ``clone'' the
 repository you made above. You can cut and paste the repo url from the github web interface. DONT COPY AND PASTE BELOW, change the user name accordingly after you are done accepting the github classsroom assignment.
 ```
 $ git clone git@github.com:CMSC-13600-Data-Engineering/project-<your github name>.git app
@@ -37,9 +37,11 @@ Your branch is up to date with 'origin/main'.
 ```
 
 ## (TODO) Step 3. Make a First Submission
-Every course TODO will be listed accordingly in these documents. This week we want you to do a dry run.
+The specifications for the homeworks are listed in this repository; the cmsc13600-course-project repo is a template for you to modify and use to manage your code.  This week we want you to do a dry run and add a few files and change a few attributes.
 
-Each week, you will complete the following steps to finish and submit your assignments. In the `app` folder, you can run the following commands.
+Each week, you will make changes to your repository and submit a branch of your repository to gradescope.
+
+Open a gitbash/Terminal window, change directory to ththe `app` folder, you can run the following commands.
 
 1. Make sure you are working on the "main" branch and that it is up-to-date
 ```
@@ -50,7 +52,7 @@ $ git pull
 ```
 $ git checkout -b hw_0
 ```
-3. Read the project spec for the homework assignment (for this week it is https://github.com/sjyk/cmsc13600-course-project/blob/main/docs/HW-0-Git.md). This will describe what you have to do and how you need to test it. 
+3. Read the project spec for the homework assignment (for this week it is https://github.com/sjyk/cmsc13600-course-project/blob/main/docs/HW-0-Git.md). This will describe what you have to do and how you need to test it.
 
 4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
 ```
@@ -60,7 +62,7 @@ $ git checkout -b hw_0
 ```
  $ git add names.txt
 ```
-6. Commit your changes, this creates a log of what you did. 
+6. Commit your changes, this creates a log of what you did.
 ```
  $ git commit -m 'We added names to the repository'
 ```
@@ -69,10 +71,10 @@ $ git checkout -b hw_0
  $ git push --set-upstream origin hw_0
 ```
 8. After pushing your changes visit the repository in github. For example, mine is [https://github.com/CMSC-13600-Data-Engineering/project-sjyk] Replace sjyk with your github username. Click on "pull requests". [https://github.com/CMSC-13600-Data-Engineering/project-sjyk/pulls]. Create a new pull request that compares your "week_i" branch to main.
-   
+
 9. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/project-sjyk/pulls/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
 
-10. EVERY project partner must submit on Canvas even if you are working from the same repository.
+10. EVERY project partner must submit on gradescope even if you are working from the same repository.
 
 11. Before you start the next week's assignment, you need to merge in the pull request you submitted.
 
@@ -90,7 +92,7 @@ Full credit 2/2 tests passed, No credit else.
 Follow this post:
 https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
 
-2. I don't know if what I'm seeing is correct? 
+2. I don't know if what I'm seeing is correct?
 
 Watch these screen recordingsas an example on my laptop
 * https://uchicago.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=d81fd73a-cc49-4bdc-be38-b13700e9f2c5
