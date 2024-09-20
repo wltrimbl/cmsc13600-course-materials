@@ -9,8 +9,8 @@ In the first homework assignment, you'll have to set up git on your own machines
 Set up git by following the instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 Complete the following steps to actually use git for the class:
-1. Create a [github.com] account if you don't have one already.
-2. Follow the github classrooms link [https://classroom.github.com/a/uz3I-hsS] to associate your github username with the course, and it will create a repository for you. If you are working in a team, only one of your team members needs to do this.
+1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
+2. Follow the github classrooms link [https://classroom.github.com/a/F3IvAIQz] to associate your github username with the course, and it will create a repository for you. If you are working in a team, only one of your team members needs to do this.
 4. Make sure to add all of your team members as collaborators on the new repository.
 5. Running through these steps creates a ``repository'' a place where all of your project code will be stored.
 
@@ -48,17 +48,15 @@ Open a gitbash/Terminal window, change directory to ththe `app` folder, you can 
 $ git checkout main
 $ git pull
 ```
-2. Before you start your work, you should create a new "branch". This tags each week's work and isolates it from previously done work. Replace the 0 below with the current week.
+2. Before you start your work, you should create a new git **branch**. This tags each week's work and indicates which part of the history should be examined by instructional staff.
 ```
 $ git checkout -b hw_0
 ```
-3. Read the project spec for the homework assignment (for this week it is https://github.com/wiltrimbl/cmsc13600-course-materials/blob/main/docs/HW-0-Git.md). This will describe what you have to do and how you need to test it.
+3. Read the project spec for the homework assignment.  
 
 4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
 ```
  $ git add <files go here>
-```
-5. (TODO) For this assignment, I want you to create a file called `names.txt` with all of your project partners names listed in a text file separated by new lines. Create this file and:
 ```
  $ git add names.txt
 ```
@@ -66,25 +64,28 @@ $ git checkout -b hw_0
 ```
  $ git commit -m 'We added names to the repository'
 ```
-7. Push your changes
+7. Push your changes; this copies your local history and all the changes you have **committed** and shares them with the git history on github.  
 ```
  $ git push --set-upstream origin hw_0
 ```
-8. After pushing your changes visit the repository in github. This url should have your github username in it.  Click on "pull requests".  Create a new pull request that compares your "week_i" branch to main.
-
-9. Once you create a pull request you can link to it through a URL, e.g., [https://github.com/CMSC-13600-Data-Engineering/project-sjyk/pulls/2] Pull requests are what we grade, add any helpful text that might help us grade your submission. There will be a link on canvas to submit your pull request.
 
 10. EVERY project partner must submit on gradescope even if you are working from the same repository.
 
 11. Before you start the next week's assignment, you need to merge in the pull request you submitted.
 
+## SpecificationA
+0.  Fork the cmsc13600-course-project repository as above and connect your fork to gradescope so that you make homework submissions.
+1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.
+2.  Remove the file `unneeded_data.csv` from the repository.
+3.  Add a file containing only the text columns of the database of Nobel laurates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without 
+
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
 1. Successfully added a file to the repository named `names.txt`
-2. Successfully created a pull request
-
-Full credit 2/2 tests passed, No credit else.
+2. Removed unneeded_data.csv
+3. Added nobel-prize-laurates.csv without the geographic shape field
+4. Submitted as a branch named hw_0.
 
 ## FAQ
 1.) I'm having github ssh problems on MacOSX
