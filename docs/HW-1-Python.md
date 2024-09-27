@@ -1,8 +1,13 @@
-# HW 1. Python
+# HW 1. python - git authorization  (due Oct 11, 2024) 
 I'm sure most of you know how program in Python, but some of you may have only encountered Python in a notebook environment. This assignment will make sure that everyone knows how to work with stand-alone python programs.
 
-## Step 1. Installing Python
-Get the latest version of Python at https://www.python.org/downloads/ or with your operating system’s package manager.
+## Step 0. Installing Python
+
+Make sure you have a working, post-2019 build of python on your laptop.  
+
+You can get the latest version of Python at https://www.python.org/downloads/,  with your operating system’s package manager, or from anaconda.
+
+## Step 1.  Scripts on the command line 
 
 Now we are going to use the command line to execute a python "script". Open up your terminal application (if you are on windows follow the instructions here https://docs.python.org/3/faq/windows.html#id2).
 
@@ -24,50 +29,33 @@ To exit you simply run
 ```
 >>>exit()
 ```
-Make sure you can do this before you proceed!
+### samplit-username.py  
+Write a script called `samplit-username.py` that, given a single filename as an argument, outputs a random sample of the lines in the file.  You must preserve the order of the lines and give each line a 1% chance of being retained.  The 1% sample of the lines in the input file should be printed to standard out.  Replace `username` in the script name with a string that identifies the human author.  
+On the command prompt, you should be able to run 
+```
+$ python samplit-username.py  nobel-prize-laurates.csv
+```
 
-## (TODO) Step 2. Anatomy of a Python Program
-Python programs are organized into .py files. Each file contains a bit of code that can be executed. 
+and get between 6 and 15 lines of output.
 
-Here you'll play around a bit with this organization so we get a feel for how files are typically organized. 
+(Yes, you may use argparse if you find it helpful.  No, you don't need to handle errors like file doesn't exist or argument doesn't exist elegantly.)
 
-1. Use your terminal to navigate to the `app` folder we created in the last assignment.
-2. Follow the assignment initialization steps in the previous homework using the branch name `hw1` this time.
-3. Create a new file called `data13600.py` in the `app` folder with the following content:
-```
-def foo():
-  print('foo()')
+##  Step 2.  Merging content from mutliple creators. 
 
-BAZ = 'baz'
+1.  When you have an adequately working samplit-username.py script, add it to your git repository.  (This entails git add, git commit, and git push).  
+
+2.  Find a partner and authorize your partner to access your repository on github.  
+
+3.  Add your partner's repo to the list of **remote** 
+
 ```
-4. Save this file, and run the python shell like we did above:
+git remote add 
 ```
-$ python
-Python 3.x.y
-[GCC 4.x] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> import data13600
->>> data13600.foo()
-foo()
->>> data13600.BAZ
-'baz'
-```
-5. We can also try something different here:
-```
-$ python
-Python 3.x.y
-[GCC 4.x] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> from data13600 import *
->>> foo()
-foo()
->>> BAZ
-'baz'
-```
-6. Add `data13600.py` to your repository, commit, and push it to submit (following the previous assignment's instructions).
+
+4.  
 
 ## Grading
-1. A correctly formed pull request is submitted to gradescope 
-2. The pull request correctly contains data13600.py
+1. (2 points) `samplit-xxx.py` has correct behavior when used as above 
+2.  Repo contains two samplit-xxx.py's that were added by different authors according to git 
+3.  The two `samplit`s seem to be from different authors according to human inspection.
 
-Full Credit 2/2 Tests Pass, 0 Otherwise

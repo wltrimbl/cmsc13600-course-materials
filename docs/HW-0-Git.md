@@ -1,4 +1,4 @@
-# HW0. Using Git For Version Control
+# HW0. Using Git For Version Control  (Due Oct 4, 2024)
 Git is a distributed version control system that tracks changes in any set of computer files, usually used for coordinating work among programmers who are collaboratively developing source code during software development. Its goals include speed, data integrity, and support for distributed, non-linear workflows.
 
 Almost every data science and software engineering project uses a framework like Git to allow for multiple engineers to collaborate on a project.
@@ -10,7 +10,8 @@ Set up git by following the instructions here: https://git-scm.com/book/en/v2/Ge
 
 Complete the following steps to actually use git for the class:
 1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow the github classrooms link [https://classroom.github.com/a/F3IvAIQz] to associate your github username with the course, and it will create a repository for you. If you are working in a team, only one of your team members needs to do this.
+2. Follow the github classrooms link https://classroom.github.com/a/iSA_rfep
+ to associate your github username with the course, and it will copy the template repository for you. 
 4. Make sure to add all of your team members as collaborators on the new repository.
 5. Running through these steps creates a ``repository'' a place where all of your project code will be stored.
 
@@ -73,11 +74,11 @@ $ git checkout -b hw_0
 
 11. Before you start the next week's assignment, you need to merge in the pull request you submitted.
 
-## SpecificationA
+## Specification
 0.  Fork the cmsc13600-course-project repository as above and connect your fork to gradescope so that you make homework submissions.
 1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.
 2.  Remove the file `unneeded_data.csv` from the repository.
-3.  Add a file containing only the text columns of the database of Nobel laurates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without 
+3.  Add a file containing only the text columns of the database of Nobel laurates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without the geographical polygons.
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
