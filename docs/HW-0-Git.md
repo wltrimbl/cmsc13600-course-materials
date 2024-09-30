@@ -10,7 +10,7 @@ Set up git by following the instructions here: https://git-scm.com/book/en/v2/Ge
 
 Complete the following steps to actually use git for the class:
 1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow the github classrooms link https://classroom.github.com/a/X5AnY8BE 
+2. Follow the github classrooms link TBA
  to associate your github username with the course, and it will copy the template repository for you.   
 3.  This will give you a repository with a name like `https://github.com/CMSC13600-Aut2024/cmsc13600-project-bobbob`
 
