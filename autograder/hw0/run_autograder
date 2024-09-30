@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Set up autograder files
+
+chmod ugo+x /autograder/submission/helloworld.py
+cp -a /autograder/submission/data /autograder/source/
+cp /autograder/submission/cat.jpg /autograder/source/
+cp /autograder/submission/comic.png /autograder/source/
+cp /autograder/submission/randhead.py /autograder/source/
+cp /autograder/submission/helloworld.py /autograder/source/
+cp /autograder/submission/book.txt /autograder/source/
+cd /autograder/source
+
+python3 run_tests.py
+
