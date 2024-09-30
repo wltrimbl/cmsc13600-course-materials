@@ -10,10 +10,9 @@ Set up git by following the instructions here: https://git-scm.com/book/en/v2/Ge
 
 Complete the following steps to actually use git for the class:
 1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow the github classrooms link https://classroom.github.com/a/iSA_rfep
- to associate your github username with the course, and it will copy the template repository for you. 
-4. Make sure to add all of your team members as collaborators on the new repository.
-5. Running through these steps creates a ``repository'' a place where all of your project code will be stored.
+2. Follow the github classrooms link https://classroom.github.com/a/X5AnY8BE 
+ to associate your github username with the course, and it will copy the template repository for you.   
+3.  This will give you a repository with a name like `https://github.com/CMSC13600-Aut2024/cmsc13600-project-bobbob`
 
 ### Common Issues on MacOSx
 If you haven't taken a class before that uses github classrooms, you will have to set up ssh authentication. On MacOSX, these instructions will work: https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
@@ -38,11 +37,13 @@ Your branch is up to date with 'origin/main'.
 ```
 
 ## (TODO) Step 3. Make a First Submission
-The specifications for the homeworks are listed in this repository; the cmsc13600-course-project repo is a template for you to modify and use to manage your code.  This week we want you to do a dry run and add a few files and change a few attributes.
+The workflow for submitting your work on github to gradescope is well described on this page from Harvey Mudd: https://hmc-cs-131-spring2020.github.io/howtos/assignments.html 
+
+The specifications for the homeworks are listed in this repository; the cmsc13600-project repo is a template for you to modify and use to manage your code.  This week we want you to do a dry run and add a few files and change a few attributes.
 
 Each week, you will make changes to your repository and submit a branch of your repository to gradescope.
 
-Open a gitbash/Terminal window, change directory to ththe `app` folder, you can run the following commands.
+Open a gitbash (on Windows) or Terminal (on MacOS/linux) window, change directory to your home folder, and run the following commands.
 
 1. Make sure you are working on the "main" branch and that it is up-to-date
 ```
@@ -78,14 +79,14 @@ $ git checkout -b hw_0
 0.  Fork the cmsc13600-course-project repository as above and connect your fork to gradescope so that you make homework submissions.
 1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.
 2.  Remove the file `unneeded_data.csv` from the repository.
-3.  Add a file containing only the text columns of the database of Nobel laurates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without the geographical polygons.
+3.  Add a file containing only the text columns of the database of Nobel laureates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without the geographical polygons.
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
 1. Successfully added a file to the repository named `names.txt`
 2. Removed unneeded_data.csv
-3. Added nobel-prize-laurates.csv without the geographic shape field
+3. Added nobel-prize-laureates.csv without the geographic shape field
 4. Submitted as a branch named hw_0.
 
 ## FAQ

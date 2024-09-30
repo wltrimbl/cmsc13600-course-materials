@@ -1,5 +1,7 @@
 # CMSC 13600 Assignments / Course Project
+
 | number | topic | date  | 
+| --- | --- | 
 | HW 0 | setup git / public key authentication |  Oct 4 | 
 | HW 1 | setup git collaboration  |  Oct 11 | 
 | HW 2 | setup/install django / ORM | Oct 18 | 

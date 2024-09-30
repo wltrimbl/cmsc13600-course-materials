@@ -33,7 +33,7 @@ To exit you simply run
 Write a script called `samplit-username.py` that, given a single filename as an argument, outputs a random sample of the lines in the file.  You must preserve the order of the lines and give each line a 1% chance of being retained.  The 1% sample of the lines in the input file should be printed to standard out.  Replace `username` in the script name with a string that identifies the human author.  
 On the command prompt, you should be able to run 
 ```
-$ python samplit-username.py  nobel-prize-laurates.csv
+$ python samplit-username.py  nobel-prize-laureates.csv
 ```
 
 and get between 6 and 15 lines of output.
