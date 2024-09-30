@@ -68,23 +68,29 @@ $ git checkout -b hw_0
 3. Read the project spec for the homework assignment.  
 
 4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
+
 ```
  $ git add <files go here>
 ```
+For instance, 
+```
  $ git add names.txt
 ```
+
 6. Commit your changes, this creates a log of what you did.
+
 ```
  $ git commit -m 'We added names to the repository'
 ```
+
 7. Push your changes; this copies your local history and all the changes you have **committed** and shares them with the git history on github.  
 ```
  $ git push --set-upstream origin hw_0
 ```
 
-10. EVERY project partner must submit on gradescope even if you are working from the same repository.
+8. EVERY project partner must submit on gradescope even if you are working from the same repository.
 
-11. Before you start the next week's assignment, you need to merge in the pull request you submitted.
+9. Before you start the next week's assignment, you need to merge in the pull request you submitted.
 
 ## Specification
 0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
