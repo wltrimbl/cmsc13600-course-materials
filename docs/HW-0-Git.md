@@ -94,7 +94,7 @@ For instance,
 
 ## Specification
 0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
-1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.
+1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include your name.
 2.  Remove the file `unneeded_data.csv` from the repository.
 3.  Add a file containing only the text columns of the database of Nobel laureates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without the geographical polygons.
 
