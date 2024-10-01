@@ -2,13 +2,10 @@
 
 # Set up autograder files
 
-chmod ugo+x /autograder/submission/helloworld.py
-cp -a /autograder/submission/data /autograder/source/
-cp /autograder/submission/cat.jpg /autograder/source/
-cp /autograder/submission/comic.png /autograder/source/
-cp /autograder/submission/randhead.py /autograder/source/
-cp /autograder/submission/helloworld.py /autograder/source/
-cp /autograder/submission/book.txt /autograder/source/
+cp -a /autograder/submission /autograder/source/
+cp -a /autograder/submission/names.txt /autograder/source/
+cp -a /autograder/submission/nobel-prize-laureates.csv /autograder/source/
+cp -a /autograder/submission/unneded_data.csv /autograder/source/
 cd /autograder/source
 
 python3 run_tests.py
