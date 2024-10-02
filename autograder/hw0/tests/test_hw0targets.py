@@ -23,7 +23,7 @@ class TestHelloWorld(unittest.TestCase):
     @weight(1)
     @number("1.0")
     def test_names_txt_exists(self):
-        '''Test names.txt exists'''
+        '''Test names.txt exists and is long enough to contain a name.'''
         self.assertTrue(os.path.exists(AG+"names.txt"),
                         "names.txt does not exist!")
         file_size = os.path.getsize('names.txt')
@@ -31,10 +31,11 @@ class TestHelloWorld(unittest.TestCase):
        
     @weight(1)
     @number("2.0")
-    def test_unneeded_data_absent(self):
-        '''Test unneeded_data.csv does not exist'''
+    def test_template_files_present_and_unneeded_data_absent(self):
+        '''Test unneeded_data.csv does not exist, and manage.py from template is present.'''
         self.assertFalse(os.path.exists(AG+"unneeded_data.csv"),
                         "unneeded_data.csv exists!")
+        self.assertTrue(os.path.exists(AG+"attendancechimp/manage.py"), "attendancechimp/manage.py does not exist!")
 
     @weight(1)
     @number("3.0")
@@ -56,7 +57,7 @@ class TestHelloWorld(unittest.TestCase):
     @weight(1)
     @number("4.0")
     def test_git_branch(self):
-        '''Submission completed '''
+        '''Submission completed.  Free point.'''
         # gradescope strips out the git history, apparently using a github
         # API endpoint that provides a snapshot of the repo as a tarball.
         # It might be possible to grade these semiautomatically, but it would 

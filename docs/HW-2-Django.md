@@ -2,13 +2,29 @@
 Django is a free and open-source, Python-based web framework that runs on a web server. It follows the model–template–views architectural pattern. This assignment will assume that you have mastered git and the command line. See course staff if you are lost
 
 ## Step 1. Setting Up A Virtual Environment
+
+Typical python installations have tens of thousands of files, and by the time there are enough things installed to be useful, the hundreds of python packages start interfering with each other.  Virtual environments are nothing more than directories on your hard drive that permit you to have different "environments" with different (potentially incompatible) packages installed.  We will create a virtual environment called "venv" to keep all the things you have to install for django from messing up your main python environment.
+
+If you use conda to manage your python, create a conda environment:
+### conda environment
+
+```
+conda create --name venv
+conda activate venv
+```
+
+Be aware, you will need to run `conda activate venv` each time you start working on the project.
+
+### python virtualenv  
+If you are not using conda, you can use python's virtualenv.
+
 The venv module supports creating lightweight “virtual environments”, each with their own independent set of Python packages installed in their 
 site directories. A virtual environment is created on top of an existing Python installation, known as the virtual environment’s “base” Python, 
 and may optionally be isolated from the packages in the base environment, so only those explicitly installed in the virtual environment are available.
 
-Go into your app folder that you have cloned in the previous assignment.
+Go into your project folder that you have cloned in a previous assignment.
 ```
-$ cd app
+$ cd cmsc13600-project-testytesterator
 ```
 Then inside the folder, create a virtual environment
 ```
@@ -30,14 +46,8 @@ To finish, you can simply run
 Here are some links to help you:
 * https://docs.python.org/3/library/venv.html#creating-virtual-environments
 
-Or, if you are using `conda` from a previous class:
-```
-conda create --name venv
-conda activate venv
-```
-
-## Step 2. Installing Django (TODO)
-First, navigate the `app` folder as before.
+## Step 2. Installing Django 
+Now navigate the `project` folder and make sure your virtual environment is avtivated.  (The shell prompt should include (venv) if this is the case.
 
 Now we will get ready to do some actual work. As a first step, install the following packages to your environment
 ```
@@ -45,10 +55,11 @@ Now we will get ready to do some actual work. As a first step, install the follo
 ```
 If you are using conda, this should be:
 ```
-conda install -y Django pytest
+(venv) $ conda install -y Django pytest
 ```
 
-It is worth using this first week to read up on Django as we will be using it throughout the class [https://docs.djangoproject.com/en/4.1/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
+Read up on Django,  we will be using it throughout the class [https://docs.djangoproject.com/en/5.0/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
+
 ```
 (venv) $ cd attendancechimp/
 (venv) $ python manage.py migrate
@@ -65,7 +76,7 @@ Follow the instructions in the terminal. Finally, you can test to see if your Dj
 While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
 
 ## Step 3. Understanding the Database (TODO)
-Stop the `runserver` process above. You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. 
+Stop the `runserver` process above. You can do this by changing focus to the terminal window running the server (and producing voluminous web server log messages) and typing Control-C.  You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. 
 
 For SQLITE. Here's what you can do. Two options:
 (1) https://sqlitebrowser.org/

@@ -12,6 +12,7 @@ class TestHelloWorld(unittest.TestCase):
     def setUp(self):
         files = glob("samplit-*.py")
         self.files = files
+        print(",".join(files))
 
     @weight(1)
     @number("1.0")
