@@ -81,8 +81,7 @@ Stop the `runserver` process above. You can do this by changing focus to the ter
 For SQLITE. Here's what you can do. Two options:
 (1) https://sqlitebrowser.org/
 - You can install that to your applications and simply open your
-db.sqlite3 file from that GUI. This is easy and it worked for me just
-fine on an old mac
+db.sqlite3 file from that GUI. 
 
 (2) You can use the command line. Run the command:
 ```
@@ -90,21 +89,22 @@ $ sqlite3 db.sqlite3
 SQLite version 3.39.4 2022-09-07 20:51:41
 Enter ".help" for usage hints.
 ```
+## Specification
+1.  Create a new file called `tables.txt` in the app folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
+2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  
+3. Create an API endpoint called "/app/sum" that, in response to an HTTP GET request with parameters n1 and n2 that are strings representing strings or integers, will return a string with the decimal representation of the sum.  
 
-Create a new file called `tables.txt` in the app folder:
-1. List all of the database tables currently in your database and what command you used to find them, put this in the file.
+* "http://localhost:8000/app/sum?n1=1&n2=2"  should return "3"
+* "http://localhost:8000/app/sum?n1=10&n2=2"  should return "12"
+* "http://localhost:8000/app/sum?n1=0.1&n2=2"  should return "2.1" or "2.1000000000" or something equivalent.
 
-## Grading
+## Grading (8 points)
 1. Does tables.txt exist and is it accurate?
-
-Full credit 1/1 passed, no credit otherwise.
+2. (3 points)  Does "/app/time" work?
+3. (4 points)  Does "/app/sum" work? 
 
 ## FAQ
-1. Do I need to merge in previous PRs before I do anything?
-
-Yes, please do merge your previous assignments in. We will give you more detailed instructions about merging in later assignments.
-
-2. What's the deal with virtual environments?
+1) What's the deal with virtual environments?
 
 Virtual environments allows you to manage separate package installations for different projects. It creates a “virtual” isolated Python installation. When you switch projects, you can create a new virtual environment which is isolated from other virtual environments. You benefit from the virtual environment since packages can be installed confidently and will not interfere with another project’s environment.
 
@@ -125,7 +125,7 @@ An ALTERNATIVE to virtual environments is to use a packaging framework called co
 conda create --name venv
 ```
 
-3) What is "activating"?
+2) What is "activating"?
 
 Activating a virtual environment means that we are putting ourselves into that isolated python environment (i.e. ,we can install whatever we want inside it!)
 
@@ -142,7 +142,7 @@ With conda, there is similar syntax:
 ```
 conda activate venv
 ```
-4) How do I install new packages?
+3) How do I install new packages?
 
 Activate your virtual environment first and then run:
 ```
@@ -152,3 +152,4 @@ or if you are using conda run:
 ```
 conda install -y ...
 ```
+These packages will be available only in the active virtual environment. 
