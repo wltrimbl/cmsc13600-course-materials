@@ -90,7 +90,6 @@ For instance,
 
 8. EVERY project partner must submit on gradescope even if you are working from the same repository.
 
-9. Before you start the next week's assignment, you need to merge in the pull request you submitted.
 
 ## Specification
 0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
