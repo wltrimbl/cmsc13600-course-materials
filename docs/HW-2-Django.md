@@ -5,6 +5,16 @@ Django is a free and open-source, Python-based web framework that runs on a web 
 
 Typical python installations have tens of thousands of files, and by the time there are enough things installed to be useful, the hundreds of python packages start interfering with each other.  Virtual environments are nothing more than directories on your hard drive that permit you to have different "environments" with different (potentially incompatible) packages installed.  We will create a virtual environment called "venv" to keep all the things you have to install for django from messing up your main python environment.
 
+"virtual environments” are alternative python install directories that have sets of Python packages installed in their
+site directories, independently of other environments. 
+A virtual environment is created on top of an existing Python installation, known as the virtual environment’s “base” Python,
+and may optionally be isolated from the packages in the base environment, so only those explicitly installed in the virtual environment are available.
+
+Go into your project folder that you have cloned in a previous assignment.
+```
+$ cd cmsc13600-project-testytesterator
+```
+
 If you use conda to manage your python, create a conda environment:
 ### conda environment
 
@@ -18,14 +28,7 @@ Be aware, you will need to run `conda activate venv` each time you start working
 ### python virtualenv  
 If you are not using conda, you can use python's virtualenv.
 
-The venv module supports creating lightweight “virtual environments”, each with their own independent set of Python packages installed in their 
-site directories. A virtual environment is created on top of an existing Python installation, known as the virtual environment’s “base” Python, 
-and may optionally be isolated from the packages in the base environment, so only those explicitly installed in the virtual environment are available.
 
-Go into your project folder that you have cloned in a previous assignment.
-```
-$ cd cmsc13600-project-testytesterator
-```
 Then inside the folder, create a virtual environment
 ```
 $ virtualenv venv
@@ -89,6 +92,23 @@ $ sqlite3 db.sqlite3
 SQLite version 3.39.4 2022-09-07 20:51:41
 Enter ".help" for usage hints.
 ```
+
+## Creating API endpoints
+To instruct the django server to respond to HTTP requests, you need to modify two files, `urls.py` and `views.py`.
+
+`urls.py` defines a list called urlpatterns that defines the URLs the server will attempt to respond to.  You must add `django.urls.path` objects with the name of the pattern and the name of the python subroutine to be run in response to this URL.
+
+You will need to create `views.py`  
+
+```
+from django.http import HttpResponse
+
+def dummypage(request):
+     if request.method == "GET": 
+         return HttpResponse("No content here, sorry!")
+
+```
+
 ## Specification
 1.  Create a new file called `tables.txt` in the app folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
 2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  
