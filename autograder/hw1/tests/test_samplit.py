@@ -14,7 +14,7 @@ class TestHelloWorld(unittest.TestCase):
         files = glob("samplit-*.py")
         self.files = files
         print(",".join(files))
-        self.python_cmd = "python3" if sys.version_info[0] >= 3 else "python"
+        self.python_cmd = "python" if platform.system() == "Windows" else ("python3" if sys.version_info[0] >= 3 else "python")
 
     @weight(1)
     @number("1.0")
