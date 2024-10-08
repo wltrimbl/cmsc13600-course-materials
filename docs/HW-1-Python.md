@@ -70,7 +70,7 @@ In the event of a merge conflict, the files that can't be merged are **marked up
 
 After these steps you (hopefully) have a new commit which has your changes, your partner's work, and any changes you made during the conflict resolution step.  
 
-Once the merge is complete, you can share your changes with your partner:
+5. Once the merge is complete, you can share your changes with your partner:
 `git push origin hw_1`  # updates your github
 `git push partner hw_1`  # updates your partner's github (!)
 
