@@ -98,6 +98,19 @@ To instruct the django server to respond to HTTP requests, you need to modify tw
 
 `urls.py` defines a list called urlpatterns that defines the URLs the server will attempt to respond to.  You must add `django.urls.path` objects with the name of the pattern and the name of the python subroutine to be run in response to this URL.
 
+
+```
+from django.urls import path
+from . import views
+urlpatterns = [
+    ...   # other endpoint definitions here
+    path("dummypage", views.dummypage, name="index"),
+]
+```
+
+This will cause the server to respond to requests for localhost:8000/dummypage by running the dummypage subroutine in views.py.
+
+
 You will need to create `views.py`  
 
 ```
@@ -109,6 +122,12 @@ def dummypage(request):
 
 ```
 
+Running 
+```
+python manage.py runserver
+```
+and navigating to `http://localhost:8000/dummypage`  should give you the (newly-minted) API result.
+
 ## Specification
 1.  Create a new file called `tables.txt` in the app folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
 2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  
@@ -119,7 +138,7 @@ def dummypage(request):
 * "http://localhost:8000/app/sum?n1=0.1&n2=2"  should return "2.1" or "2.1000000000" or something equivalent.
 
 ## Grading (8 points)
-1. Does tables.txt exist and is it accurate?
+1. (1 point) Does tables.txt exist and is it accurate?
 2. (3 points)  Does "/app/time" work?
 3. (4 points)  Does "/app/sum" work? 
 
