@@ -61,16 +61,25 @@ git checkout -b partner   # create a new branch named partner, check it out
 git pull partner <branchname>  # replace branchname with the relevant branch in partner's remote
 ```
 
+This step creates a branch (named partner) that contains your partner's changes (but not your own).
+
+5.  Merge your branch with your partner's branch:
+
+```
+git checkout hw_1  # switch to hw_1 branch
+git merge partner  # bring in changes from partner, make a new commit if possible
+```
+
 This step may work seamlessly, or it may cause a ***merge conflict*** if your changes and your partner's changes touch the same parts of the same files.  
 
-In the event of a merge conflict, the files that can't be merged are **marked up** with symbols indicating the lines that were changed.  The unmerged files contain both sets of changes.  To complete the merge you must 
+In the event of a merge conflict, the files that can't be merged are **marked up** with symbols indicating the lines that were changed.  https://carpentries-incubator.github.io/git-novice-branch-pr/08-conflict/  The unmerged files contain both sets of changes.  To complete the merge you must 
 1.  delete the unused/unneeded redundant lines and the merge symbols
 2.  `git add <filename>`  
 3.  `git commmit -m "<commit message>"`
 
 After these steps you (hopefully) have a new commit which has your changes, your partner's work, and any changes you made during the conflict resolution step.  
 
-5. Once the merge is complete, you can share your changes with your partner:
+6. Once the merge is complete, you can share your changes with your partner:
 `git push origin hw_1`  # updates your github
 `git push partner hw_1`  # updates your partner's github (!)
 
