@@ -40,13 +40,13 @@ and get between 6 and 15 lines of output.
 
 (Yes, you may use argparse if you find it helpful.  No, you don't need to handle errors like file doesn't exist or argument doesn't exist elegantly.)
 
-##  Step 2.  Merging content from mutliple creators. 
+##  Step 2.  Merging content from multiple creators. 
 
 1.  When you have an adequately working samplit-username.py script, add it to your git repository.  (This entails git add, git commit, and git push).  
 
-2.  Find a partner and authorize your partner to access your repository on github.  
+2.  Find a partner and authorize your partner to access your repository on github.    This is on the website, behind "Settings" and "Collaborators" buttons.  You need to give your partners "write" access.
 
-3.  Add your partner's repo to the list of **remote** 
+3.  Add your partner's repo to the list of **remote**s
 
 ```
 git remote add partner  git@github.com:CMSC13600-Aut2024/cmsc13600-project-partnerusername.git
@@ -83,7 +83,7 @@ After these steps you (hopefully) have a new commit which has your changes, your
 `git push origin hw_1`  # updates your github
 `git push partner hw_1`  # updates your partner's github (!)
 
-Don't be afraid of messing things up.  Every change that you have added to git history with `git add` and `git commit` is something you can expect to get back from your history if you run the right commmands.  (This usually requires 10 minutes of skimming seemingly irrelevant discussion on stackoverflow, but that's modern life.)  
+Don't be afraid of messing things up.  Every change that you have added to git history with `git add` and `git commit` is something you can expect to get back from your history if you run the right commands.  (This usually requires 10 minutes of skimming seemingly irrelevant discussion on stackoverflow, but that's modern life.)  
 
 ## Grading ( 4 points) 
 1. (2 points) `samplit-xxx.py` has correct behavior when used as above 
