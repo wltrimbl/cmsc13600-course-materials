@@ -1,4 +1,4 @@
-# HW 2. Python Django
+# HW 2. Python Django  (Due Oct 18, 2024)
 Django is a free and open-source, Python-based web framework that runs on a web server. It follows the model–template–views architectural pattern. This assignment will assume that you have mastered git and the command line. See course staff if you are lost
 
 ## Step 1. Setting Up A Virtual Environment
@@ -76,9 +76,12 @@ Follow the instructions in the terminal. Finally, you can test to see if your Dj
 ```
 (venv) $ python manage.py runserver
 ```
+
+Be warned, this command starts the web server, and does not terminate and return you to the command prompt until the server is stopped.  
+
 While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
 
-## Step 3. Understanding the Database (TODO)
+## Step 3. Understanding the Database (
 Stop the `runserver` process above. You can do this by changing focus to the terminal window running the server (and producing voluminous web server log messages) and typing Control-C.  You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. 
 
 For SQLITE. Here's what you can do. Two options:
