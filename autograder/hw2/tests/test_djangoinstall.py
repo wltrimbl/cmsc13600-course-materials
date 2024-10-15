@@ -40,6 +40,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Test for tables.txt file'''
         self.assertTrue(os.path.exists("attendancechimp/tables.txt") or
                         os.path.exists("tables.txt"),
+                        os.path.exists("app/tables.txt"),
                         "tables.txt not found")
 
     @weight(1)
@@ -51,6 +52,8 @@ class TestHelloWorld(unittest.TestCase):
              tables = "attendancechimp/tables.txt"
         if os.path.exists("tables.txt"):
              tables = "tables.txt"
+        if os.path.exists("app/tables.txt"):
+             tables = "app/tables.txt"
         self.assertTrue(tables != "", "tables.txt not found")
         content = open(tables, "r").read()
         self.assertTrue("auth_permission" in content,
