@@ -1,6 +1,6 @@
 ALL:=$(wildcard *)
 
-autograder.zip: $(ALL)
+autograder.zip: clean $(ALL)
 	rm autograder.zip
 	zip -r autograder.zip *
 
