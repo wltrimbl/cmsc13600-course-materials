@@ -15,23 +15,29 @@ from gradescope_utils.autograder_utils.decorators import weight, number
 
 
 class TestHelloWorld(unittest.TestCase):
-    '''Test django install, contents of tables.csv'''
-    def setUp(self):
-        if not getattr(self, "SERVER", False):
-            self.SERVER = True
-            return
+    '''Test django install, contents of tables.txt'''
+    @classmethod
+    def setUpClass(self):
         print("starting server")
         p = subprocess.Popen(['python3', 'attendancechimp/manage.py', 'runserver'],
                              close_fds=True)
         sleep(2)
-        self.SERVER = True
+        # Make sure server is still running in background, or error
+#       self.assertEqual(p.returncode, None, "Error starting server"+ repr(p.communicate()))
+#         self.assertIsNone(p.returncode)
+        self.SERVER = p
+
+    @classmethod
+    def tearDownClass(self):
+        self.SERVER.terminate()
 
     @weight(1)
     @number("1.0")
     def test_exist_tables(self): # Should this be tables.txt or .csv
-        '''Test for tables.csv file'''
-        self.assertTrue(os.path.exists("attendancechimp/tables.csv"),
-                        "tables.csv not found")
+        '''Test for tables.txt file'''
+        self.assertTrue(os.path.exists("attendancechimp/tables.txt") or
+                        os.path.exists("tables.txt"),
+                        "tables.txt not found")
 
 
     @weight(1)
@@ -53,6 +59,7 @@ class TestHelloWorld(unittest.TestCase):
         now = datetime.now().astimezone(CDT)
         timestr = now.strftime("%H:%M")
         response = requests.get('http://127.0.0.1:8000/app/time')
+        print(response.text)
         self.assertIn(timestr.split(":")[0], response.text.split(":")[0])
 
     @weight(1)
@@ -66,6 +73,7 @@ class TestHelloWorld(unittest.TestCase):
         now = datetime.now().astimezone(CDT)
         timestr = now.strftime("%H:%M")
         response = requests.get('http://127.0.0.1:8000/app/time')
+        print(response.text)
         self.assertIn(timestr.split(":")[1], response.text.split(":")[1])
 
     @weight(1)
@@ -83,6 +91,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Test that the sum function returns the correct output 1+2'''
         self.setUp()
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=1&n2=2')
+        print(response.text)
         self.assertIn('3', response.text)
 
     @weight(1)
@@ -91,6 +100,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Test that the sum function returns the correct output 10.5+-6.2'''
         self.setUp()
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=10.5&n2=-6.2')
+        print(response.text)
         self.assertIn('4.3', response.text)
 
     @weight(1)
@@ -99,4 +109,5 @@ class TestHelloWorld(unittest.TestCase):
         '''Test that the sum function returns the correct output 0.1+2.2'''
         self.setUp()
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=0.1&n2=2.2')
+        print(response.text)
         self.assertIn('2.3', response.text)
