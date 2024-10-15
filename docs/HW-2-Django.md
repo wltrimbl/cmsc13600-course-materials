@@ -145,6 +145,8 @@ and navigating to `http://localhost:8000/dummypage`  should give you the (newly-
 2. (3 points)  Does "/app/time" work?
 3. (4 points)  Does "/app/sum" work? 
 
+Note, seven of these depend on your django server starting up in the autograder environment.  Let instructional staff know if you need help debugging.
+
 ## FAQ
 1) What's the deal with virtual environments?
 
