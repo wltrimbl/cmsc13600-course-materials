@@ -39,8 +39,9 @@ class TestHelloWorld(unittest.TestCase):
     def test_exist_tables(self): # Should this be tables.txt or .csv
         '''Test for tables.txt file'''
         self.assertTrue(os.path.exists("attendancechimp/tables.txt") or
-                        os.path.exists("tables.txt"),
-                        os.path.exists("app/tables.txt"),
+                        os.path.exists("tables.txt") or 
+                        os.path.exists("app/tables.txt") or 
+                        os.path.exists("attendancechimp/app/tables.txt"),
                         "tables.txt not found")
 
     @weight(1)
@@ -54,8 +55,14 @@ class TestHelloWorld(unittest.TestCase):
              tables = "tables.txt"
         if os.path.exists("app/tables.txt"):
              tables = "app/tables.txt"
+        if os.path.exists("attendancechimp/app/tables.txt"):
+             tables = "attendancechimp/app/tables.txt"
         self.assertTrue(tables != "", "tables.txt not found")
+        print(tables)
         content = open(tables, "r").read()
+        print(content)
+        # Now test that tables.txt has expected django boilerplate 
+        # table names:
         self.assertTrue("auth_permission" in content,
                         "tables.txt does not contain expected table names")
         self.assertTrue("auth_user" in content,
@@ -76,7 +83,7 @@ class TestHelloWorld(unittest.TestCase):
     @weight(1)
     @number("3.0")
     def test_time_hour(self):
-        '''Test that the hour of the time view is correct'''
+        '''Strict test that the hour of the time view is correct, correctly formatted'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
         CDT = zoneinfo.ZoneInfo("America/Chicago")
@@ -90,7 +97,7 @@ class TestHelloWorld(unittest.TestCase):
     @weight(1)
     @number("4.0")
     def test_time_minutes(self):
-        '''Test that the minutes of the time view is correct'''
+        '''Strict test that the minutes of the time view is correct, correctly formatted'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
         CDT = zoneinfo.ZoneInfo("America/Chicago")
@@ -107,7 +114,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Test the sum view runs ok'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
-        q = check_output(["curl", "--no-progress-meter", "http://127.0.0.1:8000/app/sum"])
+        q = check_output(["curl", "--no-progress-meter", "http://127.0.0.1:8000/app/sum?n1=0&n2=0"])
         print(q)
 
     @weight(1)
