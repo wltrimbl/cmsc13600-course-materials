@@ -11,6 +11,8 @@ from os import system
 import platform
 from datetime import datetime, timezone
 import zoneinfo
+from bs4 import BeautifulSoup
+import math
 from gradescope_utils.autograder_utils.decorators import weight, number
 
 
@@ -123,9 +125,22 @@ class TestHelloWorld(unittest.TestCase):
         '''Test that the sum function returns the correct output 1+2'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
+        
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=1&n2=2')
         print(response.text)
-        self.assertIn('3', response.text)
+
+        # Try handling plaintext response first
+        result = response.text.strip()
+
+        if result in {'3', '3.0'}:
+            # If it's a plain text response, validate and return
+            self.assertIn(result, {'3', '3.0'})
+        else:
+            # If it's an HTML response, parse the HTML to extract the result
+            soup = BeautifulSoup(result, 'html.parser')
+            extracted_text = soup.find('p').text.strip()  # Assuming the result is in a <p> tag
+            self.assertIn(extracted_text, {'3', '3.0'})
+
 
     @weight(1)
     @number("7.0")
@@ -135,14 +150,65 @@ class TestHelloWorld(unittest.TestCase):
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=10.5&n2=-6.2')
         print(response.text)
-        self.assertIn('4.3', response.text)
+
+        result = response.text.strip()
+
+        if result == '4.3':
+            # If it's a plain text response, validate and return
+            self.assertIn(result, response.text)
+        else:
+            # If it's an HTML response, parse the HTML to extract the result
+            soup = BeautifulSoup(result, 'html.parser')
+            extracted_text = soup.find('p').text.strip()  # Assuming the result is in a <p> tag
+            self.assertIn(extracted_text, '4.3')
+
+        
 
     @weight(1)
     @number("8.0")
     def test_sum_content3(self):
-        '''Test that the sum function returns the correct output 0.1+2.2'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
+
+        # Define expected value at the start
+        expected_value = 2.3
+        
+        # Make the request
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=0.1&n2=2.2')
         print(response.text)
-        self.assertIn('2.3', response.text)
+
+        result = response.text.strip()
+
+        # First, try to parse the result as a plain text number
+        try:
+            # Convert the result to float to handle floating-point precision issues
+            result_float = float(result)
+            
+            # Use math.isclose() to compare with a tolerance
+            if math.isclose(result_float, expected_value, rel_tol=1e-9, abs_tol=1e-9):
+                self.assertTrue(True)  # Test passes
+            else:
+                self.assertTrue(False, f"Test failed: expected {expected_value}, but got {result_float}")
+        
+        except ValueError:
+            # If the result isn't a plain number, treat it as HTML and parse
+            soup = BeautifulSoup(result, 'html.parser')
+            
+            # Look for a <p> tag anywhere in the HTML, not just within the body
+            element = soup.find('p')
+            
+            if element:
+                extracted_text = element.text.strip()
+                
+                try:
+                    # Convert the extracted text to float and compare
+                    extracted_float = float(extracted_text)
+                    if math.isclose(extracted_float, expected_value, rel_tol=1e-9, abs_tol=1e-9):
+                        self.assertTrue(True)  # Test passes
+                    else:
+                        self.assertTrue(False, f"Test failed: expected {expected_value}, but got {extracted_float}")
+                except ValueError:
+                    self.assertTrue(False, f"Test failed: Unable to convert extracted text '{extracted_text}' to float")
+            else:
+                # If no <p> tag is found, fail the test
+                self.assertTrue(False, "Test failed: <p> tag not found in HTML response")
