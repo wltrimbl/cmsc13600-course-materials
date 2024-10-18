@@ -76,24 +76,25 @@ Here's a basic overview of how Django templates work:
 
 Django templates are powerful and flexible, allowing developers to create dynamic web pages efficiently. They are a key component in separating the logic from the presentation layer in Django applications.
 
-## Step 1. Creating a Front-End Element (TODO)
+## Step 1. Creating a Front-End Element 
 While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `attendancechimp/templates/app/index.html` to have the following:
 1. The webpage contains a brief bio of you and your teammates at the top
 2. The webpage bolds and highlights the name of the current logged in user 
 3. All content is neatly centered on the page.
-4. Add a variable to the dictionary in `attendancechimp/app/views.py` that is displayed on the page. It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
+4. The page displays the current time.  A good way to do this is to write a function to generate the time (string), assign it to a context dictionary in `attendancechimp/app/views.py`, and display the variable from the context dictionary on the page using template substitution.  It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
 
-Note, app/views.py#L8. You can add variables to the empty dictionary
+Note, in app/views.py. in You can add variables to the empty dictionary
 ```
-return render(request, 'app/index.html', {'my_var': 'its value'})
+return render(request, 'app/index.html', context={'my_var': 'its value'})
 ```
 
-In the template index.html#L12, you can add the following code:
+In the template index.html, you can add the following code:
 ```
 {{my_var}}
 ```
 
-What happens when you visit that page now? Does it matter where you put it?
+And the symbol is replaced with the value from context.  
+Note, when the django server is running, changes you make to the code (`views.py`) and the templates take effect immediately; you don't need to restart the server hardly ever.
 
 ## HTML Form Basics
 HTML forms are used to collect user input on a web page. When a user submits a form, the data entered into the form fields is sent to a server for processing. 
@@ -114,27 +115,33 @@ Here's a basic overview of how HTML forms work with POST data:
        <input type="submit" value="Submit">
    </form>
    ```
-When the user hits submit on the website, the data is POST'ed to myview (triggering whatever python function you've mapped it to).
+When the user hits submit on the website, the browser sends a POST request to the endpoint myview.  Django consults `urls.py` and runs the function you've specified to respond to myview with POST data of username and password attached to the request.
 
-2. **Form Attributes**: The `<form>` tag contains attributes that specify where the form data should be sent (`action` attribute) and which HTTP method should be used (`method` attribute). In the example above, the form data will be sent to a file named "submit.php" using the POST method.
+2. **Form Attributes**: The `<form>` tag contains attributes that specify where the form data should be sent (`action` attribute) and which HTTP method should be used (`method` attribute). In the example above, the form data will be sent as an HTTP POST request to localhost:8000/myview 
 
 3. **Form Controls**: Each form control within the `<form>` element should have a unique `name` attribute. When the form is submitted, the browser collects the values of all form controls and sends them to the server as key-value pairs, where the key is the `name` attribute of the form control and the value is the data entered by the user.
 
 4. **Server-side Processing**: On the server side, you need to have a function that receives the POST data sent by the form. This script can then process the data, perform validation, interact with databases, and generate a response.
 
-   Example (PHP):
    ```
    def myView(request):
-     username = request.POST.get("username")
-     password = request.POST.get("password")
-     # ... do stuff here
+       username = request.POST.get("username")
+       password = request.POST.get("password")
+       # ... do stuff here
    ```
 
-5. **Response**: After processing the form data, the server typically sends a response back to the client (browser). This response could be a new web page, a success message, an error message, or any other relevant content.
+5. **Response**: After processing the form data, the server typically sends a response back to the client (browser). This response could be a new web page, a success message, an error message, or any other relevant content such as data.  
+
+```
+from django.http import HttpResponse
+from django.http import JsonResponse
+# or, if you want to send helpful error messages to your client:
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseServerError, Http404
+```
 
 Overall, HTML forms with POST data provide a way for users to interact with web applications by submitting data to the server for processing. This enables a wide range of functionalities such as user authentication, data submission, and more.
 
-## Step 2. Create User Form (TODO)
+## Step 2. Create User Form 
 Now it's your turn to create a new view and template pair that can load and collect data from the webpage. 
 
 1. Start by creating two new URLs `/app/new` and `/app/createUser` and their corresponding functions in `views.py`.
@@ -146,22 +153,26 @@ Now it's your turn to create a new view and template pair that can load and coll
      e. A "Sign Up" button that will create this student/instructor
      f. Note that this requires creating a new template! 
    - `/app/new` should only accept GET requests and should error if there is a POST request
-   - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/createUser`.
-     a. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
-     b. The system must check that email address is not used by any other user in the system. If there is already a user with that email address, return an error.
-     c. Otherwise, a new user is created and the user is signed in and a success response should be returned.
-     
-Note: to be able to log in you have to create a "Django" user (which might be different than the user in your data model frm HW3!). Check out the documentation for https://docs.djangoproject.com/en/5.0/ref/contrib/auth/ , this step needs to create two database objects one is a student/instructor and one is a django auth user. 
+   - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/createUser`. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
+   - The system must check that email address is not used by any other user in the system. If there is already a user with that email address, return an error.
+   - Otherwise, a new user is created and the user is signed in and a success response should be returned.
+    
+You can leverage django's built-in User table, which has some of what you want: password handling, in particular. 
+ 
+Check out the documentation for user creation: https://docs.djangoproject.com/en/5.0/ref/contrib/auth/  You will have essentially three kinds of user in your databse: admin users (django admin users, who can see some web-based database tools on /admin), student users and instructor users (who are different only in their interaction with your app later on.)
 
-## What do you need to change for Step 2?
+## What files do you need to change ?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
 1. `attendancechimp/attendancechimp/urls.py` You modify this file to create the two new views/urls in Step 2.
 2. `attendancechimp/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
 3. `attendancechimp/templates/app/...` You need to create a new template for `/app/new` to handle the web form.
 
-## Grading
-1. Step 1 successfully completed.
-2. Step 2 successfully completed.
-
-2/2 for Full Credit, 0 otherwise.
+## Grading  (haven't assigned points / autograder yet)
+1.  index page meets requirements (bio, centered, current time) 
+2.  Form at /app/new has required elements
+3.  POST to /app/createUser returns success
+4.  GET to /app/createUser returns error 
+5.  login attempt (POST) to /accounts/login returns success
+6.  index page highlights current user
+  
 
