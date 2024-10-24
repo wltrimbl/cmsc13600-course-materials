@@ -7,7 +7,9 @@ cp -r /autograder/submission/attendancechimp /autograder/source
 
 cd /autograder/source
 
-rm -Rf /autograder/source/examples/
+rm -Rf /autograder/source/examples/  # may contain tests that I don't want to run
+
+rm -Rf /autograder/source/attendancechimp/app/migrations  # can cause problems 
 
 python3 run_tests.py
 
