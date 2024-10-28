@@ -12,6 +12,8 @@ import platform
 from datetime import datetime, timezone
 import zoneinfo
 from gradescope_utils.autograder_utils.decorators import weight, number
+import re
+import json
 
 
 class TestDjangoApp(unittest.TestCase):
@@ -34,34 +36,61 @@ class TestDjangoApp(unittest.TestCase):
     def tearDownClass(self):
         self.SERVER.terminate()
 
-    @weight(0)
+    @weight(1)
     @number("1.0")
-    def test_exist_tables(self): # Should this be tables.txt or .csv
-        '''Test for tables.txt file'''
-        self.assertTrue(os.path.exists("attendancechimp/tables.txt") or
-                        os.path.exists("tables.txt"),
-                        os.path.exists("app/tables.txt"),
-                        "tables.txt not found")
+    def check_index_page(self): 
+        '''Check the index page for proper requirements'''
+        index_page_text = requests.get("http://localhost:8000/index.html").text
+        center_check = re.search("text-align:\s*center",index_page_text, re.IGNORECASE)
+
+        current_time = datetime.now().hour
+        hour_check = re.search(f"{current_time}", index_page_text)
+
+        metadata_file = "/autograder/submission_metadata.json"
+        try:
+            with open(metadata_file, "r") as md:
+                metadata = json.load(md)
+            submission_name = metadata["users"][0]["name"]
+            name_check = re.search(re.escape(submission_name), index_page_text, re.IGNORECASE)
+        except (KeyError, IndexError, FileNotFoundError) as e:
+            self.fail(f"Error loading submission metadata: {e}")
+
+
+        self.assertTrue(center_check is not None,
+        "Text not properly centered on page")
+        self.assertTrue(hour_check is not None,
+        "Time not properly displayed on page")
+        self.assertTrue(name_check is not None,
+        "Bio not properly displayed on page")
+
+
 
     @weight(1)
-    @number("1.5")
+    @number("2")
     def test_content_tables(self): # Should this be tables.txt or .csv
-        '''Test content of tables.txt file'''
-        tables = ""
-        if os.path.exists("attendancechimp/tables.txt"):
-             tables = "attendancechimp/tables.txt"
-        if os.path.exists("tables.txt"):
-             tables = "tables.txt"
-        if os.path.exists("app/tables.txt"):
-             tables = "app/tables.txt"
-        self.assertTrue(tables != "", "tables.txt not found")
-        content = open(tables, "r").read()
-        self.assertTrue("auth_permission" in content,
-                        "tables.txt does not contain expected table names")
-        self.assertTrue("auth_user" in content,
-                        "tables.txt does not contain expected table names")
-        self.assertTrue("django_migrations" in content,
-                        "tables.txt does not contain expected table names")
+        '''Checks the content of the new user form page'''
+        form_page_text = requests.get("http://localhost:8000/app/new").text
+
+        name_check = re.search("Name", form_page_text, re.IGNORECASE)
+        email_check = re.search("Email", form_page_text, re.IGNORECASE)
+        radio_check = re.search("radio", form_page_text, re.IGNORECASE)
+        password_check = re.search("Password", form_page_text, re.IGNORECASE)
+        sign_up_check = re.search("Sign\s*UP", form_page_text, re.IGNORECASE)
+
+        def post_fn_test():
+            user_dict = {
+                "Name": "Charlie",
+                "email": "test@test.org",
+                "Student/Instructor": "Instructor",
+                "Password": "Password123"
+            }
+            request.post("http://localhost:8000/app/new", json=user_dict)
+            response.raise_for_status() 
+        
+        with self.assertRaises(requests.exceptions.HTTPError):
+            requests.exceptions.HTTPError
+        
+        
 
 
     @weight(0)
