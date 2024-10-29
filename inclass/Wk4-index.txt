@@ -1,0 +1,70 @@
+Suppose we want to retrieve some rows and some columns, and for specificity, the rows need to be tested but the columns don't (we know which columns we need in advance.)  Imagine a huge, 50 million by 500 serialized table.
+
+cat data | grep IL      | cut -f 3,15      or
+cat data | cut -f 3,15  | grep IL          
+
+Do these two operations commmute?  (For some data, so not really.)
+
+which one runs faster?  
+
+
+We immediately suspect it's 2 because the data volume handled by grep IL is much smaller, but we can be deliberate about it.  The principle here of course is to do ration the expensive steps and do them as few times as possible; with inexpencive or unavoidable steps we are not as constrained.
+
+The creation of an index entails a cost; we have to amortize that cost; depending on context (and how fast we need answers) it may not make sense to create an index.     Creation of an index is a simple example of a space-time tradeoff.
+
+What are desirable properties for a search engine?
+	In response to a query,
+	The engine returns a list of responses.
+	The responses should be relevant (they should be good matches)
+	The responses should be ordered somehow from most likely to be useful to least likely to be useful.
+	The response shouldn't take 1000 seconds; life is short.
+	In case of a misspelled query, it would be nice if it included things that didn't maatch excactly, but that matched exactly things that are "close" by some mispelling metric.
+
+
+The two-by-two accuracy-reporting matrix has columns representing the Truth (hits and non-hits in the corpus) and rows representing the behavior of our intex (hits and non-hits in what the index returns).  It has four cells....
+      Truth
+     F     T
+
+guess
+F    TN    FN
+
+T    FP    TP
+
+There are two statistics with TRUTH in the denomiator: sensitivity (=recall) and specificity.  These are equivalently called the True positive rate and the true negative rate.   These are 
+SENS = TP / (TP + FN)   
+and 
+SPEC = TN / (TN + FP)  
+
+These can be used when knowledge of the truth is available, so in the lab and in hypothetical questions on exams.  
+
+
+The other two statistics, PPV, also called Precision, and NPV, have the prediction in the denomiator:
+
+PPV =    TP  / (TP + FP)
+NPV =    TN /  (TN + FN)  
+
+These are the go-to, relevant statistics when you are making inferences about the truth when the output of the classifier (or in this case, index) is known.
+
+We can build data structures that have parts that are not perfect: instead of an inverted index that looks up the location of exact-match words in the corpus, suppose we have an index that retrieves the targets in the corpus for both our query and also some other words that are somehow similar to our query.   We have more hits to sift through, but we may be able to overcome mispellings (and the loss of signal that results) this way.
+
+False positives and false negatives have qualitatively different effects on search.
+False positives give us irrelevant results.  These increase the cost of search, as either our code or the customer has non-target hits to sift through.
+False negatives cause signal to be lost; we don't find all the matches if we don't find all the matches.  For some applications (cough, social media) this may not be a problem. 
+
+n-gram l-tuple k-mer :  names for the practice of breaking (usually linguistic) corpora into fixed-length tokens.  
+The analysis of these fixed-length tokens is either by counting or by presence-absence. 
+
+"good book" can be digested into 2-grams   "go", "oo", "od", "d ", " b", "bo", another "oo", and "ok". 
+
+Jaccard similarity is one of our tools for comparing sets (of tokens); digest utterance 1 into bag of tokens 1, 
+digest utterance 2 into bag of tokens 2, and evaluate the three sets:
+number of tokens unique to 1,
+number of tokens unique to 2, and
+number of tokens common to both 1 and 2.
+
+Jaccard similarlity does not respect the triangle inequality.  This is unfortunate; there are some bounds that make sense for triangle-inequality-respecting distance metrics that don't apply to Jaccard.  We don't call 1-Jaccard a distance for this reason, it's called a "dissimilarity" because there's a mathematician somewhere who will interrupt and say that you can't use the word "distance" without satisfying the triangle inequality: D(A, B) >= D(A, C) + D(C, B).
+
+Jaccard similarity (A, B)  =  number of tokens ( tokens (A) intersection tokens(B) ) / number of tokens (tokens (A) union tokens(B) ) 
+
+You should be able to convince yourself that this lies between 0 and 1.   We're going to use it to try to find mispellings by creating an index of n-grams, and checking not only the query word but also words that have n-grams in commmon with the query word.
+
