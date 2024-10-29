@@ -124,6 +124,8 @@ class TestDjangoApp(unittest.TestCase):
                 "Password": "Password123"
             }
         response = requests.get("http://localhost:8000/app/createUser", json=user_dict)
+        if response.status_code == 404: 
+            self.assertTrue(False, "GET to app/createUser returns HTTP 404") 
         with self.assertRaises(requests.exceptions.HTTPError):
             response.raise_for_status() 
 
