@@ -1,7 +1,7 @@
 ALL:=$(wildcard *)
 
 autograder.zip: clean $(ALL)
-	rm autograder.zip
+	-rm autograder.zip
 	zip -r autograder.zip *
 
 clean:
