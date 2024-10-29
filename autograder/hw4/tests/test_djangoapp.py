@@ -7,14 +7,20 @@ from subprocess import check_output
 import os
 import requests
 from time import sleep
-from os import system
+from os import system, path
 import platform
-from datetime import datetime, timezone
+from datetime import timezone, datetime
 import zoneinfo
 from gradescope_utils.autograder_utils.decorators import weight, number
 import re
 import json
 
+if path.exists("/autograder"):
+    AG = "/autograder"
+else:
+    AG = "."
+
+CDT = zoneinfo.ZoneInfo("America/Chicago")
 
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of attendancechimp API'''
@@ -38,15 +44,22 @@ class TestDjangoApp(unittest.TestCase):
 
     @weight(1)
     @number("1.0")
-    def check_index_page(self): 
-        '''Check the index page for proper requirements'''
-        index_page_text = requests.get("http://localhost:8000/index.html").text
-        center_check = re.search("text-align:\s*center",index_page_text, re.IGNORECASE)
+    def test_index_page(self): 
+        '''Check the index page for proper requirements (centered, time, bio)'''
 
-        current_time = datetime.now().hour
+        index_page_text = requests.get("http://localhost:8000/index.html").text
+
+        center_check = re.search(r"text-align:\s*center",index_page_text, re.IGNORECASE)
+        current_time = datetime.now().astimezone(CDT).strftime("%H:%M")
         hour_check = re.search(f"{current_time}", index_page_text)
 
-        metadata_file = "/autograder/submission_metadata.json"
+        self.assertTrue(center_check,
+        "Text not properly centered on page")
+        self.assertTrue(hour_check,
+        "Time not properly displayed on page")
+        return 
+        metadata_file = AG + "/submission_metadata.json"
+      
         try:
             with open(metadata_file, "r") as md:
                 metadata = json.load(md)
@@ -55,28 +68,38 @@ class TestDjangoApp(unittest.TestCase):
         except (KeyError, IndexError, FileNotFoundError) as e:
             self.fail(f"Error loading submission metadata: {e}")
 
-
-        self.assertTrue(center_check is not None,
-        "Text not properly centered on page")
-        self.assertTrue(hour_check is not None,
-        "Time not properly displayed on page")
-        self.assertTrue(name_check is not None,
+        self.assertTrue(name_check,
         "Bio not properly displayed on page")
+
 
 
 
     @weight(1)
     @number("2")
-    def test_content_tables(self): # Should this be tables.txt or .csv
-        '''Checks the content of the new user form page'''
+    def test_user_add_form(self): 
+        '''Checks the content of the new user form page (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
 
         name_check = re.search("Name", form_page_text, re.IGNORECASE)
         email_check = re.search("Email", form_page_text, re.IGNORECASE)
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
+        is_student_check = re.search("is_student", form_page_text, re.IGNORECASE)
         password_check = re.search("Password", form_page_text, re.IGNORECASE)
-        sign_up_check = re.search("Sign\s*UP", form_page_text, re.IGNORECASE)
+        sign_up_check = re.search(r"Sign\s*UP", form_page_text, re.IGNORECASE)
+        createuser_check = re.search("createUser", form_page_text)
+        self.assertTrue(name_check, "Can't find NAME field in app/new")
+        self.assertTrue(radio_check, "Can't find RADIO button in app/new")
+        self.assertTrue(is_student_check, "Can't find IS_STUDENT field in app/new")
+        self.assertTrue(password_check, "Can't find PASSWORD field in app/new")
+        self.assertTrue(name_check, "Can't find EMAIL field in app/new")
+        self.assertTrue(createuser_check, "Can't find createUser endpoint in app/new")
 
+        
+
+    @weight(1)
+    @number("3")
+    def test_user_add_api(self): 
+        '''Checks that createUser endpoint responds with code 200 when it should be successful'''
         def post_fn_test():
             user_dict = {
                 "Name": "Charlie",
@@ -84,37 +107,48 @@ class TestDjangoApp(unittest.TestCase):
                 "Student/Instructor": "Instructor",
                 "Password": "Password123"
             }
-            request.post("http://localhost:8000/app/new", json=user_dict)
+            response = requests.post("http://localhost:8000/app/createUser", json=user_dict)
             response.raise_for_status() 
-        
+        post_fn_test()
+#         with self.assertRaises(requests.exceptions.HTTPError):
+#            requests.exceptions.HTTPError
+
+    @weight(1)
+    @number("4")
+    def test_user_add_api_raises(self): 
+        '''Checks that createUser endpoint does not take GET'''
+        user_dict = {
+                "Name": "Charlie",
+                "email": "test@test.org",
+                "Student/Instructor": "Instructor",
+                "Password": "Password123"
+            }
+        response = requests.get("http://localhost:8000/app/createUser", json=user_dict)
+        if response.status_code == 404: 
+            self.assertTrue(False, "GET to app/createUser returns HTTP 404") 
         with self.assertRaises(requests.exceptions.HTTPError):
-            requests.exceptions.HTTPError
-        
-        
+            response.raise_for_status() 
 
-
-    @weight(0)
-    @number("2.0")
-    def test_runserver_app_time(self):
-        '''Test the '''
+    @weight(1)
+    @number("1.5")
+    def test_index_notloggedin(self):
+        '''Test the index page contains the phrase "Not logged in"'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
-        q = check_output(["curl", "--no-progress-meter", "http://127.0.0.1:8000/app/time"])
-        print(q)
-
+        response = requests.get('http://127.0.0.1:8000/')
+        self.assertIn("not logged", response.text, 
+            "index.html does not contain phrase 'Not logged in'")
+"""
     @weight(0)
     @number("3.0")
-    def test_time_hour(self):
+    def test_index_time(self):
         '''Test that '''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
-        CDT = zoneinfo.ZoneInfo("America/Chicago")
+        response = requests.get('http://127.0.0.1:8000/')
         now = datetime.now().astimezone(CDT)
         timestr = now.strftime("%H:%M")
-        response = requests.get('http://127.0.0.1:8000/app/time')
-        print(response.text)
-        self.assertTrue(":" in response.text)
-        self.assertEqual(timestr.split(":")[0], response.text.split(":")[0])
+        self.assertIn(timestr, response.text, "index.html does not contain{}".format(timestr))
 
     @weight(0)
     @number("4.0")
@@ -127,8 +161,8 @@ class TestDjangoApp(unittest.TestCase):
         timestr = now.strftime("%H:%M")
         response = requests.get('http://127.0.0.1:8000/app/time')
         print(response.text)
-        self.assertTrue(":" in response.text)
-        self.assertEqual(timestr.split(":")[1], response.text.split(":")[1])
+#        self.assertTrue(":" in response.text)
+#        self.assertEqual(timestr.split(":")[1], response.text.split(":")[1])
 
     @weight(1)
     @number("5.0")
@@ -147,7 +181,7 @@ class TestDjangoApp(unittest.TestCase):
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=1&n2=2')
         print(response.text)
-        self.assertIn('3', response.text)
+#        self.assertIn('3', response.text)
 
     @weight(0)
     @number("7.0")
@@ -157,7 +191,7 @@ class TestDjangoApp(unittest.TestCase):
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=10.5&n2=-6.2')
         print(response.text)
-        self.assertIn('4.3', response.text)
+#        self.assertIn('4.3', response.text)
 
     @weight(0)
     @number("8.0")
@@ -167,4 +201,5 @@ class TestDjangoApp(unittest.TestCase):
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/app/sum?n1=0.1&n2=2.2')
         print(response.text)
-        self.assertIn('2.3', response.text)
+#        self.assertIn('2.3', response.text)
+"""

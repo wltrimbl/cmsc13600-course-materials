@@ -150,9 +150,10 @@ Now it's your turn to create a new view and template pair that can load and coll
      b. University Email Address
      c. A radio button instructor/student
      d. A password
-     e. A "Sign Up" button that will create this student/instructor
+     e. A "Sign Up" button that will create this student/instructor 
      f. Note that this requires creating a new template! 
    - `/app/new` should only accept GET requests and should error if there is a POST request
+   - /app/createUser requires a POST request with the fields `email`, `user_name`, `password`, and `is_student` defined.
    - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/createUser`. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
    - The system must check that email address is not used by any other user in the system. If there is already a user with that email address, return an error.
    - Otherwise, a new user is created and the user is signed in and a success response should be returned.
@@ -163,7 +164,7 @@ Check out the documentation for user creation: https://docs.djangoproject.com/en
 
 ## What files do you need to change ?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
-1. `attendancechimp/attendancechimp/urls.py` You modify this file to create the two new views/urls in Step 2.
+1. `attendancechimp/attendancechimp/urls.py` and `attendancechimp/app/urls.py` You modify these file to create the two new views/endpoints `new` and `createUser`.
 2. `attendancechimp/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
 3. `attendancechimp/templates/app/...` You need to create a new template for `/app/new` to handle the web form.
 

@@ -7,5 +7,5 @@ apt-get -y install tzdata
 
 
 # pytest is for debugging
-pip3 install gradescope-utils pylint pytest django requests
+pip3 install gradescope-utils pylint pytest django requests Pillow
 
