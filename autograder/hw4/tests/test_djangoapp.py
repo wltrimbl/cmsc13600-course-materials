@@ -43,12 +43,12 @@ class TestDjangoApp(unittest.TestCase):
     @weight(1)
     @number("1.0")
     def test_index_page(self): 
-        '''Check the index page for proper requirements'''
+        '''Check the index page for proper requirements (centered, time, bio)'''
 
         index_page_text = requests.get("http://localhost:8000/index.html").text
 
         center_check = re.search(r"text-align:\s*center",index_page_text, re.IGNORECASE)
-        current_time = datetime.now().hour
+        current_time = datetime.now().astimezone(CDT).strftime("%H:%M")
         hour_check = re.search(f"{current_time}", index_page_text)
 
         self.assertTrue(center_check,
@@ -75,7 +75,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(1)
     @number("2")
     def test_user_add_form(self): 
-        '''Checks the content of the new user form page'''
+        '''Checks the content of the new user form page (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
 
         name_check = re.search("Name", form_page_text, re.IGNORECASE)
@@ -97,7 +97,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(1)
     @number("3")
     def test_user_add_api(self): 
-        '''Checks that createUser endpoint responds with code 200'''
+        '''Checks that createUser endpoint responds with code 200 when it should be successful'''
         def post_fn_test():
             user_dict = {
                 "Name": "Charlie",
@@ -112,7 +112,7 @@ class TestDjangoApp(unittest.TestCase):
 #            requests.exceptions.HTTPError
 
     @weight(1)
-    @number("3")
+    @number("4")
     def test_user_add_api_raises(self): 
         '''Checks that createUser endpoint does not take GET'''
         user_dict = {
@@ -125,16 +125,16 @@ class TestDjangoApp(unittest.TestCase):
         with self.assertRaises(requests.exceptions.HTTPError):
             response.raise_for_status() 
 
-    @weight(0)
-    @number("2.0")
+    @weight(1)
+    @number("1.5")
     def test_index_notloggedin(self):
-        '''Test the '''
+        '''Test the index page contains the phrase "Not logged in"'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/')
         self.assertIn("not logged", response.text, 
             "index.html does not contain phrase 'Not logged in'")
-
+"""
     @weight(0)
     @number("3.0")
     def test_index_time(self):
@@ -147,7 +147,6 @@ class TestDjangoApp(unittest.TestCase):
         timestr = now.strftime("%H:%M")
         self.assertIn(timestr, response.text, "index.html does not contain{}".format(timestr))
 
-"""
     @weight(0)
     @number("4.0")
     def test_time_minutes(self):
