@@ -20,6 +20,8 @@ if path.exists("/autograder"):
 else:
     AG = "."
 
+CDT = zoneinfo.ZoneInfo("America/Chicago")
+
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of attendancechimp API'''
     @classmethod
@@ -142,7 +144,6 @@ class TestDjangoApp(unittest.TestCase):
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/')
-        CDT = zoneinfo.ZoneInfo("America/Chicago")
         now = datetime.now().astimezone(CDT)
         timestr = now.strftime("%H:%M")
         self.assertIn(timestr, response.text, "index.html does not contain{}".format(timestr))
