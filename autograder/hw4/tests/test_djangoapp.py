@@ -46,13 +46,14 @@ class TestDjangoApp(unittest.TestCase):
     @number("1.0")
     def test_index_page(self): 
         '''Check the index page for proper requirements (centered, time, bio)'''
-
-        index_page_text = requests.get("http://localhost:8000/index.html").text
-
+        request = requests.get("http://localhost:8000/index.html")
+        index_page_text = request.text
+        self.assertEqual(request.status_code, 200, 
+              "Server returns error for http://localhost:8000/index.html.  Content:{}".format(
+              index_page_text))
         center_check = re.search(r"text-align:\s*center",index_page_text, re.IGNORECASE)
         current_time = datetime.now().astimezone(CDT).strftime("%H:%M")
         hour_check = re.search(f"{current_time}", index_page_text)
-
         self.assertTrue(center_check,
         "Text not properly centered on page")
         self.assertTrue(hour_check,
@@ -71,7 +72,15 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(name_check,
         "Bio not properly displayed on page")
 
-
+    @weight(0)
+    @number("1.5")
+    def test_new_page_renders(self): 
+        '''Check the /app/new page returns without error.'''
+        request = requests.get("http://localhost:8000/app/new")
+        new_page_text = request.text
+        self.assertEqual(request.status_code, 200, 
+              "Server returns error for http://localhost:8000/app/new.  Content:{}".format(
+              new_page_text))
 
 
     @weight(1)
@@ -136,8 +145,11 @@ class TestDjangoApp(unittest.TestCase):
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
         response = requests.get('http://127.0.0.1:8000/')
-        self.assertIn("not logged", response.text, 
-            "index.html does not contain phrase 'Not logged in'")
+        self.assertEqual(response.status_code, 200, 
+              "Server returns error for http://localhost:8000/.  Content:{}".format(
+              response.text))
+        self.assertIn("not logged", response.text.lower(), 
+            "http://localhost:8000/ response does not contain phrase 'Not logged in'")
 """
     @weight(0)
     @number("3.0")
