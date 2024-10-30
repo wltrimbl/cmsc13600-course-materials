@@ -83,7 +83,8 @@ class TestDjangoApp(unittest.TestCase):
         request = requests.get("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
-            "Server returns error for http://localhost:8000/app/new.  Content:{}".format(
+            "Server returns error for http://localhost:8000/app/new.\n"+
+            "Content:{}".format(
             new_page_text))
 
     @weight(1)
@@ -92,18 +93,18 @@ class TestDjangoApp(unittest.TestCase):
         '''Checks the content of the new user form page (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
 
-        name_check = re.search("Name", form_page_text, re.IGNORECASE)
-        email_check = re.search("Email", form_page_text, re.IGNORECASE)
-        radio_check = re.search("radio", form_page_text, re.IGNORECASE)
-        is_student_check = re.search("is_student", form_page_text, re.IGNORECASE)
-        password_check = re.search("Password", form_page_text, re.IGNORECASE)
+        name_check = re.search("user_name", form_page_text, re.IGNORECASE) 
+        email_check = re.search("email", form_page_text) 
+        radio_check = re.search("radio", form_page_text, re.IGNORECASE) 
+        is_student_check = re.search("is_student", form_page_text) 
+        password_check = re.search("password", form_page_text) 
         sign_up_check = re.search(r"Sign\s*UP", form_page_text, re.IGNORECASE)
         createuser_check = re.search("createUser", form_page_text)
-        self.assertTrue(name_check, "Can't find NAME field in app/new")
-        self.assertTrue(radio_check, "Can't find RADIO button in app/new")
-        self.assertTrue(is_student_check, "Can't find IS_STUDENT field in app/new")
-        self.assertTrue(password_check, "Can't find PASSWORD field in app/new")
-        self.assertTrue(name_check, "Can't find EMAIL field in app/new")
+        self.assertTrue(name_check, "Can't find 'user_name' field in app/new")
+        self.assertTrue(radio_check, "Can't find radio button in app/new")
+        self.assertTrue(is_student_check, "Can't find 'is_student' field in app/new")
+        self.assertTrue(password_check, "Can't find 'password' field in app/new")
+        self.assertTrue(email_check, "Can't find 'email field in app/new")
         self.assertTrue(createuser_check, "Can't find createUser endpoint in app/new")
 
     @weight(1)
@@ -113,10 +114,10 @@ class TestDjangoApp(unittest.TestCase):
         when it should be successful'''
         def post_fn_test():
             user_dict = {
-                "Name": "Charlie",
+                "user_name": "Charlie",
                 "email": "test@test.org",
-                "Student/Instructor": "Instructor",
-                "Password": "Password123"
+                "is_student": "0",
+                "password": "Password123"
             }
             response = requests.post("http://localhost:8000/app/createUser", json=user_dict)
             response.raise_for_status()
