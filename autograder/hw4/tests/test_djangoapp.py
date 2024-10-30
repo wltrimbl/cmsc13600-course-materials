@@ -61,7 +61,8 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(center_check,
             "Text not properly centered on page")
         self.assertTrue(hour_check,
-            "Time not properly displayed on page")
+            "Time {} not properly displayed on page\n{}".format(
+             current_time, index_page_text))
         return
         metadata_file = AG + "/submission_metadata.json"
 
@@ -120,7 +121,9 @@ class TestDjangoApp(unittest.TestCase):
                 "password": "Password123"
             }
             response = requests.post("http://localhost:8000/app/createUser", data=user_dict)
-            response.raise_for_status()
+            if response.status_code != 200 :
+                self.assertEqual(response.status_code, 200, 
+                    "Wrong response code - {}".format(response.text) ) 
         post_fn_test()
 #         with self.assertRaises(requests.exceptions.HTTPError):
 #            requests.exceptions.HTTPError
@@ -137,7 +140,8 @@ class TestDjangoApp(unittest.TestCase):
             }
         response = requests.get("http://localhost:8000/app/createUser", json=user_dict)
         if response.status_code == 404:
-            self.assertTrue(False, "GET to app/createUser returns HTTP 404")
+            self.assertTrue(False, "GET to app/createUser returns HTTP 404 {}".format(
+                reseponse.text))
         with self.assertRaises(requests.exceptions.HTTPError):
             response.raise_for_status()
 
