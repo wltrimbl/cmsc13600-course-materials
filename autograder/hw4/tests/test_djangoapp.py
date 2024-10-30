@@ -119,7 +119,7 @@ class TestDjangoApp(unittest.TestCase):
                 "is_student": "0",
                 "password": "Password123"
             }
-            response = requests.post("http://localhost:8000/app/createUser", json=user_dict)
+            response = requests.post("http://localhost:8000/app/createUser", data=user_dict)
             response.raise_for_status()
         post_fn_test()
 #         with self.assertRaises(requests.exceptions.HTTPError):
