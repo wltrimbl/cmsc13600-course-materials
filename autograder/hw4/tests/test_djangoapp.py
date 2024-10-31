@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 
 import unittest
-from glob import glob
 import subprocess
-from subprocess import check_output
-import os
 import requests
 from time import sleep
-from os import system, path
-import platform
-from datetime import timezone, datetime
+from os import path
+from datetime import datetime
 import zoneinfo
-from gradescope_utils.autograder_utils.decorators import weight, number
 import re
 import json
 import string
 import random
+from bs4 import BeautifulSoup
+from gradescope_utils.autograder_utils.decorators import weight, number
 
 if path.exists("/autograder"):
     AG = "/autograder"
@@ -40,7 +37,7 @@ class TestDjangoApp(unittest.TestCase):
             self.SERVER = p
         else:
             self.DEADSERVER = True
-            print(pp.communicate())
+            self.deadserver_error = p.communicate()
 
         self.user_dict =  {
                 "user_name": "Charlie",
@@ -57,8 +54,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(1)
     @number("1.0")
     def test_index_page(self):
-        '''Check the index page for proper requirements (centered,
-        time, bio)'''
+        '''Check the index page for proper requirements (centered, time, bio)'''
         request = requests.get("http://localhost:8000/index.html")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -87,8 +83,22 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(name_check,
             "Bio not properly displayed on page")
 
+    @weight(1)
+    @number("1.2")
+    def test_index_notloggedin(self):
+        '''Test the index page contains the phrase "Not logged in"'''
+        if self.DEADSERVER:
+            self.assertFalse(True, "Django server didn't start" + 
+                 self.deadserver_error)
+        response = requests.get('http://127.0.0.1:8000/')
+        self.assertEqual(response.status_code, 200,
+                        "Server returns error for http://localhost:8000/.  Content:{}".format(
+                        response.text))
+        self.assertIn("not logged", response.text.lower(),
+                      "http://localhost:8000/ response does not contain phrase 'Not logged in'")
+
     @weight(0)
-    @number("1.5")
+    @number("2.0")
     def test_new_page_renders(self):
         '''Check the /app/new page returns without error.'''
         request = requests.get("http://localhost:8000/app/new")
@@ -99,7 +109,7 @@ class TestDjangoApp(unittest.TestCase):
             new_page_text))
 
     @weight(1)
-    @number("2")
+    @number("2.1")
     def test_user_add_form(self):
         '''Checks the content of the new user form page (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
@@ -109,7 +119,6 @@ class TestDjangoApp(unittest.TestCase):
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
         is_student_check = re.search("is_student", form_page_text)
         password_check = re.search("password", form_page_text)
-        sign_up_check = re.search(r"Sign\s*UP", form_page_text, re.IGNORECASE)
         createuser_check = re.search("createUser", form_page_text)
         self.assertTrue(name_check, "Can't find 'user_name' field in app/new")
         self.assertTrue(radio_check, "Can't find radio button in app/new")
@@ -132,9 +141,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0.5)
     @number("3.5")
     def test_user_add_duplicate_email_api(self):
-        '''Checks that createUser endpoint responds with an error when
-        asked to add duplicate email.
-        '''
+        '''Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
         dup_user["user_name"] = "Different name"
         response = requests.post("http://localhost:8000/app/createUser", data=dup_user)
@@ -151,27 +158,15 @@ class TestDjangoApp(unittest.TestCase):
             data=self.user_dict)  # data doesn't matter
         if response.status_code == 404:
             self.assertTrue(False, "GET to app/createUser returns HTTP 404 {}".format(
-                reseponse.text))
+                response.text))
         with self.assertRaises(requests.exceptions.HTTPError):
             response.raise_for_status()
 
-    @weight(1)
-    @number("1.5")
-    def test_index_notloggedin(self):
-        '''Test the index page contains the phrase "Not logged in"'''
-        if self.DEADSERVER:
-            self.assertFalse(True, "Django server didn't start")
-        response = requests.get('http://127.0.0.1:8000/')
-        self.assertEqual(response.status_code, 200,
-                        "Server returns error for http://localhost:8000/.  Content:{}".format(
-                        response.text))
-        self.assertIn("not logged", response.text.lower(),
-                      "http://localhost:8000/ response does not contain phrase 'Not logged in'")
 
     @weight(1)
-    @number("6")
+    @number("5")
     def test_user_login(self):
-        '''Checks accounts/login page for login success, index page for username'''
+        '''Checks accounts/login page for login success'''
         user_dict = self.user_dict
         session = requests.Session()
         response0 = session.get("http://localhost:8000/accounts/login/")
@@ -186,11 +181,48 @@ class TestDjangoApp(unittest.TestCase):
                 "http://localhost:8000/accounts/login/"}
         response1 = session.post("http://localhost:8000/accounts/login/", data=logindata,
               headers=loginheaders)
+        soup = BeautifulSoup(response1.text, 'html.parser')
+        try: 
+            error_message = soup.find("ul", class_="errorlist nonfield")
+        except AttributeError: 
+            error_message = ""
+        print("ERROR_MESSAGE", error_message)
+        self.assertEqual(response1.status_code, 200, 
+             "Login at /accounts/login unsuccessful, {} {}".format(error_message, 
+             response1.text))
+        print("RESPONSE1\n"+response1.text)
+
+    @weight(1)
+    @number("6")
+    def test_user_login_displayed(self):
+        '''Checks index page contains username (email) if logged in'''
+        user_dict = self.user_dict
+        session = requests.Session()
+        response0 = session.get("http://localhost:8000/accounts/login/")
+        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
+        if csrf:
+            csrfdata = csrf.groups()[0]
+        else:
+            raise ValueError("Can't find csrf token in accounts/login/ page")
+        logindata = {"username": user_dict["email"], "password": user_dict["password"],
+                "csrfmiddlewaretoken": csrfdata}
+        loginheaders = {"X-CSRFToken": csrfdata, "Referer":
+                "http://localhost:8000/accounts/login/"}
+        response1 = session.post("http://localhost:8000/accounts/login/", data=logindata,
+              headers=loginheaders)
+        soup = BeautifulSoup(response1.text, 'html.parser')
+        try: 
+            error_message = soup.find("ul", class_="errorlist nonfield")
+        except AttributeError: 
+            error_message = ""
+        print("ERROR_MESSAGE", error_message)
         if response1.ok and "sessionid" in response1.cookies:
-             print("Success!")
+            print("Success!")
         self.assertEqual(response1.status_code, 200,
                         "Server returns error for http://localhost:8000/accounts/login/" +
-                        "Content:{}".format(response1.text))
+                        "Content:{} {}".format(error_message, response1.text))
         response2 = session.get("http://localhost:8000/")
-        self.assertIn(user_dict["email"], response2.text,
-            "Can't find username (email) on index.html {}".format(response2.text))
+        sanitized_text = response2.text.replace('value="{}"'.format(user_dict["email"]), 'value=WRONGLOGIN')
+        self.assertIn(user_dict["email"], sanitized_text,
+            "Can't find username (email) in index.html {}{}".format(
+            error_message, sanitized_text))
