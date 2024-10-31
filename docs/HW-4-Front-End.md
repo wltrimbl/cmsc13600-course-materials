@@ -162,18 +162,30 @@ You can leverage django's built-in User table, which has some of what you want: 
  
 Check out the documentation for user creation: https://docs.djangoproject.com/en/5.0/ref/contrib/auth/  You will have essentially three kinds of user in your databse: admin users (django admin users, who can see some web-based database tools on /admin), student users and instructor users (who are different only in their interaction with your app later on.)
 
+### createUser test
+
+Your API should be able to add a row to the user table (the first time) with this canonical request: 
+```
+curl -sS -d "user_name=boris&password=sk3j5n.k&is_student=1&email=boris@school.edu" -X POST http://localhost:8000/app/createUser
+```
+You are welcome to use slightly different values for `is_student` in your form, but your API has to handle this request as well as your form.
+
 ## What files do you need to change ?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
 1. `attendancechimp/attendancechimp/urls.py` and `attendancechimp/app/urls.py` You modify these file to create the two new views/endpoints `new` and `createUser`.
 2. `attendancechimp/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
-3. `attendancechimp/templates/app/...` You need to create a new template for `/app/new` to handle the web form.
+3. `attendancechimp/templates/app/...` You need to create a new html template files for `/app/new` and `index.html`.  These will contain the form and some django logic. 
 
-## Grading  (haven't assigned points / autograder yet)
-1.  index page meets requirements (bio, centered, current time) 
-2.  Form at /app/new has required elements
-3.  POST to /app/createUser returns success
-4.  GET to /app/createUser returns error 
-5.  login attempt (POST) to /accounts/login returns success
-6.  index page highlights current user
+## Grading  (10 points) 
+1. (1 point) index page meets requirements (bio, centered, current time) 
+2. (2 points) Form at /app/new has required elements, GET/POST behavior
+3. (2 points) POST to /app/createUser returns success
+4. (1 point)  GET to /app/createUser returns error 
+5. (1 point) login attempt (POST) to /accounts/login returns success
+6. (2 points)  index page highlights current user
   
+## Bug bounty 
+Information leading to the updating of mistakes in the autograder is appreciated. 
+
+If you find an instance where the autograder gives the wrong answer, and you can explain how it does not faithfully test one of the requirements of the specification (in either direction; either erroneous code passes or sound code fails), you can a point for each test fixed toward your homework score.
 
