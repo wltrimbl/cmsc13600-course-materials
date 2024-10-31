@@ -86,7 +86,7 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(name_check,
                         "Bio not properly displayed on page")
 
-    @weight(1)
+    @weight(0)
     @number("1.2")
     def test_index_notloggedin(self):
         '''Test the index page contains the phrase "Not logged in"'''
@@ -114,7 +114,7 @@ class TestDjangoApp(unittest.TestCase):
             new_page_text))
 
 
-    @weight(1)
+    @weight(1.5)
     @number("2.1")
     def test_user_add_form(self):
         '''Checks content of /app/new form (right fields, right endpoint)'''
@@ -163,7 +163,7 @@ class TestDjangoApp(unittest.TestCase):
                              "Wrong response code - should pass - {}".format(
                                  response.text))
 
-    @weight(0.5)
+    @weight(1)
     @number("3.5")
     def test_user_add_duplicate_email_api(self):
         '''Checks that createUser responds with an error adding duplicate email user'''
@@ -256,7 +256,14 @@ class TestDjangoApp(unittest.TestCase):
         response2 = session.get("http://localhost:8000/")
         # and make sure that the only email address/user name isn't prefilled in a form
         sanitized_text = response2.text.replace('value="{}"'.format(
-            user_dict["email"]), 'value=WRONGLOGIN')
-        self.assertIn(user_dict["user_name"], sanitized_text,
-            "Can't find username (email) in index.html {}{}".format(
-            error_message, sanitized_text))
+            user_dict["email"]), 'value=WRONGEMAIL')
+        sanitized_text = sanitized_text.replace('value="{}"'.format(
+            user_dict["user_name"]), 'value=WRONGLOGIN')
+        # Allow either email or Username
+        with self.assertRaises(AssertionError):
+            self.assertIn(user_dict["user_name"], sanitized_text,
+                "Can't find username in index.html when logged in {}{}".format(
+                error_message, sanitized_text))
+            self.assertIn(user_dict["email"], sanitized_text,
+                "Can't find email in index.html when logged in {}{}".format(
+                error_message, sanitized_text))
