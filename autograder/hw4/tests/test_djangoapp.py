@@ -40,19 +40,19 @@ class TestDjangoApp(unittest.TestCase):
             self.deadserver_error = p.communicate()
 
         self.user_dict = {
-                "user_name": "Charlie",
                 "email": (random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase) +
                           "_test@test.org"),
                 "is_student": "0",
                 "password": "Password123"
                 }
+        self.user_dict["user_name"] = "Charlie_" + self.user_dict["email"][0:2]
 
     @classmethod
     def tearDownClass(self):
         self.SERVER.terminate()
 
-    @weight(1)
+    @weight(2)
     @number("1.0")
     def test_index_page(self):
         '''Check index.html for proper requirements (centered, time, bio)'''
@@ -113,6 +113,7 @@ class TestDjangoApp(unittest.TestCase):
             "Content:{}".format(
             new_page_text))
 
+
     @weight(1)
     @number("2.1")
     def test_user_add_form(self):
@@ -138,6 +139,18 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(createuser_check,
                         "Can't find createUser endpoint in app/new")
 
+    @weight(0.5)
+    @number("2.3")
+    def test_new_page_fails_post(self):
+        '''Check the /app/new page returns an error if POST.'''
+        request = requests.post("http://localhost:8000/app/new")
+        new_page_text = request.text
+        self.assertNotEqual(request.status_code, 200,
+            "Server should return error for POST " + 
+            "http://localhost:8000/app/new.\n" +
+            "Content:{}".format(
+            new_page_text))
+
     @weight(1)
     @number("3")
     def test_user_add_api(self):
@@ -155,7 +168,8 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_duplicate_email_api(self):
         '''Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
-        dup_user["user_name"] = "Different name"
+        dup_user["user_name"] = ( 
+             "TestUserName-" +  dup_user["email"][0:2]) 
         response = requests.post("http://localhost:8000/app/createUser",
                                  data=dup_user)
         if response.status_code == 200:
@@ -205,7 +219,7 @@ class TestDjangoApp(unittest.TestCase):
              "Login at /accounts/login unsuccessful, {} {}".format(
                  error_message, response1.text))
 
-    @weight(1)
+    @weight(2)
     @number("6")
     def test_user_login_displayed(self):
         '''Checks index page contains username (email) if logged in'''
@@ -244,5 +258,5 @@ class TestDjangoApp(unittest.TestCase):
         sanitized_text = response2.text.replace('value="{}"'.format(
             user_dict["email"]), 'value=WRONGLOGIN')
         self.assertIn(user_dict["user_name"], sanitized_text,
-            "Can't find username (email) in index.html {}{}\nXX\n{}\nXX".format(
-            error_message, sanitized_text, csrfdata))
+            "Can't find username (email) in index.html {}{}".format(
+            error_message, sanitized_text))
