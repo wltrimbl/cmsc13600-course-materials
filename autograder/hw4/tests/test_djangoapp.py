@@ -41,9 +41,9 @@ class TestDjangoApp(unittest.TestCase):
 
         self.user_dict = {
                 "user_name": "Charlie",
-                "email": (random.choice(string.ascii_letters) +
-                          random.choice(string.ascii_letters) +
-                          "test@test.org"),
+                "email": (random.choice(string.ascii_lowercase) +
+                          random.choice(string.ascii_lowercase) +
+                          "_test@test.org"),
                 "is_student": "0",
                 "password": "Password123"
                 }
@@ -99,7 +99,7 @@ class TestDjangoApp(unittest.TestCase):
                         "  Content:{}".format(
                         response.text))
         self.assertIn("not logged", response.text.lower(),
-                      "http://localhost:8000/ response does not contain"+
+                      "http://localhost:8000/ response does not contain" +
                       " phrase 'Not logged in'")
 
     @weight(0)
@@ -109,7 +109,7 @@ class TestDjangoApp(unittest.TestCase):
         request = requests.get("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
-            "Server returns error for http://localhost:8000/app/new.\n"+
+            "Server returns error for http://localhost:8000/app/new.\n" +
             "Content:{}".format(
             new_page_text))
 
@@ -188,7 +188,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["email"], "password": user_dict["password"],
+        logindata = {"username": user_dict["user_name"], "password": user_dict["password"],
                 "csrfmiddlewaretoken": csrfdata}
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
@@ -217,11 +217,13 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["email"], 
+        logindata = {"username": user_dict["user_name"], 
                      "password": user_dict["password"],
                      "csrfmiddlewaretoken": csrfdata}
+        print(logindata)
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
+        print(csrfdata)
         # now attempt login
         response1 = session.post("http://localhost:8000/accounts/login/", 
                                  data=logindata, headers=loginheaders)
@@ -241,6 +243,6 @@ class TestDjangoApp(unittest.TestCase):
         # and make sure that the only email address/user name isn't prefilled in a form
         sanitized_text = response2.text.replace('value="{}"'.format(
             user_dict["email"]), 'value=WRONGLOGIN')
-        self.assertIn(user_dict["email"], sanitized_text,
-            "Can't find username (email) in index.html {}{}".format(
-            error_message, sanitized_text))
+        self.assertIn(user_dict["user_name"], sanitized_text,
+            "Can't find username (email) in index.html {}{}\nXX\n{}\nXX".format(
+            error_message, sanitized_text, csrfdata))
