@@ -1,9 +1,23 @@
-# HW5. Analytics and Data Science
+# HW5.   More API endpoints and some data export   - Due Nov 8, 2024
 We'll need a few more pieces before our app does useful things.  We need to create rows in Lectures, in Courses, and we need to add students to Courses.  This week we will write a few more API calls, some that populate the database and some which will retrieve content from the database.
 
-## Step 1. 
-For the Lectures table, 
-In `attendancechimp/app/views.py`, 
+## Step 1.  Create some new endpoints
+We now have the functionality to create users (and have tested it!), but not too much else.  
+
+We'll provide django templates to submit to the following three APIs.    (TODO Nov 2)
+You will need to write the API endpoints that will permit you to populate the `Lecture`, `Courses`, and `QRCodeUploads` tables, whatever they are named in your implementation of attendnacechimp.  These need not be very different from `/app/new` and `/app/createUser` but with different field names and data types.  
+
+* `/app/new_course`       (HTML form/view to submit to createCourse) 
+* `/app/new_lecture`      (HTML form/view to submit to createLecture) 
+* `/app/new_attendance`   (HTML form/vies to submit to createQRCodeUpload) 
+
+* `/app/createCourse`        (API endpoint, takes POST request  (TODO SPEC) )
+* `/app/createLecture`       (API endpoint, takes POST request  (TODO SPEC) )
+* `/app/createQRCodeUpload`  (API endpoint, takes POST request  (TODO SPEC) )
+
+Don't worry too much about these; their main purpose will be to create test fixtures so that we can test the logic in step 2.
+
+Your code to create these goes in `attendancechimp/app/views.py`, with some updates to  `attendancechimp/app/urls.py` to ensure that they render. 
 
 ## Step 2. Write A Helper Function getUploadsForCourse
 In `attendancechimp/app/models.py`, you will add a new helper function. This function will return all of the valid uploads for a particular course. Here is how the function will be called:
@@ -24,10 +38,10 @@ The function should have the following behavior:
 
 In summary, you are to write a new function that returns all of the QRCodeUploads that fall within a course's meeting time.
 
-## (TODO) Step 3. Create A `/app/getUploads?course=id` API End Point
+## Step 3. Create A `/app/getUploads?course=id` API End Point
 You will create a new API endpoint accessed with the URL `http://localhost:8000/app/getUploads`. An instructor can visit the `/app/getUploads?course=id`, this should load all of the data class attendance for the course associated with the code `id`. This can be done in `attendancechimp/app/urls.py` and should trigger a view function called getUploads in `attendancechimp/app/views.py`.
  
-## (TODO) Step 4. The getUploads(request) View
+## Step 4. The getUploads(request) View
 Create a getUploads view in `attendancechimp/app/views.py`. This view function processes an HTTP GET request to the url `http://localhost:8000/app/getUploads`, and you can expect a URL argument `?course=id`. That means that you should test with URLs that look like this, e.g., for course id 4 `http://localhost:8000/app/getUploads?course=4`.
 
 This view function should have the following behavior:
@@ -54,7 +68,7 @@ You'll have to add the import statement to the top of views.py:
 from django.http import JsonResponse
 ```
 
-## (TODO) Step 5. Testing
+## Step 5. Testing
 To test that this all works, you can open a second python terminal while the Django server is running and try to load the data into some data science tools. For example, in pandas:
 ```
 import pandas as pd
@@ -65,7 +79,5 @@ df = pd.read_json('http://localhost:8000/app/getUploads?course=1') #reads data f
 2. Start this assignment early! It seems simple but there are a lot of moving pieces to get wrong.
 
 ## Submission
-Same as before!
-
-
+Upload from github to gradescope.
 
