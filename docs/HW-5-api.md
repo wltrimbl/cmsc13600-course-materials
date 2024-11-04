@@ -4,16 +4,25 @@ We'll need a few more pieces before our app does useful things.  We need to crea
 ## Step 1.  Create some new endpoints
 We now have the functionality to create users (and have tested it!), but not too much else.  
 
-We'll provide django templates to submit to the following three APIs.    (TODO Nov 2)
+We'll provide django templates to submit to the following three APIs.  These render only for logged-in
+users: only instructors can create new courses and new lectures; only students can create new uploads.
+You are welcome to change the templates any way necessary to make them work; do not treat them as fixed. 
+
+https://github.com/wltrimbl/cmsc13600-course-materials/tree/main/attendancechimp/templates/app
+
 You will need to write the API endpoints that will permit you to populate the `Lecture`, `Courses`, and `QRCodeUploads` tables, whatever they are named in your implementation of attendnacechimp.  These need not be very different from `/app/new` and `/app/createUser` but with different field names and data types.  
 
 * `/app/new_course`       (HTML form/view to submit to createCourse) 
 * `/app/new_lecture`      (HTML form/view to submit to createLecture) 
-* `/app/new_attendance`   (HTML form/vies to submit to createQRCodeUpload) 
+* `/app/new_qr_upload`   (HTML form/vies to submit to createQRCodeUpload) 
 
-* `/app/createCourse`        (API endpoint, takes POST request  (TODO SPEC) )
-* `/app/createLecture`       (API endpoint, takes POST request  (TODO SPEC) )
-* `/app/createQRCodeUpload`  (API endpoint, takes POST request  (TODO SPEC) )
+    path('new_course', views.new_course, name='course_create'), # course_create: localhost:8000/app/new_course
+    path('new_lecture', views.new_lecture, name='qr_create'), # qr_create: localhost:8000/app/new_lecture
+    path('new_qr_upload', views.new_qr_upload, name='qr_upload'), # qr_upload: localhost:8000/new_qr_upload
+
+* `/app/createCourse`        (API endpoint, takes POST request  (fields course-name, start-time, end-time, and one or more of the fields day-mon, day-tue, day-wed, day-thu, day-fri. ) 
+* `/app/createLecture`       (API endpoint, takes POST request, field "choice" which contains course id) 
+* `/app/createQRCodeUpload`  (API endpoint, takes POST request containing imageUpload, your code can infer the user and lecture from the content / login)
 
 Don't worry too much about these; their main purpose will be to create test fixtures so that we can test the logic in step 2.
 
@@ -68,16 +77,19 @@ You'll have to add the import statement to the top of views.py:
 from django.http import JsonResponse
 ```
 
-## Step 5. Testing
-To test that this all works, you can open a second python terminal while the Django server is running and try to load the data into some data science tools. For example, in pandas:
-```
-import pandas as pd
-df = pd.read_json('http://localhost:8000/app/getUploads?course=1') #reads data from course id 1!
-```
+
 
 1. It's up to you to create some test data, use the application to generate valid and invalid uploads.
 2. Start this assignment early! It seems simple but there are a lot of moving pieces to get wrong.
 
+## Grading 
+
+
+
 ## Submission
 Upload from github to gradescope.
-
+1.  /app/createCourse
+2.  /app/createLecture
+3.  /app/createQRCodeUpload  
+4.  /app/getUploads   (returns JSON)
+You may find it helpful to create test fixtures to convince yourself that the API is doing what it is intended.  
