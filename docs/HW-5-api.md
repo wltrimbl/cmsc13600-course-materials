@@ -1,4 +1,4 @@
-# HW5.   More API endpoints and some data export   - Due Nov 8, 2024
+# HW5.   More API endpoints and some data export   - Due Wednesday, Nov 13, 2024
 We'll need a few more pieces before our app does useful things.  We need to create rows in Lectures, in Courses, and we need to add students to Courses.  This week we will write a few more API calls, some that populate the database and some which will retrieve content from the database.
 
 ## Step 1.  Create some new endpoints
@@ -68,6 +68,24 @@ You'll have to add the import statement to the top of views.py:
 from django.http import JsonResponse
 ```
 
+## Revising the schema
+You may discover that your schema is not up to the tasks set to it.  This is ok, but needs to be fixed.  When you update your models.py, django needs to move your data from the old schema to the new schema, a process called migration.
+
+If you encounter errors updating your schema with makemigrations+migrate, remember, our database doesn't have anything of value in it.
+As long as that is the case, we can wipe it out and rebuild it.
+
+Wipe out the migrations directory:
+```
+git rm -r migrations  
+  # or just
+rm -Rf migrations
+```
+and wipe out the databse:
+```
+rm db.sqlite3
+python manage.py makemigrations
+python manage.py migrate
+```
 
 1. It's up to you to create some test data, use the application to generate valid and invalid uploads.
 2. Start this assignment early! It seems simple but there are a lot of moving pieces to get wrong.

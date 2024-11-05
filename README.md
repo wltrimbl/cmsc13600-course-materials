@@ -8,8 +8,8 @@
 | Exam 1 | databases & ORM | Oct 23 | 
 | HW 3 | define DDL  |  Oct 25 | 
 | HW 4 | front end: login page |  Nov 1 | 
-| HW 5 | implementing the API |  Nov 8 | 
-| HW 6 | Testing the API, creating fixtures | Nov 15  |
+| HW 5 | implementing the API |  Nov 13 | 
+| HW 6 | Testing the API, creating fixtures | Nov 22  |
 | Exam 2 | architecture, hashing | Nov 20 | 
 | HW 7 | Testing the app, writing tests  | Dec 6 | 
 | Exam 3 |  pulling it all together |  TBA Dec 9-12  | 
