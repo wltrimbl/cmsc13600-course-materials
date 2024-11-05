@@ -2,6 +2,7 @@
 
 import unittest
 import subprocess
+from subprocess import check_output
 import requests
 from time import sleep
 from os import path
@@ -20,22 +21,21 @@ else:
     AG = "."
 
 # DEsired tests:
-# /app/new_course (HTML form/view to submit to createCourse) PROVIDED 
-# /app/new_lecture (HTML form/view to submit to createLecture) PROVIDED 
-# /app/new_qr_upload (HTML form/view fot submit createQRCodeUpload)  PROVIDED 
+# /app/new_course (HTML form/view to submit to createCourse) PROVIDED
+# /app/new_lecture (HTML form/view to submit to createLecture) PROVIDED
+# /app/new_qr_upload (HTML form/view fot submit createQRCodeUpload)  PROVIDED
 # /app/dumpCourses  (TO BE PROVIDED )
 # /app/dumpLectures (TO BE PROVIDED )
 
-# /app/createCourse   (API endpoint for  new_course) 
-# /app/createLecture  (API endpoint for  new_lecture) 
-# /app/createQRCodeUpload  (API endpoint for new_qr_upload) 
+# /app/createCourse   (API endpoint for  new_course)
+# /app/createLecture  (API endpoint for  new_lecture)
+# /app/createQRCodeUpload  (API endpoint for new_qr_upload)
 # /app/getUploads   (diagnostic endpoint for createQRCodeUpload)
-# TESTS FOR HTTP  200 response...  (4) 
-# TEST that row is actually added with valid input  (3) 
+# TESTS FOR HTTP  200 response...  (4)
+# TEST that row is actually added with valid input  (3)
 # three tests with invalid input, something essential not defined (3)
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
-
 
 
 class TestDjangoApp(unittest.TestCase):
@@ -62,7 +62,7 @@ class TestDjangoApp(unittest.TestCase):
                 "password": "Password123"
                 }
         response = requests.post("http://localhost:8000/app/createUser",
-                                 data=self.instructor_data, 
+                                 data=self.instructor_data,
                                  )
         print("CreateUser status", response.status_code)
         session = requests.Session()
@@ -74,54 +74,68 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = ""
 #            raise ValueError("Can't find csrf token in accounts/login/ page")
         print("CSRF:", csrfdata)
-        logindata = {"username": self.instructor_data["user_name"], 
+        logindata = {"username": self.instructor_data["user_name"],
                      "password": self.instructor_data["password"],
-                "csrfmiddlewaretoken": csrfdata}
+                     "csrfmiddlewaretoken": csrfdata}
         print("LOGINDATA", logindata)
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                "http://localhost:8000/accounts/login/"}
+                        "http://localhost:8000/accounts/login/"}
         response1 = session.post("http://localhost:8000/accounts/login/", data=logindata,
               headers=loginheaders)
         print("LOGINRESPNSE", response1.status_code)
         assert "Please enter a correct username" not in response1.text
         if response1.ok and "sessionid" in response1.cookies:
-             print("DX Login successful!")
+            print("DX Login successful!")
         else:
-             print("DX", response1.text)
+            print("DX", response1.text)
         soup = BeautifulSoup(response1.text, 'html.parser')
 
         try:
             error_message = soup.find("ul", class_="errorlist nonfield")
         except AttributeError:
             error_message = ""
-        try: 
+        try:
             csrf = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
-        except: 
+        except AttributeError:
             csrf = ""
 # Now we can use self.session  as a logged-in requests object.
         self.session = session
-        self.headers = {   "X-CSRFToken": csrf, 
-        "Referer": "http://localhost:8000/accounts/login" } 
+        self.headers = {"X-CSRFToken": csrf,
+                        "Referer": "http://localhost:8000/accounts/login"}
         self.csrfdata = csrf
 
     @classmethod
     def tearDownClass(self):
         self.SERVER.terminate()
 
+    def count_app_rows(self):
+        tables = check_output(["sqlite3", "db.sqlite3",
+"SELECT name FROM sqlite_master WHERE type='table'"]).decode().split("\n")
+        apptables = [table for table in tables if table[0:3] == 'app']
+        apptables = [str(table) for table in tables if table[0:3] == 'app']
+        n = 0
+        for apptable in apptables:
+            contents = check_output(["sqlite3", "db.sqlite3", "SELECT * from "+apptable]).decode().split()
+            n += len(contents)
+#            print("Apptable", apptable, len(contents), "rows")
+        return n
+
     @weight(0)
     @number("10")
     def test_createcourse_endpoint(self):
         '''Check server responds to http://localhost:8000/app/createCourse/'''
-        data = { 'course-name':"CS101" , "start-time":"2025-01-01 12:00", 
-                          "end-time": "2025-01-01 13:20", "day-mon": "1"} 
-        request = requests.post("http://localhost:8000/app/createCourse/", 
-                      data = data, headers=self.headers) 
+        data = {'course-name': "CS101", "start-time": "2025-01-01 12:00",
+                "end-time": "2025-01-01 13:20", "day-mon": "1"}
+        request = requests.post(
+            "http://localhost:8000/app/createCourse/",
+            data=data, headers=self.headers)
         page_text = request.text
         self.assertEqual(request.status_code, 200,
                          "Server returns error for " +
                          "http://localhost:8000/app/createCourse/" +
-                         "Data:{}".format(data)  + 
+                         "Data:{}".format(data) +
                          "Content:{}".format(page_text))
+
     @weight(0)
     @number("11")
     def test_login_index(self):
@@ -133,11 +147,12 @@ class TestDjangoApp(unittest.TestCase):
         sanitized_text = response_index.text.replace('value="{}"'.format(
             instructor_data["email"]), 'value=WRONGEMAIL')
         self.assertEqual(response_index.status_code, 200,
-                        "Server returns error for http://localhost:8000/" +
-                        "Content:{}".format(response_index.text))
+                         "Server returns error for http://localhost:8000/" +
+                         "Content:{}".format(response_index.text))
         print(sanitized_text)
         self.assertTrue((instructor_data["user_name"] in sanitized_text or
-            self.instructor_data["email"] in  sanitized_text), "Can't find email or username in {}".format(sanitized_text))
+                         self.instructor_data["email"] in sanitized_text),
+                        "Can't find email or username in {}".format(sanitized_text))
 
     @weight(0)
     @number("11")
@@ -145,17 +160,35 @@ class TestDjangoApp(unittest.TestCase):
         '''Logs in, tests return values for createCourse'''
         session = self.session
         # Now hit createCourse, now that we are logged in
-        data = { 'course-name':"CS102" , "start-time":"2025-01-01 12:00",
-                          "end-time": "2025-01-01 13:20", "day-mon": "1", 
-                  "csrfmiddlewaretoken": self.csrfdata }
+        data = {'course-name': "CS102", "start-time": "2025-01-01 12:00",
+                          "end-time": "2025-01-01 13:20", "day-mon": "1",
+                  "csrfmiddlewaretoken": self.csrfdata}
         response2 = session.post("http://localhost:8000/app/createCourse/",
-                      data = data, headers= self.headers)
+                      data=data, headers= self.headers)
         self.assertEqual(response2.status_code, 200,
-                        "Server returns error for http://localhost:8000/app/createCourse/" +
-                        "Content:{}".format(response2.text))
+                         "Server returns error for http://localhost:8000/app/createCourse/" +
+                         "Content:{}".format(response2.text))
 
 
- 
+    @weight(0)
+    @number("11")
+    def test_add_createcourse(self):
+        ''' 
+        '''
+        session = self.session
+        before_rows = self.count_app_rows()
+        # Now hit createCourse, now that we are logged in
+        data = {'course-name': "CS103", "start-time": "2025-01-01 12:00",
+                          "end-time": "2025-01-01 13:20", "day-mon": "1",
+                  "csrfmiddlewaretoken": self.csrfdata}
+        response2 = session.post("http://localhost:8000/app/createCourse/",
+                      data=data, headers= self.headers)
+        after_rows = self.count_app_rows()
+        self.assertGreater(after_rows - before_rows , 0 ,
+                         "Cannot confirm createCourse updated database" +
+                         "Content:{}".format(response2.text))
+  
+
 """
 
     @weight(0)
@@ -249,7 +282,7 @@ class TestDjangoApp(unittest.TestCase):
         request = requests.post("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertNotEqual(request.status_code, 200,
-            "Server should return error for POST " + 
+            "Server should return error for POST " +
             "http://localhost:8000/app/new.\n" +
             "Content:{}".format(
             new_page_text))
@@ -271,8 +304,8 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_duplicate_email_api(self):
         '''Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
-        dup_user["user_name"] = ( 
-             "TestUserName-" +  dup_user["email"][0:2]) 
+        dup_user["user_name"] = (
+             "TestUserName-" +  dup_user["email"][0:2])
         response = requests.post("http://localhost:8000/app/createUser",
                                  data=dup_user)
         if response.status_code == 200:
@@ -334,7 +367,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["user_name"], 
+        logindata = {"username": user_dict["user_name"],
                      "password": user_dict["password"],
                      "csrfmiddlewaretoken": csrfdata}
         print(logindata)
@@ -342,7 +375,7 @@ class TestDjangoApp(unittest.TestCase):
                 "http://localhost:8000/accounts/login/"}
         print(csrfdata)
         # now attempt login
-        response1 = session.post("http://localhost:8000/accounts/login/", 
+        response1 = session.post("http://localhost:8000/accounts/login/",
                                  data=logindata, headers=loginheaders)
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
@@ -362,9 +395,9 @@ class TestDjangoApp(unittest.TestCase):
             user_dict["email"]), 'value=WRONGEMAIL')
         sanitized_text = sanitized_text.replace('value="{}"'.format(
             user_dict["user_name"]), 'value=WRONGLOGIN')
-        check_username = (user_dict["user_name"] in sanitized_text or  
-            user_dict["email"], sanitized_text) 
-        self.assertTrue(check_username, 
+        check_username = (user_dict["user_name"] in sanitized_text or
+            user_dict["email"], sanitized_text)
+        self.assertTrue(check_username,
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
         # Allow either email or Username
@@ -376,4 +409,3 @@ class TestDjangoApp(unittest.TestCase):
 #                "Can't find email in index.html when logged in {}{}".format(
 #                error_message, sanitized_text))
 """
-
