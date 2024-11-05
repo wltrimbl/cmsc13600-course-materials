@@ -69,20 +69,55 @@ class TestDjangoApp(unittest.TestCase):
         self.SERVER.terminate()
 
     @weight(0)
-    @number("1.01")
+    @number("10")
     def test_createcourse_endpoint(self):
-        '''Check server responds to http://localhost:8000/createCourse'''
-        data = { 'course-name':"CS101" , "start-time":"12:00", 
-                          "end-time": "13:20", "day-mon": "1"} 
-        request = requests.post("http://localhost:8000/app/createCourse", 
+        '''Check server responds to http://localhost:8000/app/createCourse/'''
+        data = { 'course-name':"CS101" , "start-time":"2025-01-01 12:00", 
+                          "end-time": "2025-01-01 13:20", "day-mon": "1"} 
+        request = requests.post("http://localhost:8000/app/createCourse/", 
                       data = data) 
-        index_page_text = request.text
+        page_text = request.text
         self.assertEqual(request.status_code, 200,
                          "Server returns error for " +
-                         "http://localhost:8000/app/createCourse" +
-                         "Data:{}".format(data), 
-                         "Content:{}".format(index_page_text))
+                         "http://localhost:8000/app/createCourse/" +
+                         "Data:{}".format(data)  + 
+                         "Content:{}".format(page_text))
 
+    @weight(0)
+    @number("11")
+    def test_login(self):
+        '''Logs in, tests return values for createCourse'''
+        user_dict = self.user_dict
+        session = requests.Session()
+        response0 = session.get("http://localhost:8000/accounts/login/")
+        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
+        if csrf:
+            csrfdata = csrf.groups()[0]
+        else:
+            raise ValueError("Can't find csrf token in accounts/login/ page")
+        logindata = {"username": user_dict["user_name"], 
+                     "password": user_dict["password"],
+                     "csrfmiddlewaretoken": csrfdata}
+        print(logindata)
+        loginheaders = {"X-CSRFToken": csrfdata, "Referer":
+                "http://localhost:8000/accounts/login/"}
+        print(csrfdata)
+        # now attempt login
+        response1 = session.post("http://localhost:8000/accounts/login/", 
+                                 data=logindata, headers=loginheaders)
+        soup = BeautifulSoup(response1.text, 'html.parser')
+        self.assertEqual(response1.status_code, 200,
+                        "Server returns error for http://localhost:8000/accounts/login/" +
+                        "Content:{}".format(response1.text))
+        # Now hit createCourse, now that we are logged in
+        data = { 'course-name':"CS102" , "start-time":"2025-01-01 12:00",
+                          "end-time": "2025-01-01 13:20", "day-mon": "1"}
+        response2 = session.post("http://localhost:8000/app/createCourse/",
+                      data = data)
+        self.assertEqual(response2.status_code, 200,
+                        "Server returns error for http://localhost:8000/app/createCourse/" +
+                        "Content:{}".format(response2.text))
+ 
 """
 
     @weight(0)

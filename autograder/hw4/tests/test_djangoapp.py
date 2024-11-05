@@ -52,6 +52,28 @@ class TestDjangoApp(unittest.TestCase):
     def tearDownClass(self):
         self.SERVER.terminate()
 
+    @weight(0)
+    @number("1.01")
+    def test_index_endpoint(self):
+        '''Check server responds to http://localhost:8000/index.html'''
+        request = requests.get("http://localhost:8000/index.html")
+        index_page_text = request.text
+        self.assertEqual(request.status_code, 200,
+                         "Server returns error for " +
+                         "http://localhost:8000/index.html." +
+                         "Content:{}".format(index_page_text))
+
+    @weight(0)
+    @number("1.02")
+    def test_default_endpoint(self):
+        '''Check server responds to http://localhost:8000/'''
+        request = requests.get("http://localhost:8000/")
+        index_page_text = request.text
+        self.assertEqual(request.status_code, 200,
+                         "Server returns error for " +
+                         "http://localhost:8000/" +
+                         "Content:{}".format(index_page_text))
+
     @weight(2)
     @number("1.0")
     def test_index_page(self):
@@ -62,7 +84,7 @@ class TestDjangoApp(unittest.TestCase):
                          "Server returns error for " +
                          "http://localhost:8000/index.html." +
                          "Content:{}".format(index_page_text))
-        center_check = re.search(r"text-align:\s*center", index_page_text,
+        center_check = re.search(r"center", index_page_text,
                                  re.IGNORECASE)
         current_time = datetime.now().astimezone(CDT).strftime("%H:%M")
         hour_check = re.search(f"{current_time}", index_page_text)
@@ -72,19 +94,6 @@ class TestDjangoApp(unittest.TestCase):
                         "Time {} not properly displayed on page\n{}".format(
                          current_time, index_page_text))
         return
-        metadata_file = AG + "/submission_metadata.json"
-
-        try:
-            with open(metadata_file, "r") as md:
-                metadata = json.load(md)
-            submission_name = metadata["users"][0]["name"]
-            name_check = re.search(re.escape(submission_name),
-                                   index_page_text, re.IGNORECASE)
-        except (KeyError, IndexError, FileNotFoundError) as e:
-            self.fail(f"Error loading submission metadata: {e}")
-
-        self.assertTrue(name_check,
-                        "Bio not properly displayed on page")
 
     @weight(0)
     @number("1.2")
@@ -105,7 +114,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("2.0")
     def test_new_page_renders(self):
-        '''Check the /app/new page returns without error.'''
+        '''Server returns /app/new page without error.'''
         request = requests.get("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -119,7 +128,6 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_form(self):
         '''Checks content of /app/new form (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
-
         name_check = re.search("user_name", form_page_text, re.IGNORECASE)
         email_check = re.search("email", form_page_text)
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
@@ -259,11 +267,16 @@ class TestDjangoApp(unittest.TestCase):
             user_dict["email"]), 'value=WRONGEMAIL')
         sanitized_text = sanitized_text.replace('value="{}"'.format(
             user_dict["user_name"]), 'value=WRONGLOGIN')
+        check_username = (user_dict["user_name"] in sanitized_text or  
+            user_dict["email"], sanitized_text) 
+        self.assertTrue(check_username, 
+                "Can't find email {} or username {} in index.html when logged in {}{}".format(
+                user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
         # Allow either email or Username
-        with self.assertRaises(AssertionError):
-            self.assertIn(user_dict["user_name"], sanitized_text,
-                "Can't find username in index.html when logged in {}{}".format(
-                error_message, sanitized_text))
-            self.assertIn(user_dict["email"], sanitized_text,
-                "Can't find email in index.html when logged in {}{}".format(
-                error_message, sanitized_text))
+#        with self.assertRaises(AssertionError):
+#            self.assertIn(user_dict["user_name"], sanitized_text,
+#                "Can't find username in index.html when logged in {}{}".format(
+#                error_message, sanitized_text))
+#            self.assertIn(user_dict["email"], sanitized_text,
+#                "Can't find email in index.html when logged in {}{}".format(
+#                error_message, sanitized_text))

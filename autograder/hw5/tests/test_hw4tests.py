@@ -19,20 +19,7 @@ if path.exists("/autograder"):
 else:
     AG = "."
 
-# DEsired tests:
-# /app/new_course (HTML form/view to submit to createCourse) PROVIDED 
-# /app/new_lecture (HTML form/view to submit to createLecture) PROVIDED 
-# /app/new_qr_upload (HTML form/view fot submit createQRCodeUpload)  PROVIDED 
-# /app/dumpCourses  (TO BE PROVIDED )
-# /app/dumpLectures (TO BE PROVIDED )
-
-# /app/createCourse   (API endpoint for  new_course) 
-# /app/createLecture  (API endpoint for  new_lecture) 
-# /app/createQRCodeUpload  (API endpoint for new_qr_upload) 
-# /app/getUploads   (diagnostic endpoint for createQRCodeUpload)
-# TESTS FOR HTTP  200 response...  (4) 
-# TEST that row is actually added with valid input  (3) 
-# three tests with invalid input, something essential not defined (3)
+# HW4 tests with point values set to zero.
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
@@ -289,11 +276,3 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(check_username, 
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
-        # Allow either email or Username
-#        with self.assertRaises(AssertionError):
-#            self.assertIn(user_dict["user_name"], sanitized_text,
-#                "Can't find username in index.html when logged in {}{}".format(
-#                error_message, sanitized_text))
-#            self.assertIn(user_dict["email"], sanitized_text,
-#                "Can't find email in index.html when logged in {}{}".format(
-#                error_message, sanitized_text))
