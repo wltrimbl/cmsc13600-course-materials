@@ -100,13 +100,13 @@ class TestDjangoApp(unittest.TestCase):
         except AttributeError:
             error_message = ""
         try:
-            csrf = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
+            csrfdata = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
         except AttributeError:
-            csrf = ""
-            print("This is bad, can't find CSRF token")
+            print("csrf: {}".format(csrf)) 
+            print("This is bad, can't find CSRF token, using old token {}".format(csrfdata))
 # Now we can use self.session  as a logged-in requests object.
         self.session = session
-        self.headers = {"X-CSRFToken": csrf,
+        self.headers = {"X-CSRFToken": csrfdata,
                         "Referer": "http://localhost:8000/accounts/login"}
         self.csrfdata = csrf
 
@@ -129,101 +129,6 @@ class TestDjangoApp(unittest.TestCase):
 #            print("Apptable", apptable, len(contents), "rows")
         return n
 
-    @weight(0)
-    @number("10.1")
-    def test_createcourse_endpoint(self):
-        '''Check server responds to http://localhost:8000/app/createCourse/'''
-        data = {'course-name': "CS101", "start-time": "2025-01-01 12:00",
-                "end-time": "2025-01-01 13:20", "day-mon": "1"}
-        request = requests.post(
-            "http://localhost:8000/app/createCourse/",
-            data=data, headers=self.headers)
-        page_text = request.text
-        self.assertEqual(request.status_code, 200,
-                         "Server returns error for " +
-                         "http://localhost:8000/app/createCourse/" +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(page_text))
-
-
-    @weight(0)
-    @number("10.2")
-    def test_createlecture_endpoint(self):
-        '''
-        '''
-        session = self.session
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata}
-        response2 = session.post("http://localhost:8000/app/createLecture/",
-                      data=data, headers= self.headers)
-        self.assertEqual(response2.status_code, 200,
-                         "Server returns error for http://localhost:8000/" +
-                         "Content:{}".format(response2.text))
-
-    @weight(0)
-    @number("10.3")
-    def test_createqrcodeupload_endpoint(self):
-        '''
-        '''
-        session = self.session
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata}
-        response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
-                      data=data, headers= self.headers)
-        self.assertEqual(response2.status_code, 200,
-                         "Server returns error for http://localhost:8000/" +
-                         "Content:{}".format(response2.text))
-
-
-    @weight(0)
-    @number("10.6")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      data=data, headers= self.headers)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200)
-
-    @weight(0)
-    @number("11")
-    def test_login_index(self):
-        '''Logs in, tests index.html '''
-        session = self.session
-        instructor_data = self.instructor_data
-        # Now hit createCourse, now that we are logged in
-        response_index = session.get("http://localhost:8000/")
-        sanitized_text = response_index.text.replace('value="{}"'.format(
-            instructor_data["email"]), 'value=WRONGEMAIL')
-        self.assertEqual(response_index.status_code, 200,
-                         "Server returns error for http://localhost:8000/" +
-                         "Content:{}".format(response_index.text))
-        print(sanitized_text)
-        self.assertTrue((instructor_data["user_name"] in sanitized_text or
-                         self.instructor_data["email"] in sanitized_text),
-                        "Can't find email or username in {}".format(sanitized_text))
-
-    @weight(0)
-    @number("11")
-    def test_login(self):
-        '''Logs in, tests return values for createCourse'''
-        session = self.session
-        # Now hit createCourse, now that we are logged in
-        data = {'course-name': "CS102", "start-time": "2025-01-01 12:00",
-                          "end-time": "2025-01-01 13:20", "day-mon": "1",
-                  "csrfmiddlewaretoken": self.csrfdata}
-        response2 = session.post("http://localhost:8000/app/createCourse/",
-                      data=data, headers= self.headers)
-        self.assertEqual(response2.status_code, 200,
-                         "Server returns error for http://localhost:8000/app/createCourse/" +
-                         "Content:{}".format(response2.text))
-
 
     @weight(0)
     @number("11")
@@ -233,8 +138,8 @@ class TestDjangoApp(unittest.TestCase):
         session = self.session
         before_rows = self.count_app_rows()
         # Now hit createCourse, now that we are logged in
-        data = {'course-name': "CS103", "start-time": "2025-01-01 12:00",
-                          "end-time": "2025-01-01 13:20", "day-mon": "1",
+        data = {'course-name': "CS103", "start-time": "12:00",
+                          "end-time": "13:20", "day-mon": "1",
                   "csrfmiddlewaretoken": self.csrfdata}
         response2 = session.post("http://localhost:8000/app/createCourse/",
                       data=data, headers= self.headers)

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-apt-get update && apt-get install -y python3-pip python3 file # python3-dev 
+apt-get update && apt-get install -y python3-pip python3 file sqlite3 # python3-dev 
 
 TZ=Etc/UTC 
 apt-get -y install tzdata 
