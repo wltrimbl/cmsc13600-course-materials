@@ -6,12 +6,8 @@ from subprocess import check_output
 import requests
 from time import sleep
 from os import path
-from datetime import datetime
 import zoneinfo
 import re
-import json
-import string
-import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
@@ -43,7 +39,7 @@ instructor_data = {
                 "user_name": "Autograder Tester",
                 "password": "Password123"
                 }
-student_data= {
+student_data = {
                 "email": "student_test@test.org",
                 "is_student": "1",
                 "user_name": "Tester Student",
@@ -71,7 +67,6 @@ class TestDjangoHw5simple(unittest.TestCase):
         else:
             self.DEADSERVER = True
             self.deadserver_error = p.communicate()
-
 
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
@@ -115,13 +110,12 @@ class TestDjangoHw5simple(unittest.TestCase):
                 print("This is bad, can't find CSRF token, using old one {}".format(csrf))
             headers = {"X-CSRFToken": csrf,
                         "Referer": "http://localhost:8000/accounts/login"}
-            return(session, headers, csrf)
+            return session, headers, csrf 
 # Now we can use self.session  as a logged-in requests object.
         self.session_ins, self.headers_ins, self.csrfdata_ins = login(instructor_data)
         self.session_stu, self.headers_stu, self.csrfdata_stu = login(student_data)
         print("INScookies", self.session_ins.cookies)
         print("STUcookies", self.session_stu.cookies)
-
 
     @classmethod
     def tearDownClass(self):
@@ -137,7 +131,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         apptables = [str(table) for table in tables if table[0:3] == 'app']
         n = 0
         for apptable in apptables:
-            contents = check_output(["sqlite3", "attendancechimp/db.sqlite3", "SELECT * from "+apptable]).decode().split()
+            contents = check_output(["sqlite3", "attendancechimp/db.sqlite3", "SELECT * from "
+                 + apptable]).decode().split()
             n += len(contents)
 #            print("Apptable", apptable, len(contents), "rows")
         return n
@@ -154,11 +149,11 @@ class TestDjangoHw5simple(unittest.TestCase):
             "http://localhost:8000/app/createCourse/",
             data=data) # , headers=self.headers_ins)
         self.assertEqual(request.status_code, 200,
-                         "Server returns error for POST to " +
-                         "http://localhost:8000/app/createCourse/ " +
-                         "Data:{}".format(data)
-#                         "Content:{}".format(request.text)
-                          )
+            "Server returns error for POST to " +
+            "http://localhost:8000/app/createCourse/ " +
+            "Data:{}".format(data)
+#           "Content:{}".format(request.text)
+            )
 
     @weight(0.5)
     @number("10.1")
@@ -170,62 +165,83 @@ class TestDjangoHw5simple(unittest.TestCase):
         session = self.session_stu
         request = session.post(
             "http://localhost:8000/app/createCourse/",
-            data=data, headers=self.headers_stu)
+             data=data, headers=self.headers_stu)
+        self.assertNotEqual(request.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Data:{}".format(data)
+#           "Content:{}".format(response2.text)
+            )
         self.assertEqual(request.status_code, 401,
-                         "Server returns error for POST to " +
-                         "http://localhost:8000/app/createCourse/ " +
-                         "Data:{}".format(data)
-#                        + "Content:{}".format(request.text)
-                           )
-
+            "Server returns error for POST to " +
+            "http://localhost:8000/app/createCourse/ " +
+            "Data:{}".format(data)
+#           + "Content:{}".format(request.text)
+            )
 
     @weight(0.5)
     @number("11.0")
     def test_createlecture_endpoint(self):
-        '''
+        '''Test createLecture endpoint.
         '''
         session = self.session_ins
         # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",}
+        data = {'choice': "CS103"}
         response2 = session.post(
-                    "http://localhost:8000/app/createLecture/",
-                    data=data )
+            "http://localhost:8000/app/createLecture/",
+            data=data)
+#        404 pages are too bulky to show in gradescope
+        self.assertNotEqual(response2.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Data:{}".format(data)
+#           "Content:{}".format(response2.text)
+            )
         self.assertEqual(response2.status_code, 200,
-                         "Server returns error for http://localhost:8000/app/createLecture/ " +
-                         "Data:{}".format(data)
-#                         "Content:{}".format(response2.text)
-                         )
+            "Server returns error for http://localhost:8000/app/createLecture/ " +
+            "Data:{}".format(data)+
+            "Content:{}".format(response2.text)
+            )
 
     @weight(0.5)
     @number("11.1")
     def test_createlecture_endpoint_student(self):
-        '''
+        '''Tests createLecture endpoint by a student, which should fail with 401 unauthorized.
         '''
         session = self.session_stu
-        data = {'choice': "CS103",}
+        data = {'choice': "CS103"}
         response2 = session.post(
-                    "http://localhost:8000/app/createLecture/",
-                    data=data)
+             "http://localhost:8000/app/createLecture/",
+             data=data)
+        self.assertNotEqual(response2.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Data:{}".format(data)
+#           "Content:{}".format(response2.text)
+            )
         self.assertEqual(response2.status_code, 401,
-                         "Server should returns 401 unauthorized for student at http://localhost:8000/app/createLecture/ " +
-                         "Data:{}".format(data)
-                        + "Content:{}".format(response2.text)
-                          )
+            "Server should return 401 unauthorized for student at http://localhost:8000/app/createLecture/ " +
+            "Data:{}".format(data) +
+            "Content:{}".format(response2.text)
+            )
 
     @weight(0.5)
     @number("12.0")
     def test_createqrcodeupload_endpoint(self):
-        '''
+        ''' Test createQRCodeUpload endpoint.
         '''
         session = self.session_stu
         files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                       files=files)
+        self.assertNotEqual(response2.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Data:{}".format(files)
+#            "Content:{}".format(response2.text)
+            )
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/createQRCodeUpload/ " +
                          "Data:{}".format(files)
                         + "Content:{}".format(response2.text)
-                         )
+                          )
+
     @weight(0.5)
     @number("12.1")
     def test_createqrcodeupload_endpoint_instructor(self):
@@ -235,11 +251,16 @@ class TestDjangoHw5simple(unittest.TestCase):
         files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                       files=files)
+        self.assertNotEqual(response2.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+                         "Data:{}".format(files)
+#                         "Content:{}".format(response2.text)
+                          )
         self.assertEqual(response2.status_code, 401,
                          "Server should returns error for instructor to http://localhost:8000/createQRCodeUpload/ " +
-                         "Data:{}".format(files)+
+                         "Data:{}".format(files) +
                          "Content:{}".format(response2.text)
-                         )
+                          )
 
     @weight(0.5)
     @number("13.0")
@@ -273,7 +294,11 @@ class TestDjangoHw5simple(unittest.TestCase):
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                           )
-
+        self.assertNotEqual(response2.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+                         "Data:{}".format(files)
+#                         "Content:{}".format(response2.text)
+                          )
 
     @weight(0)
     @number("19")
@@ -292,7 +317,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                          instructor_data["email"] in sanitized_text),
                         "Can't find email or username in {}".format(sanitized_text))
 
-    @weight(0)
+    @weight(2)
     @number("23")
     def test_createqrcodeupload_add(self):
         '''Test that createQRCodeUpload endpoint actually adds data
@@ -302,11 +327,12 @@ class TestDjangoHw5simple(unittest.TestCase):
         # Now hit createLecture, now that we are logged in
         data = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
-                      files=data)
+                                 files=data)
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
-                         "Cannot confirm createQRCodeUpload updated database" +
-                         "Content:{}".format(response2.text))
+                           "Cannot confirm createQRCodeUpload updated database" +
+                           "Content:{}".format(response2.text))
+
     @weight(2)
     @number("21")
     def test_createcourse_add(self):
@@ -316,9 +342,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         before_rows = self.count_app_rows()
         # Now hit createCourse, now that we are logged in
         data = {'course-name': "CS103", "start-time": "12:00",
-                          "end-time": "13:20", "day-mon": "1"}
+                "end-time": "13:20", "day-mon": "1"}
         response2 = session.post("http://localhost:8000/app/createCourse/",
-                      data=data)
+                                 data=data)
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
                          "Cannot confirm createCourse updated database" +
@@ -334,10 +360,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         # Now hit createLecture, now that we are logged in
         data = {'choice': "CS103"}
         response2 = session.post("http://localhost:8000/app/createLecture/",
-                      data=data) 
+                                 data=data)
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
-                         "Cannot confirm createLecture updated database" +
-                         "Content:{}".format(response2.text))
-
-
+            "Cannot confirm createLecture updated database" +
+            "Content:{}".format(response2.text))
