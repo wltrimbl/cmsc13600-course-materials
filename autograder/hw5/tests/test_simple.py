@@ -90,7 +90,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             print("LOGINDATA", logindata)
             loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                             "http://localhost:8000/accounts/login/"}
-            response1 = session.post("http://localhost:8000/accounts/login/", 
+            response1 = session.post("http://localhost:8000/accounts/login/",
                         data=logindata,
                         headers=loginheaders)
             print("LOGINRESPNSE", response1.status_code)
@@ -118,15 +118,15 @@ class TestDjangoHw5simple(unittest.TestCase):
             return(session, headers, csrf)
         self.session_ins, self.headers_ins, self.csrfdata_ins = login(self.instructor_data)
         self.session_stu, self.headers_stu, self.csrfdata_stu = login(self.student_data)
-      
+
 
 
     @classmethod
     def tearDownClass(self):
         self.SERVER.terminate()
 
-    @weight(0)
-    @number("10.1")
+    @weight(0.5)
+    @number("10.0")
     def test_createcourse_endpoint(self):
         '''Check server responds to http://localhost:8000/app/createCourse/'''
         data = {'course-name': "CS101", "start-time": "12:00",
@@ -135,14 +135,15 @@ class TestDjangoHw5simple(unittest.TestCase):
         session = self.session_ins
         request = session.post(
             "http://localhost:8000/app/createCourse/",
-            data=data ) # , headers=self.headers_ins)
+            data=data) # , headers=self.headers_ins)
         self.assertEqual(request.status_code, 200,
                          "Server returns error for POST to " +
                          "http://localhost:8000/app/createCourse/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(request.text))
+                         "Data:{}".format(data)
+#                         "Content:{}".format(request.text)
+                          )
 
-    @weight(0)
+    @weight(0.5)
     @number("10.1")
     def test_createcourse_endpoint_student(self):
         '''Check server responds to http://localhost:8000/app/createCourse/'''
@@ -156,12 +157,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         self.assertEqual(request.status_code, 200,
                          "Server returns error for POST to " +
                          "http://localhost:8000/app/createCourse/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(request.text))
+                         "Data:{}".format(data)
+#                        + "Content:{}".format(request.text)
+                           )
 
 
-    @weight(0)
-    @number("10.2")
+    @weight(0.5)
+    @number("11.0")
     def test_createlecture_endpoint(self):
         '''
         '''
@@ -174,11 +176,12 @@ class TestDjangoHw5simple(unittest.TestCase):
                     data=data, headers=self.headers_ins)
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/app/createLecture/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
+                         "Data:{}".format(data)
+#                         "Content:{}".format(response2.text)
+                         )
 
-    @weight(0)
-    @number("10.2")
+    @weight(0.5)
+    @number("11.1")
     def test_createlecture_endpoint_student(self):
         '''
         '''
@@ -191,11 +194,12 @@ class TestDjangoHw5simple(unittest.TestCase):
                     data=data, headers=self.headers_stu)
         self.assertEqual(response2.status_code, 401,
                          "Server should returns 401 unauthorized for student at http://localhost:8000/app/createLecture/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
+                         "Data:{}".format(data)
+#                        + "Content:{}".format(response2.text)
+                          )
 
-    @weight(0)
-    @number("10.3")
+    @weight(0.5)
+    @number("12.0")
     def test_createqrcodeupload_endpoint(self):
         '''
         '''
@@ -207,10 +211,11 @@ class TestDjangoHw5simple(unittest.TestCase):
                       data=data, headers= self.headers_stu)
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/createQRCodeUpload/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
-    @weight(0)
-    @number("10.3")
+                         "Data:{}".format(data)
+#                        + "Content:{}".format(response2.text)
+                         )
+    @weight(0.5)
+    @number("12.1")
     def test_createqrcodeupload_endpoint_instructor(self):
         '''
         '''
@@ -222,12 +227,12 @@ class TestDjangoHw5simple(unittest.TestCase):
                       data=data, headers= self.headers_ins)
         self.assertEqual(response2.status_code, 401,
                          "Server should returns error for instructor to http://localhost:8000/createQRCodeUpload/ " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
+                         "Data:{}".format(data)
+#                         "Content:{}".format(response2.text)
+                         )
 
-
-    @weight(0)
-    @number("10.6")
+    @weight(0.5)
+    @number("13.0")
     def test_dumpuploads_endpoint(self):
         '''
         '''
@@ -238,28 +243,31 @@ class TestDjangoHw5simple(unittest.TestCase):
         response2 = session.get("http://localhost:8000/app/dumpUploads",
                       data=data, headers= self.headers_ins)
         print(response2.text)
-        self.assertEqual(response2.status_code, 200, 
+        self.assertEqual(response2.status_code, 200,
             "Server returns error for GET to http://localhost:8000/dumpUploads " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
-    @weight(0)
-    @number("10.6")
+                         "Data:{}".format(data)
+#                         "Content:{}".format(response2.text)
+                         )
+
+    @weight(0.5)
+    @number("13.1")
     def test_dumpuploads_notloggedin(self):
         '''
         '''
         session = requests.Session() #Not logged in
         data = {'choice': "CS103"}
         response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      data=data ) 
+                      data=data )
         print(response2.text)
-        self.assertEqual(response2.status_code, 401, 
+        self.assertEqual(response2.status_code, 401,
             "Server should return 401 Not authorized for http://localhost:8000/dumpUploads " +
-                         "Data:{}".format(data) +
-                         "Content:{}".format(response2.text))
+                         "Data:{}".format(data)
+#                         "Content:{}".format(response2.text)
+                          )
 
 
     @weight(0)
-    @number("11")
+    @number("19")
     def test_login_index(self):
         '''Logs in, tests index.html '''
         session = self.session_ins
@@ -275,4 +283,3 @@ class TestDjangoHw5simple(unittest.TestCase):
         self.assertTrue((instructor_data["user_name"] in sanitized_text or
                          self.instructor_data["email"] in sanitized_text),
                         "Can't find email or username in {}".format(sanitized_text))
-

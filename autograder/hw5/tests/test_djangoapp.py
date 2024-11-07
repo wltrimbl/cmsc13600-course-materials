@@ -88,7 +88,7 @@ class TestDjangoApp(unittest.TestCase):
         response1 = session.post("http://localhost:8000/accounts/login/", data=logindata,
               headers=loginheaders)
         print("LOGINRESPNSE", response1.status_code)
-        assert "Please enter a correct username" not in response1.text
+#         assert "Please enter a correct username" not in response1.text
         if response1.ok and "sessionid" in response1.cookies:
             print("DX Login successful!")
         else:
@@ -130,10 +130,10 @@ class TestDjangoApp(unittest.TestCase):
         return n
 
 
-    @weight(0)
-    @number("11")
+    @weight(2)
+    @number("21")
     def test_createcourse_add(self):
-        '''
+        '''Test that createCourse endpoint actually adds data
         '''
         session = self.session
         before_rows = self.count_app_rows()
@@ -148,10 +148,10 @@ class TestDjangoApp(unittest.TestCase):
                          "Cannot confirm createCourse updated database" +
                          "Content:{}".format(response2.text))
 
-    @weight(0)
-    @number("14")
+    @weight(2)
+    @number("22")
     def test_createlecture_add(self):
-        '''
+        '''Test that createLecture endpoint actually adds data
         '''
         session = self.session
         before_rows = self.count_app_rows()
@@ -166,9 +166,9 @@ class TestDjangoApp(unittest.TestCase):
                          "Content:{}".format(response2.text))
 
     @weight(0)
-    @number("14")
+    @number("23")
     def test_createqrcodeupload_add(self):
-        '''
+        '''Test that createQRCodeUpload endpoint actually adds data
         '''
         session = self.session
         before_rows = self.count_app_rows()

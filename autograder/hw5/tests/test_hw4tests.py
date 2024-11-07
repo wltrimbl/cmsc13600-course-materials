@@ -58,7 +58,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("1.01")
     def test_index_endpoint(self):
-        '''Check server responds to http://localhost:8000/index.html'''
+        '''HW4: Check server responds to http://localhost:8000/index.html'''
         request = requests.get("http://localhost:8000/index.html")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -70,7 +70,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("1.02")
     def test_default_endpoint(self):
-        '''Check server responds to http://localhost:8000/'''
+        '''HW4: Check server responds to http://localhost:8000/'''
         request = requests.get("http://localhost:8000/")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -81,7 +81,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("1.0")
     def test_index_page(self):
-        '''Check index.html for proper requirements (centered, time, bio)'''
+        '''HW4: Check index.html for proper requirements (centered, time, bio)'''
         request = requests.get("http://localhost:8000/index.html")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -102,7 +102,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("1.2")
     def test_index_notloggedin(self):
-        '''Test the index page contains the phrase "Not logged in"'''
+        '''HW4: Test the index page contains the phrase "Not logged in"'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start" +
                  self.deadserver_error)
@@ -118,7 +118,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("2.0")
     def test_new_page_renders(self):
-        '''Server returns /app/new page without error.'''
+        '''HW4: Server returns /app/new page without error.'''
         request = requests.get("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
@@ -130,7 +130,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("2.1")
     def test_user_add_form(self):
-        '''Checks content of /app/new form (right fields, right endpoint)'''
+        '''HW4: Checks content of /app/new form (right fields, right endpoint)'''
         form_page_text = requests.get("http://localhost:8000/app/new").text
         name_check = re.search("user_name", form_page_text, re.IGNORECASE)
         email_check = re.search("email", form_page_text)
@@ -154,7 +154,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("2.3")
     def test_new_page_fails_post(self):
-        '''Check the /app/new page returns an error if POST.'''
+        '''HW4: Check the /app/new page returns an error if POST.'''
         request = requests.post("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertNotEqual(request.status_code, 200,
@@ -166,7 +166,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("3")
     def test_user_add_api(self):
-        '''Checks that createUser endpoint responds with code 200
+        '''HW4: Checks that createUser endpoint responds with code 200
         when it should be successful'''
         response = requests.post("http://localhost:8000/app/createUser",
                                  data=self.user_dict)
@@ -178,7 +178,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("3.5")
     def test_user_add_duplicate_email_api(self):
-        '''Checks that createUser responds with an error adding duplicate email user'''
+        '''HW4: Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
         dup_user["user_name"] = ( 
              "TestUserName-" +  dup_user["email"][0:2]) 
@@ -192,7 +192,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("4")
     def test_user_add_api_raises(self):
-        '''Checks that createUser endpoint does not take GET'''
+        '''HW4: Checks that createUser endpoint does not take GET'''
         response = requests.get("http://localhost:8000/app/createUser",
             data=self.user_dict)  # data doesn't matter
         if response.status_code == 404:
@@ -204,7 +204,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("5")
     def test_user_login(self):
-        '''Checks accounts/login page for login success'''
+        '''HW4: Checks accounts/login page for login success'''
         user_dict = self.user_dict
         session = requests.Session()
         # first get csrf token from login page
@@ -234,7 +234,7 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("6")
     def test_user_login_displayed(self):
-        '''Checks index page contains username (email) if logged in'''
+        '''HW4: Checks index page contains username (email) if logged in'''
         user_dict = self.user_dict
         session = requests.Session()
         response0 = session.get("http://localhost:8000/accounts/login/")
