@@ -118,13 +118,13 @@ class TestDjangoApp(unittest.TestCase):
         '''Counts all the rows in sqlite tables beginning
         with "app", to confirm that rows are being added.
         '''
-        tables = check_output(["sqlite3", "db.sqlite3",
+        tables = check_output(["sqlite3", "attendancechimp/db.sqlite3",
 "SELECT name FROM sqlite_master WHERE type='table'"]).decode().split("\n")
         apptables = [table for table in tables if table[0:3] == 'app']
         apptables = [str(table) for table in tables if table[0:3] == 'app']
         n = 0
         for apptable in apptables:
-            contents = check_output(["sqlite3", "db.sqlite3", "SELECT * from "+apptable]).decode().split()
+            contents = check_output(["sqlite3", "attendancechimp/db.sqlite3", "SELECT * from "+apptable]).decode().split()
             n += len(contents)
 #            print("Apptable", apptable, len(contents), "rows")
         return n
@@ -139,8 +139,7 @@ class TestDjangoApp(unittest.TestCase):
         before_rows = self.count_app_rows()
         # Now hit createCourse, now that we are logged in
         data = {'course-name': "CS103", "start-time": "12:00",
-                          "end-time": "13:20", "day-mon": "1",
-                  "csrfmiddlewaretoken": self.csrfdata}
+                          "end-time": "13:20", "day-mon": "1"}
         response2 = session.post("http://localhost:8000/app/createCourse/",
                       data=data, headers= self.headers)
         after_rows = self.count_app_rows()
@@ -156,8 +155,7 @@ class TestDjangoApp(unittest.TestCase):
         session = self.session
         before_rows = self.count_app_rows()
         # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata}
+        data = {'choice': "CS103"}
         response2 = session.post("http://localhost:8000/app/createLecture/",
                       data=data, headers= self.headers)
         after_rows = self.count_app_rows()
@@ -173,8 +171,7 @@ class TestDjangoApp(unittest.TestCase):
         session = self.session
         before_rows = self.count_app_rows()
         # Now hit createLecture, now that we are logged in
-        data = {'imageUpload': open("test_QR.png", "rb"),
-                  "csrfmiddlewaretoken": self.csrfdata}
+        data = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                       data=data, headers= self.headers)
         after_rows = self.count_app_rows()
