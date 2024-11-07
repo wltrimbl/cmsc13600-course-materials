@@ -37,6 +37,18 @@ else:
 # three tests with invalid input, something essential not defined (3)
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
+instructor_data = {
+                "email": "autograder_test@test.org",
+                "is_student": "0",
+                "user_name": "Autograder Tester",
+                "password": "Password123"
+                }
+student_data= {
+                "email": "student_test@test.org",
+                "is_student": "1",
+                "user_name": "Tester Student",
+                "password": "Password123"
+                }
 
 
 class TestDjangoHw5simple(unittest.TestCase):
@@ -59,18 +71,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         else:
             self.DEADSERVER = True
             self.deadserver_error = p.communicate()
-        self.instructor_data = {
-                "email": "autograder_test@test.org",
-                "is_student": "0",
-                "user_name": "Autograder Tester",
-                "password": "Password123"
-                }
-        self.student_data= {
-                "email": "student_test@test.org",
-                "is_student": "1",
-                "user_name": "Tester Student",
-                "password": "Password123"
-                }
+
+
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
                                      data=data,
@@ -84,8 +86,8 @@ class TestDjangoHw5simple(unittest.TestCase):
             else:
                 csrfdata = ""
             print("CSRF:", csrfdata)
-            logindata = {"username": self.instructor_data["user_name"],
-                     "password": self.instructor_data["password"],
+            logindata = {"username": data["user_name"],
+                     "password": data["password"],
                      "csrfmiddlewaretoken": csrfdata}
             print("LOGINDATA", logindata)
             loginheaders = {"X-CSRFToken": csrfdata, "Referer":
@@ -111,19 +113,34 @@ class TestDjangoHw5simple(unittest.TestCase):
             except AttributeError:
                 csrf = csrfdata
                 print("This is bad, can't find CSRF token, using old one {}".format(csrf))
-#                raise Exception("Can't find CSRF token")
-# Now we can use self.session  as a logged-in requests object.
             headers = {"X-CSRFToken": csrf,
                         "Referer": "http://localhost:8000/accounts/login"}
             return(session, headers, csrf)
-        self.session_ins, self.headers_ins, self.csrfdata_ins = login(self.instructor_data)
-        self.session_stu, self.headers_stu, self.csrfdata_stu = login(self.student_data)
-
+# Now we can use self.session  as a logged-in requests object.
+        self.session_ins, self.headers_ins, self.csrfdata_ins = login(instructor_data)
+        self.session_stu, self.headers_stu, self.csrfdata_stu = login(student_data)
+        print("INScookies", self.session_ins.cookies)
+        print("STUcookies", self.session_stu.cookies)
 
 
     @classmethod
     def tearDownClass(self):
         self.SERVER.terminate()
+
+    def count_app_rows(self):
+        '''Counts all the rows in sqlite tables beginning
+        with "app", to confirm that rows are being added.
+        '''
+        tables = check_output(["sqlite3", "attendancechimp/db.sqlite3",
+"SELECT name FROM sqlite_master WHERE type='table'"]).decode().split("\n")
+        apptables = [table for table in tables if table[0:3] == 'app']
+        apptables = [str(table) for table in tables if table[0:3] == 'app']
+        n = 0
+        for apptable in apptables:
+            contents = check_output(["sqlite3", "attendancechimp/db.sqlite3", "SELECT * from "+apptable]).decode().split()
+            n += len(contents)
+#            print("Apptable", apptable, len(contents), "rows")
+        return n
 
     @weight(0.5)
     @number("10.0")
@@ -148,13 +165,13 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_createcourse_endpoint_student(self):
         '''Check server responds to http://localhost:8000/app/createCourse/'''
         data = {'course-name': "CS101", "start-time": "12:00",
-                "end-time": "13:20", "day-mon": "1",
-                 "csrfmiddlewaretoken": self.csrfdata_stu}
+                "end-time": "13:20", "day-mon": "1"}
+#                 "csrfmiddlewaretoken": self.csrfdata_stu}
         session = self.session_stu
         request = session.post(
             "http://localhost:8000/app/createCourse/",
             data=data, headers=self.headers_stu)
-        self.assertEqual(request.status_code, 200,
+        self.assertEqual(request.status_code, 401,
                          "Server returns error for POST to " +
                          "http://localhost:8000/app/createCourse/ " +
                          "Data:{}".format(data)
@@ -169,11 +186,10 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         session = self.session_ins
         # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata_ins}
+        data = {'choice': "CS103",}
         response2 = session.post(
                     "http://localhost:8000/app/createLecture/",
-                    data=data, headers=self.headers_ins)
+                    data=data )
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/app/createLecture/ " +
                          "Data:{}".format(data)
@@ -186,16 +202,14 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         '''
         session = self.session_stu
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata_stu}
+        data = {'choice': "CS103",}
         response2 = session.post(
                     "http://localhost:8000/app/createLecture/",
-                    data=data, headers=self.headers_stu)
+                    data=data)
         self.assertEqual(response2.status_code, 401,
                          "Server should returns 401 unauthorized for student at http://localhost:8000/app/createLecture/ " +
                          "Data:{}".format(data)
-#                        + "Content:{}".format(response2.text)
+                        + "Content:{}".format(response2.text)
                           )
 
     @weight(0.5)
@@ -204,15 +218,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         '''
         session = self.session_stu
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata_stu}
+        files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
-                      data=data, headers= self.headers_stu)
+                      files=files)
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/createQRCodeUpload/ " +
-                         "Data:{}".format(data)
-#                        + "Content:{}".format(response2.text)
+                         "Data:{}".format(files)
+                        + "Content:{}".format(response2.text)
                          )
     @weight(0.5)
     @number("12.1")
@@ -220,15 +232,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         '''
         session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata_ins}
+        files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
-                      data=data, headers= self.headers_ins)
+                      files=files)
         self.assertEqual(response2.status_code, 401,
                          "Server should returns error for instructor to http://localhost:8000/createQRCodeUpload/ " +
-                         "Data:{}".format(data)
-#                         "Content:{}".format(response2.text)
+                         "Data:{}".format(files)+
+                         "Content:{}".format(response2.text)
                          )
 
     @weight(0.5)
@@ -238,14 +248,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         session = self.session_ins
         # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS103",
-                  "csrfmiddlewaretoken": self.csrfdata_ins}
+        files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      data=data, headers= self.headers_ins)
+                      files=files)
         print(response2.text)
         self.assertEqual(response2.status_code, 200,
             "Server returns error for GET to http://localhost:8000/dumpUploads " +
-                         "Data:{}".format(data)
+                         "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                          )
 
@@ -255,13 +264,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         '''
         session = requests.Session() #Not logged in
-        data = {'choice': "CS103"}
+        files = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      data=data )
+                      files=files)
         print(response2.text)
         self.assertEqual(response2.status_code, 401,
             "Server should return 401 Not authorized for http://localhost:8000/dumpUploads " +
-                         "Data:{}".format(data)
+                         "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                           )
 
@@ -271,7 +280,6 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_login_index(self):
         '''Logs in, tests index.html '''
         session = self.session_ins
-        instructor_data = self.instructor_data
         # Now hit createCourse, now that we are logged in
         response_index = session.get("http://localhost:8000/")
         sanitized_text = response_index.text.replace('value="{}"'.format(
@@ -281,5 +289,55 @@ class TestDjangoHw5simple(unittest.TestCase):
                          "Content:{}".format(response_index.text))
         print(sanitized_text)
         self.assertTrue((instructor_data["user_name"] in sanitized_text or
-                         self.instructor_data["email"] in sanitized_text),
+                         instructor_data["email"] in sanitized_text),
                         "Can't find email or username in {}".format(sanitized_text))
+
+    @weight(0)
+    @number("23")
+    def test_createqrcodeupload_add(self):
+        '''Test that createQRCodeUpload endpoint actually adds data
+        '''
+        session = self.session_stu
+        before_rows = self.count_app_rows()
+        # Now hit createLecture, now that we are logged in
+        data = {'imageUpload': open("test_QR.png", "rb")}
+        response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
+                      files=data)
+        after_rows = self.count_app_rows()
+        self.assertGreater(after_rows - before_rows, 0,
+                         "Cannot confirm createQRCodeUpload updated database" +
+                         "Content:{}".format(response2.text))
+    @weight(2)
+    @number("21")
+    def test_createcourse_add(self):
+        '''Test that createCourse endpoint actually adds data
+        '''
+        session = self.session_ins
+        before_rows = self.count_app_rows()
+        # Now hit createCourse, now that we are logged in
+        data = {'course-name': "CS103", "start-time": "12:00",
+                          "end-time": "13:20", "day-mon": "1"}
+        response2 = session.post("http://localhost:8000/app/createCourse/",
+                      data=data)
+        after_rows = self.count_app_rows()
+        self.assertGreater(after_rows - before_rows, 0,
+                         "Cannot confirm createCourse updated database" +
+                         "Content:{}".format(response2.text))
+
+    @weight(2)
+    @number("22")
+    def test_createlecture_add(self):
+        '''Test that createLecture endpoint actually adds data
+        '''
+        session = self.session_ins
+        before_rows = self.count_app_rows()
+        # Now hit createLecture, now that we are logged in
+        data = {'choice': "CS103"}
+        response2 = session.post("http://localhost:8000/app/createLecture/",
+                      data=data) 
+        after_rows = self.count_app_rows()
+        self.assertGreater(after_rows - before_rows, 0,
+                         "Cannot confirm createLecture updated database" +
+                         "Content:{}".format(response2.text))
+
+
