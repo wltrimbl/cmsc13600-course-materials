@@ -68,6 +68,16 @@ You'll have to add the import statement to the top of views.py:
 from django.http import JsonResponse
 ```
 
+## Authentication
+The autograder will create a student and an instructor (it's ok if these user creations fail if the test users already exist) and will confirm that the API enforces some security requirements:
+
+* `/app/createCourse`      must be logged in as instructor, otherwise return should have HTTP status code 401 unauthorized
+* `/app/createLecture`        must be logged in as instructor, otherwise 401 unauthorized
+* `/app/createQRCodeUpload`   must be logged in as student, otherwise 401 unauthorized
+* `/app/dumpUploads`         must be logged in as instructor, otherwise 401 unauthorized
+
+While each of these requirements is two (or four) lines of code, this depends on the createUser successfully differentiating between these two types of user.
+
 ## Revising the schema
 You may discover that your schema is not up to the tasks set to it.  This is ok, but needs to be fixed.  When you update your models.py, django needs to move your data from the old schema to the new schema, a process called migration.
 
