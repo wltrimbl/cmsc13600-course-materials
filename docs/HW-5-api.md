@@ -100,6 +100,27 @@ python manage.py migrate
 1. It's up to you to create some test data, use the application to generate valid and invalid uploads.
 2. Start this assignment early! It seems simple but there are a lot of moving pieces to get wrong.
 
+## Install the testing harness locally 
+The tests are written with the python unittest framework.  Tests are hard to write but easy to run.
+
+1.  In your virtual environment for django, you will need to install a few things:
+
+```
+conda install -y pytest bs4 
+```
+
+and a few things that must be installed with pip:
+
+```
+python -m pip install gradescope_utils requests
+```
+
+2.  Put the test file (for HW5 it's `test_simple.py`) from https://github.com/wltrimbl/cmsc13600-course-materials/tree/main/autograder/hw5/tests in the project directory (the directory containing attendancechimp) 
+
+3.  To run all the tests, it's `pytest test_simple.py`
+
+4.  To run a single test, it's `pytest test_simple.py::TestDjangoHw5simple::test_createlecture_endpoint_student`
+
 ## Grading 
 You have four new API endpoints:
 1.  /app/createCourse
