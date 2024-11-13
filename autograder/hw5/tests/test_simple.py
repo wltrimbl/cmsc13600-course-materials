@@ -123,7 +123,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.0")
     def test_createcourse_endpoint(self):
-        '''Check server responds to http://localhost:8000/app/createCourse/'''
+        '''Check server responds with success to http://localhost:8000/app/createCourse/'''
         data = {'course-name': "CS103",  # +random.choice(string.ascii_lowercase) +
 #                          random.choice(string.ascii_lowercase), 
                                  "start-time": "12:00",
@@ -142,7 +142,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.1")
     def test_createcourse_endpoint_student(self):
-        '''Check server responds to http://localhost:8000/app/createCourse/'''
+        '''Test createCourse endpoint by a student, which should fail with 401 unauthorized http://localhost:8000/app/createCourse/'''
         data = {'course-name': "CS103" + random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase), "start-time": "12:00",
                 "end-time": "13:20", "day-mon": "1"}
@@ -151,7 +151,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "http://localhost:8000/app/createCourse/",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/createCourse/" +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
@@ -175,7 +175,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             data=data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/createLecture/" +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
@@ -196,7 +196,7 @@ class TestDjangoHw5simple(unittest.TestCase):
              "http://localhost:8000/app/createLecture/",
              data=data)
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/createLecture/ " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
@@ -216,7 +216,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                       files=files)
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/createQRCodeUpload/" +
             "Data:{}".format(files)
 #            "Content:{}".format(response2.text)
             )
@@ -236,7 +236,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                       files=files)
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/createQRCodeUpload/" +
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                           )
@@ -258,7 +258,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                       files=files)
         print(response2.text)
         self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/dumpUploads " +
+            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                          )
@@ -274,12 +274,12 @@ class TestDjangoHw5simple(unittest.TestCase):
                       files=files)
         print(response2.text)
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/dumpUploads " +
+            "Server returned 404 not found for http://localhost:8000/app/dumpUploads " +
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                           )
         self.assertEqual(response2.status_code, 401,
-            "Server should return 401 Not authorized for http://localhost:8000/dumpUploads " +
+            "Server should return 401 Not authorized for http://localhost:8000/app/dumpUploads " +
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
                           )
@@ -313,7 +313,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                                  files=data)
         self.assertEqual(response2.status_code, 200,
-                         "Server returns error for GET to http://localhost:8000/ " +
+                         "Server returns error for GET to http://localhost:8000/app/createQRCodeUpload/" +
                          "Content:{}".format(response2.text))
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
