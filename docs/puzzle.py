@@ -4,7 +4,7 @@ import random
 text that requires a little bit of programming to brute force.
 '''
 
-key = "{:07d}".format(int(random.random() * 10000000))
+key = "{:09d}".format(int(random.random() * 1000000000))
 
 words = open("TEXT", "r").read()
 with open("PUZZLE", "w") as puzzle:
