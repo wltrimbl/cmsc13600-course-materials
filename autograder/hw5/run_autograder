@@ -7,8 +7,6 @@ cp -r /autograder/submission/attendancechimp /autograder/source
 
 cd /autograder/source
 
-touch test_QR.png
-
 rm -Rf /autograder/source/examples/
 
 python3 run_tests.py

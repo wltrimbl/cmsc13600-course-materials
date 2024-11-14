@@ -108,6 +108,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Counts all the rows in sqlite tables beginning
         with "app", to confirm that rows are being added.
         '''
+        if not path.exists("attendancechimp/db.sqlite3"):
+            raise AssertionError("Cannot find attendancechimp/db.sqlite3, this test isn't going to work")
         tables = check_output(["sqlite3", "attendancechimp/db.sqlite3",
             "SELECT name FROM sqlite_master WHERE type='table'"]).decode().split("\n")
         apptables = [table for table in tables if table[0:3] == 'app']
@@ -307,7 +309,11 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test that createQRCodeUpload endpoint actually adds data
         '''
         session = self.session_stu
-        before_rows = self.count_app_rows()
+        try:
+            before_rows = self.count_app_rows()
+        except AssertionError:
+            self.assertEqual(0,1, "Cannot find attendancechimp/db.sqlite3!")
+
         # Now hit createLecture, now that we are logged in
         data = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
