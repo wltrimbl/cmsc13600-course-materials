@@ -51,6 +51,12 @@ a username and an upload time as a string value:
 So far the data that we've created to permit automated testing (called the "test fixtures") have just been usernames, passwords, and a few dummy classes.  We will need to create a a collection of photos of QR codes to test the QR code decoding / lecture matching functionality. 
 
 For now, modify createLecture to accept an (optional) field called qrdata containing 16 alphanumeric characters.  Make sure that the new createLecuture populates a field in the Lectures table with this value (or random data if the parameter is not specified).
- 
+
+## Grading
+* models.getUploadsForCourse
+* /app/getUploads
+* createLecture with qrdata
+* hw6-puzzlesolution.txt
+
 ## Submission
 Upload from github to gradescope.
