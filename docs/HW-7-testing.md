@@ -10,5 +10,7 @@ QR codes represent a handful to a few hundred bytes of data, and it makes most s
 1.  Modify `app/createLecture` to create a lecture identifer of 16 random ascii characters if the qrdata is not specified at the time of the API call, and with the qrdata otherwise.
 2.  Modify `app/createQRCodeUpload` to decode the QR code, and, if a match is found in the Lectures table, populate a foreign key.   We'll create some test fixtures 9th week.  If an upload does not decode or does not match a valid lecture, don't raise an HTTP error; we will have to handle invalid uploads in the reporting.
 
-
-
+## Grading
+1. (2 points)  Three tests, different from each other, that appropriately assert required functionality.
+2. (2 points)  Tests actually run.
+3. (2 points)  Decoding and matching seems to work, at least for the really, really easy QR code image.
