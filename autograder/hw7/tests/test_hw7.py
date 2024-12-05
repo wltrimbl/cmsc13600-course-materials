@@ -109,8 +109,8 @@ class TestDjangoHw5simple(unittest.TestCase):
 
     @weight(0)
     @number("30.0")
-    def test_createcourse_endpoint(self):
-        '''test file exists'''
+    def test_test_student_exists(self):
+        '''test attendancechimp/test_student.py file exists'''
         if not path.exists("attendancechimp/test_student.py"):
             raise AssertionError("Cannot find attendancechimp/test_student.py")
 
@@ -179,7 +179,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0)
     @number("32.0")
     def test_createqrcodeupload_testQRjpeg(self):
-        ''' Test createQRCodeUpload endpoint with easy QR.jpeg
+        ''' Upload test-QR.jpeg to createQRCodeUpload 
         '''
         session = self.session_stu
         files = {'imageUpload': open("test-QR.jpeg", "rb")}
@@ -199,7 +199,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0)
     @number("33.0")
     def test_createqrcodeupload_testQRmedium(self):
-        ''' Test createQRCodeUpload endpoint with easy QR.jpeg
+        ''' Upload to createQRCodeUpload endpoint QR.jpeg
         '''
         session = self.session_stu
         files = {'imageUpload': open("test-QR-medium.jpeg", "rb")}
@@ -219,7 +219,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("34.0")
     def test_createqrcodeupload_cantfindlecture(self):
-        ''' Test createQRCodeUpload endpoint with QR code with no corresponding lecture
+        ''' Upload QR code with no lecture to createQRCodeUpload 
         '''
         session = self.session_stu
         files = {'imageUpload': open("test-BAD.png", "rb")}
@@ -239,7 +239,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("35.0")
     def test_createqrcodeupload_testnotaQRcode(self):
-        ''' Test createQRCodeUpload endpoint with picture that is not a QR code
+        ''' Upload picture that is not a QR code to createQRCodeUpload
         '''
         session = self.session_stu
         files = {'imageUpload': open("test-CAT.jpeg", "rb")}
@@ -256,196 +256,14 @@ class TestDjangoHw5simple(unittest.TestCase):
                         + "Content:{}".format(response2.text)
                           )
 
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
-    @weight(0)
-    @number("13.0")
-    def test_dumpuploads_endpoint(self):
-        '''
-        '''
-        session = self.session_ins
-        # Now hit createLecture, now that we are logged in
-        files = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.get("http://localhost:8000/app/dumpUploads",
-                      files=files)
-        print(response2.text)
-        self.assertEqual(response2.status_code, 200,
-            "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
-                         "Data:{}".format(files)
-#                         "Content:{}".format(response2.text)
-                         )
 
-    @weight(0)
-    @number("23")
-    def test_createqrcodeupload_add(self):
-        '''Test that createQRCodeUpload endpoint actually adds data
-        '''
-        session = self.session_stu
-        try:
-            before_rows = self.count_app_rows()
-        except AssertionError:
-            self.assertEqual(0,1, "Cannot find attendancechimp/db.sqlite3!")
-
-        # Now hit createLecture, now that we are logged in
-        data = {'imageUpload': open("test_QR.png", "rb")}
-        response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
-                                 files=data)
-        self.assertEqual(response2.status_code, 200,
-                         "Server returns error for GET to http://localhost:8000/app/createQRCodeUpload/" +
-                         "Content:{}".format(response2.text))
-        after_rows = self.count_app_rows()
-        self.assertGreater(after_rows - before_rows, 0,
-                           "Cannot confirm createQRCodeUpload updated database" +
-                           "Content:{}".format(response2.text))
-
-    @weight(0)
-    @number("21")
-    def test_createcourse_add(self):
-        '''Test that createCourse endpoint actually adds data
-        '''
-        session = self.session_ins
-        before_rows = self.count_app_rows()
-        # Now hit createCourse, now that we are logged in
-        data = {'course-name': "CS104", "start-time": "12:00",
-                "end-time": "13:20", "day-mon": "1"}
-        print("Calling http://localhost:8000/app/createCourse/ with", data)
-        response2 = session.post("http://localhost:8000/app/createCourse/",
-                                 data=data)
-        after_rows = self.count_app_rows()
-        self.assertGreater(after_rows - before_rows, 0,
-                         "Cannot confirm createCourse updated database" +
-                         "Content:{}".format(response2.text))
-    @weight(0)
-    @number("22")
-    def test_createlecture_add(self):
-        '''Test that createLecture endpoint actually adds data
-        '''
-        session = self.session_ins
-        before_rows = self.count_app_rows()
-        # Now hit createLecture, now that we are logged in
-        data = {'choice': "CS104"}
-        response2 = session.post("http://localhost:8000/app/createLecture/",
-                                 data=data)
-        after_rows = self.count_app_rows()
-        self.assertGreater(after_rows - before_rows, 0,
-                         "Cannot confirm createCourse updated database" +
-                         "Content:{}".format(response2.text))
-
-    @weight(0)
-    @number("22")
+    @weight(1)
+    @number("39")
     def test_run_test_student(self):
-        '''Test that createLecture endpoint actually adds data
+        '''Run student tests, confirm no failures
         '''
+        if not path.exists("attendancechimp/test_student.py"):
+            raise AssertionError("Cannot find attendancechimp/test_student.py")
         out = check_output(["pytest", "attendancechimp/test_student.py"]).decode("utf-8")
         self.assertFalse("ailed" in out, "Some student-provided tests failed "+out)
   
