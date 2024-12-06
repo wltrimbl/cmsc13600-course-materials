@@ -3,7 +3,7 @@ from glob import glob
 import cv2
 import platform
 
-if platform.system() == "Darwin" and 0: 
+if platform.system() == "Darwin": 
 # QR detector from opencv, not as capable 
 # https://stackoverflow.com/questions/72542475/opencv-qrdetector-read-nothing-but-detect-the-qr
     def qrdecode(fname):
