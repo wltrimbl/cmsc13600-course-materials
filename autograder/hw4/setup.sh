@@ -1,11 +1,15 @@
 #!/bin/bash
 
-apt-get update && apt-get install -y python3-pip python3 file # python3-dev 
+apt-get update && apt-get install -y python3-pip python3 file  sqlite3 python3-opencv libzbar0 # python3-dev 
 
 TZ=Etc/UTC 
 apt-get -y install tzdata 
 
 
 # pytest is for debugging
-pip3 install gradescope-utils pylint pytest django requests Pillow bs4
+
+pip3 install gradescope-utils pylint pytest requests Pillow bs4 qrcode opencv-python
+pip3 install pyzbar 
+python -m pip install Django==5.1
+
 
