@@ -30,7 +30,7 @@ else:
 # /app/createLecture  (API endpoint for  new_lecture)
 # /app/createQRCodeUpload  (API endpoint for new_qr_upload)
 # /app/getUploads   (diagnostic endpoint for createQRCodeUpload)
-# TESTS FOR HTTP  200 response...  (4)
+# TESTS FOR HTTP  200 or 201 response...  (4)
 # TEST that row is actually added with valid input  (3)
 # three tests with invalid input, something essential not defined (3)
 
@@ -134,7 +134,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         request = session.post(
             "http://localhost:8000/app/createCourse/",
             data=data)
-        self.assertEqual(request.status_code, 200,
+        self.assertLess(request.status_code, 203,  # 200 or 201 ok
             "Server returns error for POST to " +
             "http://localhost:8000/app/createCourse/ " +
             "Data:{}".format(data)
@@ -181,7 +181,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
-        self.assertEqual(response2.status_code, 200,
+        self.assertLess(response2.status_code, 203,
             "Server returns error for http://localhost:8000/app/createLecture/ " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
@@ -222,7 +222,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Data:{}".format(files)
 #            "Content:{}".format(response2.text)
             )
-        self.assertEqual(response2.status_code, 200,
+        self.assertLess(response2.status_code, 203,
                          "Server returns error for http://localhost:8000/createQRCodeUpload/ " +
                          "Data:{}".format(files)
                         + "Content:{}".format(response2.text)
@@ -259,7 +259,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response2 = session.get("http://localhost:8000/app/dumpUploads",
                       files=files)
         print(response2.text)
-        self.assertEqual(response2.status_code, 200,
+        self.assertLess(response2.status_code, 203,
             "Server returns error for GET to http://localhost:8000/app/dumpUploads " +
                          "Data:{}".format(files)
 #                         "Content:{}".format(response2.text)
@@ -295,7 +295,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response_index = session.get("http://localhost:8000/")
         sanitized_text = response_index.text.replace('value="{}"'.format(
             instructor_data["email"]), 'value=WRONGEMAIL')
-        self.assertEqual(response_index.status_code, 200,
+        self.assertLess(response_index.status_code, 203,
                          "Server returns error for GET to http://localhost:8000/ " +
                          "Content:{}".format(response_index.text))
         print(sanitized_text)
@@ -318,7 +318,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         data = {'imageUpload': open("test_QR.png", "rb")}
         response2 = session.post("http://localhost:8000/app/createQRCodeUpload/",
                                  files=data)
-        self.assertEqual(response2.status_code, 200,
+        self.assertLess(response2.status_code, 203,
                          "Server returns error for GET to http://localhost:8000/app/createQRCodeUpload/" +
                          "Content:{}".format(response2.text))
         after_rows = self.count_app_rows()

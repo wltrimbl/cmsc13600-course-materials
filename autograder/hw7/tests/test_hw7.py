@@ -115,7 +115,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             raise AssertionError("Cannot find attendancechimp/test_student.py")
 
     @weight(0)
-    @number("10.0")
+    @number("10.01")
     def test_createcourse_endpoint(self):
         '''Check server responds with success to http://localhost:8000/app/createCourse/'''
         data = {'course-name': "CS103",  # +random.choice(string.ascii_lowercase) +
@@ -168,8 +168,8 @@ class TestDjangoHw5simple(unittest.TestCase):
                       files=files)
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createQRCodeUpload/" +
-            "Data:{}".format(files)
-#            "Content:{}".format(response2.text)
+            "Data:{}".format(files)+
+            "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 200,
                          "Server returns error for http://localhost:8000/createQRCodeUpload/ " +
@@ -177,7 +177,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                         + "Content:{}".format(response2.text)
                           )
     @weight(0)
-    @number("32.0")
+    @number("32.5")
     def test_createqrcodeupload_testQRjpeg(self):
         ''' Upload test-QR.jpeg to createQRCodeUpload 
         '''
@@ -264,8 +264,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         if not path.exists("attendancechimp/test_student.py"):
             raise AssertionError("Cannot find attendancechimp/test_student.py")
-        out = check_output(["pytest", "attendancechimp/test_student.py"]).decode("utf-8")
-        self.assertFalse("ailed" in out, "Some student-provided tests failed "+out)
-  
+        result = subprocess.run(["pytest", "attendancechimp/test_student.py"], capture_output=True, text=True)
+        out = result.stdout
         print(out)
+        self.assertFalse(result.returncode, "Some student-provided tests failed "+out)
 

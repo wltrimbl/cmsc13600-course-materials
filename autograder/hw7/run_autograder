@@ -3,11 +3,14 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
+find /autograder/submission -name '*.pyc'  -exec rm -Rf {} \+ 
+find /autograder/submission -name '__pycache__'  -exec rm -Rf {} \+ 
+rm -Rf /autograder/submission/examples/
+
 cp -r /autograder/submission/attendancechimp /autograder/source
+cp -r /autograder/submission/* /autograder/source
 
 cd /autograder/source
-
-rm -Rf /autograder/source/examples/
 
 python3 run_tests.py
 
