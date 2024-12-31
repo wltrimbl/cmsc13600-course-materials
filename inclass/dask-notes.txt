@@ -1,0 +1,24 @@
+conda create --name dask
+conda activate dask
+# From https://cloud.coiled.io/get-started getting started with coiled
+
+pip install pip==24.0
+
+pip install coiled "dask[complete]"
+
+coiled login
+
+
+conda create -n dask2 -c conda-forge coiled 
+
+
+
+import coiled
+cluster = coiled.Cluster(n_workers=10)
+client = cluster.get_client()
+
+import dask.dataframe as dd
+
+.... ultimately I abandoned this because the local environment (managed by conda) didn't perfectly
+match the worker environment; I ended up using docker instead.
+
