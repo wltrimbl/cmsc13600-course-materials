@@ -1,0 +1,60 @@
+To deploy attendancechimp in the cloud (Amazon elasic cloud EC2):
+
+Sign up for Amazon Web Services, go to the EC2 control panel
+
+New server:
+ubuntu LTS 22.04
+
+choose public key that you've already set up with amazon; this will 
+allow you to log in.
+
+Server type: t1.micro, at a rate of $0.0116 / hour
+
+Firewall:
+allow ssh from everywhere
+custom firewall rule:  allow TCP traffic on port 8000 from everywhere
+
+Launch Instance.
+
+After creating new instance, take note of its ip and add the following four lines to 
+your (local) ~/.ssh/config: 
+
+	Host AMAZON
+	Hostname         34.207.69.6 
+	User ubuntu
+	Identityfile   /Users/grover/.ssh/amazonkey.pem
+
+Populate the new instance with the source code.  Rather than authorizing git
+on the EC2 node, we can just transfer a file:
+
+scp attendancechimp.zip AMAZON:   # transfer local file attendnancechimp.zip to remote server AMAZON
+
+ssh AMAZON
+
+# Now we have a blank server in amazon's cloud running ubuntu.  We have to install everything, with 
+the possible exception of git. 
+
+# Commands to install everything needed by django and pytest:
+sudo apt-get update
+sudo apt install python3-django unzip -y 
+sudo apt install python3-bs4 python3-pytest  python3-pillow sqlite3  -y
+sudo apt install python3-pip -y 
+pip3 install  --break-system-packages gradescope_utils
+
+And the magic happens when we
+unzip attendancechimp.zip
+python3 attendancechimp/manage.py runserver 0.0.0.0:8000
+
+And we may have to change attendancechimp/attendancechimp/settings.py 
+ALLOWED_HOSTS = ["*"]
+
+to permit django to actually respond to requests from The Internet.
+
+Now I can go to 
+http://34.207.69.6:8000/app/index.html
+
+and see the server I have deployed.  
+
+In any kind of real-world environment other than data analysis, there would be a script to
+create, configure, run, and destroy the nodes, and the code monkey's job is to understand
+the script well enough to fix it when it breaks.
