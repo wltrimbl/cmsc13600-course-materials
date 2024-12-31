@@ -35,6 +35,12 @@ class TestHelloWorld(unittest.TestCase):
         '''Test unneeded_data.csv does not exist, and manage.py from template is present.'''
         self.assertFalse(os.path.exists(AG+"unneeded_data.csv"),
                         "unneeded_data.csv exists!")
+        self.assertFalse(os.path.exists(AG+"unneded_data.csv"),
+                        "unneded_data.csv exists!")
+        self.assertFalse(os.path.exists(AG+"uneded_data.csv"),
+                        "uneded_data.csv exists!")
+        self.assertFalse(os.path.exists(AG+"uneeded_data.csv"),
+                        "uneeded_data.csv exists!")
         self.assertTrue(os.path.exists(AG+"attendancechimp/manage.py"), "attendancechimp/manage.py does not exist!")
 
     @weight(1)
