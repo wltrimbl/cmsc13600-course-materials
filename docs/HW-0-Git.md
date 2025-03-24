@@ -93,14 +93,16 @@ For instance,
 0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
 1.  Add a file to your repository called `names.txt` that has the names and github IDs of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include just your name and github id.
 2.  Remove the file `unneeded_data.csv` from the repository.
-3.  Clean up the data here https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category and check in a clean version with the last column removed.  This database has a very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove this column and check in the database with the other 19 columns.
+3.  Download the table of nobel laureates from here https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category .  This database has a very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove this column and check in the database with the other 19 columns as `nobel-prize-laureates-clean.csv`.  Do not check `nobel-prize-laureates.csv` in to github for full credit.  (Github will let you do it, but you won't pass all the tests if you do.)   This "cleaning" can be done entirely with a single unix command:
+https://man7.org/linux/man-pages/man1/cut.1.html
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
 1. Successfully added a file to the repository named `names.txt`
 2. Removed `unneeded_data.csv`
-3. (2 points) Added nobel-prize-laureates.csv without the geographic shape field
+3. Added `nobel-prize-laureates-clean.csv` without the geographic shape field
+3. Did not add `nobel-prize-laureates.csv` to the repository.
 
 ## FAQ
 1. I'm having github ssh problems on MacOSX
