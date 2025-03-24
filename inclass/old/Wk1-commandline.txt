@@ -1,0 +1,32 @@
+# A sanitized subset of the class roster as of 
+# Tuesday of 1st week is on canvas.
+
+cd new
+
+ls -l
+
+wc cleanroster.csv
+
+cat cleanroster.csv
+
+cut -f 1 cleanroster.csv
+
+man cut
+
+cut -f 6 -d , cleanroster.csv
+
+cut -f 6 -d , cleanroster.csv | sort
+
+cut -f 6 -d , cleanroster.csv| uniq 
+
+cut -f 6 -d , cleanroster.csv|sort | uniq 
+
+cut -f 6 -d , cleanroster.csv|sort | uniq -c
+
+grep Economics cleanroster.csv
+
+grep Economics cleanroster.csv |wc 
+
+cut -f 6,7 -d , cleanroster.csv
+
+cut -f 6,7 -d , cleanroster.csv| sort | uniq -c

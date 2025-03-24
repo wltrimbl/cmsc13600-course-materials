@@ -1,4 +1,4 @@
-# HW0. Using Git For Version Control  (Due Oct 4, 2024)
+# HW0. Using Git For Version Control  (Due Mar 27, 2025, but late additions to the class need not worry)
 Git is a distributed version control system that tracks changes in any set of computer files, usually used for coordinating work among programmers who are collaboratively developing source code during software development. Its goals include speed, data integrity, and support for distributed, non-linear workflows.
 
 Almost every data science and software engineering project uses a framework like Git to allow for multiple engineers to collaborate on a project.
@@ -10,11 +10,11 @@ Set up git by following the instructions here: https://git-scm.com/book/en/v2/Ge
 
 Complete the following steps to actually use git for the class:
 1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow this github classroom invite link https://classroom.github.com/a/ovghgO_A 
+2. Follow this github classroom invite link:  https://classroom.github.com/a/4ZINvIfP 
  to associate your github username with the course, and it will copy the template repository for you.   
-3.  This will give you a repository with a name like `https://github.com/CMSC13600-Aut2024/cmsc13600-project-yourusername`.  This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
+3.  This will give you a repository with a name like `https://github.com/CMSC-13600-Data-Engineering/project-YOURUSERNAME`.  This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
 
-4.  The commmand `git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-yourusername.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
+4.  The commmand `git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
 
 The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
@@ -36,12 +36,12 @@ to confirm that github recognizes you.
 Use the command line interface to to ``clone'' the
 repository you made above. You can cut and paste the repo url from the github web interface. DONT COPY AND PASTE BELOW, change the user name accordingly after you are done accepting the github classsroom assignment.
 ```
-$ git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-yourusername.git 
+$ git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-YOURUSERNAME.git 
 ```
-Cloning creates a local copy of the code (named cmsc13600-project-yourusername) and you can now work on it!
+Cloning creates a local copy of the code (named cmsc13600-project-YOURUSERNAME) and you can now work on it!
 
 ```
- $ cd cmsc13600-project-yourusername
+ $ cd cmsc13600-project-YOURUSERNAME
  $ git status
 On branch main
 Your branch is up to date with 'origin/main'.
@@ -106,7 +106,7 @@ Test-driven development (TDD) is a software development process relying on softw
 4. Submitted as a branch named hw_0.
 
 ## FAQ
-1.) I'm having github ssh problems on MacOSX
+1. I'm having github ssh problems on MacOSX
 
 The official documentation is here:
 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github

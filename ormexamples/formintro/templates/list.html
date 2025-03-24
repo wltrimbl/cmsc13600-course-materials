@@ -1,0 +1,14 @@
+
+<h1>Titles</h1>
+<ul>
+{% for book in books %}
+    <li><b>{{ book.isbn }}</b> {{ book.title }} by <em>{{ book.author }}</em></li>
+{% endfor %}
+</ul>
+
+<h1>Inventory</h1>
+<ul>
+{% for inv in inventory %}
+    <li>{{ inv.id }}, {{ inv.book.title }}, Checked Out {{inv.borrowed}} </em></li>
+{% endfor %}
+</ul>

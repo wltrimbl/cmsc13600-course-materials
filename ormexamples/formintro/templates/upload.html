@@ -1,0 +1,17 @@
+
+
+<!-- This is an HTML Form. Forms can be used to generate POST requests from your browser -->
+
+<!-- the enc type is crucial here -->
+<form method="post" action="handleUpload" enctype="multipart/form-data">
+
+  <!-- This is a token the prevents outside websites from generating POST requests -->
+  {% csrf_token %}
+
+  <!-- This is the actual form -->
+  <label for="file">File:</label><br>
+  <input type="file" name="file">
+  <input type="submit" value="Submit">
+</form>
+
+{{error}}
