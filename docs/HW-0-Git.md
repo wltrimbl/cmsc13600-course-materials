@@ -14,7 +14,7 @@ Complete the following steps to actually use git for the class:
  to associate your github username with the course, and it will copy the template repository for you.   
 3.  This will give you a repository with a name like `https://github.com/CMSC-13600-Data-Engineering/project-YOURUSERNAME`.  This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
 
-4.  The commmand `git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
+4.  The command `git clone git@github.com:CMSC13600-Aut2024/cmsc13600-project-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
 
 The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
@@ -61,13 +61,11 @@ Open a gitbash (on Windows) or Terminal (on MacOS/linux) window, change director
 $ git checkout main
 $ git pull
 ```
-2. Before you start your work, you should create a new git **branch**. This tags each week's work and indicates which part of the history should be examined by instructional staff.
-```
-$ git checkout -b hw_0
+2. In past quarters, we suggested that different weeks' homework be tracked in different git branches.  This ended up confusing all the instructional staff when hw6's content was in the branch named hw2_final.
 ```
 3. Read the project spec for the homework assignment.  
 
-4. Complete the assignment by following the directions in the spec. After you are done add all of the new files or modified files to the repo:
+4. After you are done add all of the new files or modified files to the repo:
 
 ```
  $ git add <files go here>
@@ -77,33 +75,32 @@ For instance,
  $ git add names.txt
 ```
 
-6. Commit your changes, this creates a log of what you did.
+5. Commit your changes, this creates a log of what you did.
 
 ```
  $ git commit -m 'We added names to the repository'
 ```
 
-7. Push your changes; this copies your local history and all the changes you have **committed** and shares them with the git history on github.  
+6. Push your changes; this copies your local history and all the changes you have **committed** and shares them with the git history on github.  
 ```
  $ git push --set-upstream origin hw_0
 ```
 
-8. EVERY project partner must submit on gradescope even if you are working from the same repository.
+7. EVERY project partner must submit on gradescope even if you are working from the same repository.
 
 
 ## Specification
 0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
-1.  Add a file to your repository called `names.txt` that has all the names of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include your name.
+1.  Add a file to your repository called `names.txt` that has the names and github IDs of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include just your name and github id.
 2.  Remove the file `unneeded_data.csv` from the repository.
-3.  Add a file containing only the text columns of the database of Nobel laureates from https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category    This database has a very bulky and not very interesting column in it; remove this column and check in the database without the geographical polygons.
+3.  Clean up the data here https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category and check in a clean version with the last column removed.  This database has a very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove this column and check in the database with the other 19 columns.
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
 1. Successfully added a file to the repository named `names.txt`
 2. Removed `unneeded_data.csv`
-3. Added nobel-prize-laureates.csv without the geographic shape field
-4. Submitted as a branch named hw_0.
+3. (2 points) Added nobel-prize-laureates.csv without the geographic shape field
 
 ## FAQ
 1. I'm having github ssh problems on MacOSX
