@@ -1,0 +1,61 @@
+Virtualization - using software to provide isolation
+	changes costs:
+	flexible amount of compute
+	portability
+	isolation
+
+
+Suppose attendancechimp got a contract to run the timecard system for a medium-sized state government.
+Customers are managers, employees, HR..
+
+Design pattern:  
+	separate code and data
+	separate high-value data from low-value data
+	separate code from configuration
+
+Debuggin pattern:  
+	fail early, fail often!
+
+How to characterize a distributed system?
+	Consistency
+	Availability
+	Partition tolerance
+
+CAP theorem:  pick two.
+Ordinary circumstances the internet works, and we choose Consistency and Availability, duh.
+When the network goes down, we much choose one, consistency or availability.
+
+OLAP  Online analysis processing
+	optimized for large, slow, possibly imprecise queries
+	complex
+	ok if inconsistent or incomplete if informative
+	(log analysis, A/B testing)
+
+OLTP Online Transaction processing 
+	optimized for small, routine, high-avialability updates
+	simple
+	fast
+	Must Be Consistent.
+	(shopping cart checkout)
+
+Compression:  
+	Lossless
+	models the data
+	encodes parameters + difference from model
+	because model is good, differences are small & take up less space than the whole dataset
+	use short codes for differences that are most probable
+
+	Lossy
+	Models the data
+	encodes the model
+	size(model parameters) we hope is << size(data)
+	throw away differences that are inconsistent with model (and presumably less important)
+
+
+Latency:  time to respons to a single reuqest
+Throughput:  number of requests handled per unit time
+Bandwidth :  number of bits per second passing through a channel.
+	Also synonym for "attention," the thing CS professors claim not to have when blowing you off.
+
+
+

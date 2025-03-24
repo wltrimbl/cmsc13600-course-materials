@@ -1,0 +1,49 @@
+Quote - sometimes server, sometimes os.
+When you ask for more resources than permitted, you get cut off.
+CPU    Memory    Disk
+
+Concurrency vs. parallelism
+
+Computer runs multiple apps at once  -- how?
+What does OS do?
+	python manage.py runserver
+	OS checks for program python 
+	OS checks is it ok to run 
+	Load into memory...
+	give it the whole ship for a few miliseconds
+OS is fundamentally a resource manager, a gatekeeper, enforcing constraints to allow proggrams to run
+without interfering with each other.s
+
+Developing attendnacechimp -- what did we do?
+	delete the database?
+	rm -Rf migrations?
+	switch between screens running pytest, runserver, browser?
+	add print statements
+	wish we could debug line-by-line
+	have to debug all the issues that appear when we switch to a different environment (autograder)
+
+resource utilization: what does an enterprise need?
+	SQL server
+	Webserver
+	email
+	calendar
+	storage
+	...
+
+One style of management is to put all these on VMs.
+
+Full virtualization:
+Server - hypervisor - multiple VM os's
+
+Containers: ( virtualization lite)
+Server - host os - virtualization engine - VM os 
+
+
+design aesthetic:  one server for code, one to host the data, one for authentication, one for the search engine
+pack as many servers onto the same hardware as possible while maintaining required performance
+
+Prinicipal motivation of virtualization was to tuse software to reduce hardware costs...
+but portability came as a side benefit.  Dragging your own environment with you 
+uses more computing resources, but often fewer human ones for dealing with portability nonsense.
+
+
