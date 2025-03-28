@@ -33,7 +33,7 @@ To exit you simply run
 Write a script called `samplit-username.py` that, given a single filename as an argument, outputs a random sample of the lines in the file.  You must preserve the order of the lines and give each line a 1% chance of being retained.  The 1% sample of the lines in the input file should be printed to standard out.  Replace `username` in the script name with a string that identifies the human author.  
 On the command prompt, you should be able to run 
 ```
-$ python samplit-username.py  nobel-prize-laureates.csv
+$ python samplit-username.py  nobel-prize-laureates-clean.csv
 ```
 
 and get between 6 and 15 lines of output.
@@ -44,15 +44,19 @@ and get between 6 and 15 lines of output.
 
 1.  When you have an adequately working samplit-username.py script, add it to your git repository.  (This entails git add, git commit, and git push).  
 
-2.  Find a partner and authorize your partner to access your repository on github.    This is on the website, behind "Settings" and "Collaborators" buttons.  You need to give your partners "write" access.
+2.  Find a partner and authorize your partner to access your repository on github.    This is on the website, behind "Settings" and "Collaborators" buttons.  You need to give your partners "write" access.  
 
 3.  Add your partner's repo to the list of **remote**s
 
 ```
 git remote add partner  git@github.com:CMSC-13600-Data-Engineering/cmsc13600-project-partnerusername.git
 ```
+or 
+```
+git remote add partner  https://github.com/CMSC-13600-Data-Engineering/cmsc13600-project-partnerusername.git
+```
 
-This creates two "nicknames" for remotes: `origin` (yours) and `partner`, your partner's.
+The `git remote add` command creates two "nicknames" for remotes: `origin` (yours) and `partner`, your partner's.  You can see the list of remote nicknames by running `git remote -v`.  Keep in mind that the content on your local (laptop) repo, your cloud-hosted github repo, and your partner's cloud-hosted github repo may diverge, and most of what git will be doing for you is making sure that every change is accounted for (either merged or deliberately discarded).
 
 4. Create a new branch and pull your partner's changes:
 
@@ -83,7 +87,9 @@ After these steps you (hopefully) have a new commit which has your changes, your
 `git push origin hw_1`  # updates your github
 `git push partner hw_1`  # updates your partner's github (!)
 
-Don't be afraid of messing things up.  Every change that you have added to git history with `git add` and `git commit` is something you can expect to get back from your history if you run the right commands.  (This usually requires 10 minutes of skimming seemingly irrelevant discussion on stackoverflow, but that's modern life.)  
+Don't be afraid of messing things up.  Every change that you have added to git history with `git add` and `git commit` is something you can expect to get back from your history if you run the right commands.  (This usually requires 10 minutes on stackoverflow, but that's modern life.)  
+
+Next week, we'll send you some updates to your  `CMSC-13600-Data-Engineering/project-Alpacawang` via a pull request.  
 
 ## Grading ( 4 points) 
 1. (2 points) `samplit-xxx.py` has correct behavior when used as above 
