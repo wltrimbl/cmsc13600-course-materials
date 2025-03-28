@@ -1,14 +1,19 @@
-# HW 2. Python Django  (Due Oct 18, 2024)
-Django is a free and open-source, Python-based web framework that runs on a web server. It follows the model–template–views architectural pattern. This assignment will assume that you have mastered git and the command line. See course staff if you are lost
+# HW 2. Python Django  (Due Friday week 3, April 11, 2025)
+Django is a free and open-source, Python-based web framework that runs on a web server. It follows the model–template–views architectural pattern. This assignment will assume that you have mastered git and the command line. See course staff if you are lost.
 
 ## Step 1. Setting Up A Virtual Environment
 
-Typical python installations have tens of thousands of files, and by the time there are enough things installed to be useful, the hundreds of python packages start interfering with each other.  Virtual environments are nothing more than directories on your hard drive that permit you to have different "environments" with different (potentially incompatible) packages installed.  We will create a virtual environment called "venv" to keep all the things you have to install for django from messing up your main python environment.
+Typical python installations have tens of thousands of files, and by the time there are enough things installed to be useful, the hundreds of python packages start interfering with each other.  Virtual environments are nothing more than directories on your hard drive that permit you to have different "environments" with different (potentially incompatible) packages installed.  We will create a virtual environment called "venv" to keep all the things you have to install for django from messing up your main python environment. 
+
 
 "virtual environments” are alternative python install directories that have sets of Python packages installed in their
 site directories, independently of other environments. 
 A virtual environment is created on top of an existing Python installation, known as the virtual environment’s “base” Python,
 and may optionally be isolated from the packages in the base environment, so only those explicitly installed in the virtual environment are available.
+
+Since our python venv will have thousands of (easily replaced with some install commands) files in it, it is important that we not check our `venv` directory into git.  github can handle all the files associated with a django installation but gradescope cannot, and will choke on your repository.
+
+Git wants to help us out here.  If there is a file or class of files that we know that we never want git to track, we can tell git to ignore these files.  This is done with the contents of a file called `.gitignore` in the project directory.  Find out how to edit `.gitignore` and add a line containing just `venv` to be safe.
 
 Go into your project folder that you have cloned in a previous assignment.
 ```
@@ -86,15 +91,16 @@ Stop the `runserver` process above. You can do this by changing focus to the ter
 
 For SQLITE. Here's what you can do. Two options:
 (1) https://sqlitebrowser.org/
-- You can install that to your applications and simply open your
-db.sqlite3 file from that GUI. 
+- You can install SQLitebrowser and simply open your db.sqlite3 file from that GUI.   This will give you some windows which show the content and schema of your database.
 
-(2) You can use the command line. Run the command:
+(2) You can use the command line SQL client. Run the command:
 ```
 $ sqlite3 db.sqlite3
 SQLite version 3.39.4 2022-09-07 20:51:41
 Enter ".help" for usage hints.
+sqlite>
 ```
+And here you can type SQLlite commands to inspect the tables.
 
 ## Creating API endpoints
 To instruct the django server to respond to HTTP requests, you need to modify two files, `urls.py` and `views.py`.
@@ -133,7 +139,7 @@ and navigating to `http://localhost:8000/dummypage`  should give you the (newly-
 
 ## Specification
 1.  Create a new file called `tables.txt` in the app folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
-2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  
+2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  The clock in the autograder environment is set to UTC, so you will need to explicitly set the time zone.
 3. Create an API endpoint called "/app/sum" that, in response to an HTTP GET request with parameters n1 and n2 that are strings representing strings or integers, will return a string with the decimal representation of the sum.  
 
 * "http://localhost:8000/app/sum?n1=1&n2=2"  should return "3"
@@ -167,6 +173,8 @@ $ python3 -m virtualenv venv
 An ALTERNATIVE to virtual environments is to use a packaging framework called conda. Some of you may already have this installed for your previous classes. Here's how you do the above in conda.
 ```
 conda create --name venv
+conda activate venv
+conda install -y (some packages and stuff)
 ```
 
 2) What is "activating"?
