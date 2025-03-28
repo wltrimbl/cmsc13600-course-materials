@@ -24,10 +24,11 @@ class TestHelloWorld(unittest.TestCase):
     @number("1.0")
     def test_names_txt_exists(self):
         '''Test names.txt exists and is long enough to contain a name.'''
-        self.assertTrue(os.path.exists(AG + "names.txt"),
+        NAMES = AG+"names.txt"
+        self.assertTrue(os.path.exists(NAMES),
                         "names.txt does not exist!")
-        file_size = os.path.getsize('names.txt')
-        file_contents = open('names.txt').read()
+        file_size = os.path.getsize(NAMES)
+        file_contents = open(NAMES).read()
         self.assertGreater(file_size, 5,
                            "names.txt is not large enough to contain a name")
         self.assertTrue(" " in file_contents,
@@ -36,10 +37,12 @@ class TestHelloWorld(unittest.TestCase):
     @weight(1)
     @number("2.0")
     def test_template_files_present_and_unneeded_data_absent(self):
-        '''Test unneeded_data.csv does not exist, and manage.py from
-        template is present.'''
+        '''Test unneeded_data.csv does not exist and that LICENSE and
+        README.md from template are present.'''
         self.assertFalse(os.path.exists(AG + "unneeded_data.csv"),
                          "unneeded_data.csv exists!")
+        self.assertFalse(os.path.exists(AG + "unneded_data.csv"),
+                         "unneded_data.csv exists!")
 
         self.assertTrue(os.path.exists(AG + "LICENSE"),
                         "LICENSE does not exist!")
@@ -53,6 +56,8 @@ class TestHelloWorld(unittest.TestCase):
         NP = AG + "nobel-prize-laureates-clean.csv"
         self.assertTrue(os.path.exists(NP),
                         NP + " does not exist!")
+        self.assertFalse(os.path.exists(AG + "nobel-prize-laureates.csv"),
+                        "nobel-prize-laureates.csv exists!")
         out = check_output(["wc", "-l", NP])
         print("OUT", out)
         num_lines = int(out.strip().split()[0])

@@ -3,10 +3,12 @@
 # Set up autograder files
 
 cp -a /autograder/submission /autograder/source/
-cp -a /autograder/submission/names.txt /autograder/source/
-cp -a /autograder/submission/nobel-prize-laureates.csv /autograder/source/
-cp -a /autograder/submission/unneded_data.csv /autograder/source/
+#cp -a /autograder/submission/names.txt /autograder/source/
+#cp -a /autograder/submission/nobel-prize-laureates.csv /autograder/source/
+#cp -a /autograder/submission/unneded_data.csv /autograder/source/
 cd /autograder/source
+rm -Rf /autograder/submission/examples
+rm -Rf /autograder/submission/attendancechimp
 
 python3 run_tests.py
 
