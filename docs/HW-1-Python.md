@@ -41,19 +41,27 @@ and get between 6 and 15 lines of output.
 (Yes, you may use argparse if you find it helpful.  No, you don't need to handle errors like file doesn't exist or argument doesn't exist elegantly.)
 
 ##  Step 2.  Merging content from multiple creators. 
+For this step we must create a new github fork, separate from the repository we used last week.   
 
-1.  When you have an adequately working samplit-username.py script, add it to your git repository.  (This entails git add, git commit, and git push).  
+1.  Follow this invite link:
+https://classroom.github.com/a/5i9zkMFY
+and enter your username when it asks for an unchangeable group name.  
 
-2.  Find a partner and authorize your partner to access your repository on github.    This is on the website, behind "Settings" and "Collaborators" buttons.  You need to give your partners "write" access.  
+2.  Choose where you want your project2 folder and run `git clone 
+https://github.com/CMSC-13600-Data-Engineering/project2-YOURgroupname`
 
-3.  Add your partner's repo to the list of **remote**s
+3.  When you have an adequately working samplit-username.py script, coopy it to / save it in the `project2` repository and add it to git. (This entails git add, git commit, and git push).  
+
+4.  Find a partner and authorize your partner to access your repository on github.    This is on the website, behind "Settings" and "Collaborators" buttons.  You need to give your partners "write" access.  
+
+5.  Add your partner's repo to the list of **remote**s
 
 ```
-git remote add partner  git@github.com:CMSC-13600-Data-Engineering/cmsc13600-project-partnerusername.git
+git remote add partner  git@github.com:CMSC-13600-Data-Engineering/project2-partnerusername.git
 ```
 or 
 ```
-git remote add partner  https://github.com/CMSC-13600-Data-Engineering/cmsc13600-project-partnerusername.git
+git remote add partner  https://github.com/CMSC-13600-Data-Engineering/project2-partnerusername.git
 ```
 
 The `git remote add` command creates two "nicknames" for remotes: `origin` (yours) and `partner`, your partner's.  You can see the list of remote nicknames by running `git remote -v`.  Keep in mind that the content on your local (laptop) repo, your cloud-hosted github repo, and your partner's cloud-hosted github repo may diverge, and most of what git will be doing for you is making sure that every change is accounted for (either merged or deliberately discarded).
