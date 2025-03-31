@@ -65,12 +65,14 @@ class TestHelloWorld(unittest.TestCase):
         self.assertLess(num_lines, 1016, NP + " has too many lines")
         file_size = os.path.getsize(NP)
         self.assertGreater(file_size, 100000,  NP + " is too small")
-        self.assertLess(file_size, 300000, NP + " is too large")
+        self.assertLess(file_size, 480000, NP + " is too large")
         file_content = open(NP, "r").read()
+        self.assertFalse("coordinates" in file_content, 
+            NP + " contains string 'coordinates' (and it shouldn't)") 
         self.assertGreater(file_content.find("Pauling"), 0,
-            "nobel-prize-laureates.csv does not contain 'Pauling'")
+            NP + " does not contain 'Pauling'")
         self.assertLess(file_content.find("coordinates"), 0,
-            "nobel-prize-laureates.csv contains 'coordinates' and shouldn't")
+            NP + " contains 'coordinates' and shouldn't")
 
     @weight(1)
     @number("4.0")
