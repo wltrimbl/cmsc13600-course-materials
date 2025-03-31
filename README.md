@@ -1,4 +1,4 @@
-# CMSC 13600 Assignments / Course Project | number | topic | date  | | --- | --- | -- | 
+# CMSC 13600 Assignments / Course Project 
 
 | number | topic | date | grading | 
 | --- | --- | -- |  ---|  
