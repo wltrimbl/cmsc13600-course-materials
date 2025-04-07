@@ -59,20 +59,26 @@ Now navigate the `project` folder and make sure your virtual environment is avti
 
 Now we will get ready to do some actual work. As a first step, install the following packages to your environment
 ```
-(venv) $ pip install Django pytest
+(venv) $ pip install Django pytest legacy-cgi
 ```
 If you are using conda, this should be:
 ```
-(venv) $ conda install -y Django pytest
+(venv) $ conda install -y Django pytest cgi 
+(venv) $ pip install lecagy-cgi 
+
 ```
 
 Read up on Django,  we will be using it throughout the class [https://docs.djangoproject.com/en/5.0/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
 
 ```
-(venv) $ cd attendancechimp/
+(venv) $ mkdir cloudysky/
+(venv) $ django-admin startproject cloudysky cloudysky
+```
+This creates a new, blank project directory and `manage.py`.  The project will end up with a few dozen files, some of which are automatically created.
+``` 
 (venv) $ python manage.py migrate
 ```
-This will create a file call db.sqlite3 in your folder. Do not add this file to your repository. It is a running database of all the state that
+This will create a file call `db.sqlite3` in your folder. Do not add this file to your repository. It is a running database of all the state that
 your application manages. Next, you will create a user account in Django
 ```
 (venv) $ python manage.py createsuperuser
@@ -86,7 +92,7 @@ Be warned, this command starts the web server, and does not terminate and return
 
 While keeping the command running, visit the URL [http://127.0.0.1:8000/app/] in your web browser. You should see a dialog "hello xyz" or it might prompt you to log in.
 
-## Step 3. Understanding the Database (
+## Step 3. Understanding the Database 
 Stop the `runserver` process above. You can do this by changing focus to the terminal window running the server (and producing voluminous web server log messages) and typing Control-C.  You should install a sqlite3 client on your machine. This will help you debug assignments in this class by understanding what data has been stored in the database. 
 
 For SQLITE. Here's what you can do. Two options:
@@ -117,7 +123,7 @@ urlpatterns = [
 ]
 ```
 
-This will cause the server to respond to requests for localhost:8000/dummypage by running the dummypage subroutine in views.py.
+This will cause the server to respond to requests for localhost:8000/dummypage by running the dummypage subroutine in `views.py`.
 
 
 You will need to create `views.py`  

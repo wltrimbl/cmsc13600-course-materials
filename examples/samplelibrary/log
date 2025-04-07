@@ -1,0 +1,28 @@
+Let us create a new django project, copy the three files containing sample code `models.py`, `views.py` and `urls.py`, and get it running.
+
+django-admin startproject samplelibrary
+cd samplelibrary 
+python manage.py startapp library
+copy views.py and models.py into samplelibrary/library 
+python manage.py makemigrations
+python manage.py migrate
+# great
+python manage.py shell
+copy urls.py into samplelibrary/library
+modify   samplelibrary/urls.py  to include :
+ 	from django.urls import path
+	urlpatterns = [ 
+	...
+	  path('', include('library.urls')),  # Route root URL to your app
+	 ]
+and modify samplelibrary/samplelibrary/urls.py to include
+	INSTALLED_APPS = [
+	'library' 
+	]
+Now 
+python manage.py shell
+lets me interact with the python objects, and 
+python manage.py runserver
+will cause the server to run.
+
+
