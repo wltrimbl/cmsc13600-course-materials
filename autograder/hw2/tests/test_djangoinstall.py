@@ -16,13 +16,13 @@ import math
 from gradescope_utils.autograder_utils.decorators import weight, number
 
 
-class TestHelloWorld(unittest.TestCase):
+class TestDjangoInstall(unittest.TestCase):
     '''Test django install, contents of tables.txt'''
     @classmethod
     def setUpClass(self):
         self.DEADSERVER = False
         print("starting server")
-        p = subprocess.Popen(['python3', 'attendancechimp/manage.py', 'runserver'],
+        p = subprocess.Popen(['python3', 'cloudysky/manage.py', 'runserver'],
                              close_fds=True)
         sleep(2)
         # Make sure server is still running in background, or error
@@ -40,10 +40,10 @@ class TestHelloWorld(unittest.TestCase):
     @number("1.0")
     def test_exist_tables(self): # Should this be tables.txt or .csv
         '''Test for tables.txt file'''
-        self.assertTrue(os.path.exists("attendancechimp/tables.txt") or
+        self.assertTrue(os.path.exists("cloudysky/tables.txt") or
                         os.path.exists("tables.txt") or 
                         os.path.exists("app/tables.txt") or 
-                        os.path.exists("attendancechimp/app/tables.txt"),
+                        os.path.exists("cloudysky/app/tables.txt"),
                         "tables.txt not found")
 
     @weight(1)
@@ -51,15 +51,10 @@ class TestHelloWorld(unittest.TestCase):
     def test_content_tables(self): # Should this be tables.txt or .csv
         '''Test content of tables.txt file'''
         tables = ""
-        if os.path.exists("attendancechimp/tables.txt"):
-             tables = "attendancechimp/tables.txt"
         if os.path.exists("tables.txt"):
              tables = "tables.txt"
-        if os.path.exists("app/tables.txt"):
-             tables = "app/tables.txt"
-        if os.path.exists("attendancechimp/app/tables.txt"):
-             tables = "attendancechimp/app/tables.txt"
-        self.assertTrue(tables != "", "tables.txt not found")
+        self.assertTrue(tables != "", 
+             "tables.txt not found in project directory")
         print(tables)
         content = open(tables, "r").read()
         print(content)
