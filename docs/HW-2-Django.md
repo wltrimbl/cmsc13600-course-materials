@@ -144,7 +144,7 @@ python manage.py runserver
 and navigating to `http://localhost:8000/dummypage`  should give you the (newly-minted) API result.
 
 ## Specification
-1.  Create a new file called `tables.txt` in the app folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
+1.  Create a new file called `tables.txt` in the top-level project folder containing a list all of the database tables currently in your database.  It is a good idea to document the command you used to find the databases, but we don't require it for grading.
 2. Create an API endpoint called "/app/time" that, in response to a HTTP GET request returns a five character string containing like "13:24"  which will report the number of hours and minutes since midnight Central Daylight Time.  The clock in the autograder environment is set to UTC, so you will need to explicitly set the time zone.
 3. Create an API endpoint called "/app/sum" that, in response to an HTTP GET request with parameters n1 and n2 that are strings representing strings or integers, will return a string with the decimal representation of the sum.  
 
@@ -153,7 +153,7 @@ and navigating to `http://localhost:8000/dummypage`  should give you the (newly-
 * "http://localhost:8000/app/sum?n1=0.1&n2=2"  should return "2.1" or "2.1000000000" or something equivalent.
 
 ## Grading (8 points)
-1. (1 point) Does tables.txt exist and is it accurate?
+1. (1 point) Does project2-username/tables.txt exist and does it contain the expected django tables?
 2. (3 points)  Does "/app/time" work?
 3. (4 points)  Does "/app/sum" work? 
 
