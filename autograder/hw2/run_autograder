@@ -3,9 +3,8 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
-cp -r /autograder/submission/attendancechimp /autograder/source
-cp -r /autograder/submission/app/tables.txt /autograder/source
-cp -r /autograder/submission/tables.txt /autograder/source
+cp -r /autograder/submission/cloudysky /autograder/source
+cp /autograder/submission/tables.txt /autograder/source
 
 cd /autograder/source
 
