@@ -1,0 +1,70 @@
+A search-engine request for "django views html table"  returns the following recipe:
+
+To display data from a Django view in an HTML table, data is first passed from the view to the template. The template then iterates through the data to dynamically generate table rows.
+First, in views.py, data is retrieved, often from a model, and passed to the template using the render function:
+Python
+
+from django.shortcuts import render
+from .models import MyModel
+
+def my_view(request):
+    data = MyModel.objects.all()
+    return render(request, 'my_template.html', {'data': data})
+
+Next, in the HTML template (my_template.html), a table is created, and the data passed from the view is used to populate the table rows:
+Code
+
+<table>
+  <thead>
+    <tr>
+      <th>Column 1</th>
+      <th>Column 2</th>
+      ...
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+    <tr>
+      <td>{{ item.field1 }}</td>
+      <td>{{ item.field2 }}</td>
+      ...
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+In this example, data is the context variable passed from the view, and item.field1, item.field2 etc., access the attributes of each object in the data. The for loop iterates through the data, creating a new table row (<tr>) for each item.
+
+
+
+SOOO let's localize this to the book table.
+
+
+This goes in views.py: 
+
+def show_books(request):
+    data = Book.objects.all()
+    return render(request, 'show_books.html', {'data': data})
+
+And this goes in templates/library/show_books.html:
+
+<table>
+  <thead>
+    <tr>
+      <th>Year</th>
+      <th>Title</th>
+      <th>Author</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+    <tr>
+      <td>{{ item.year }}</td>
+      <td>{{ item.title }}</td>
+      <td>{{ item.author }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+As soon as I try this, I find that library.views.show_books isn't connected to any webserver endpoint, so I have to edit library/urls.py:
