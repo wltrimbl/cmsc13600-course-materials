@@ -1,3 +1,4 @@
+new_book.save()
 
 
 # When invoked via 
