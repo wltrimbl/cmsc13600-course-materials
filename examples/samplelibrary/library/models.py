@@ -58,7 +58,7 @@ class Book(models.Model):
     '''
 
     #this is the year, can be null if unknown 
-    year = models.IntegerField()
+    year = models.IntegerField(null=True )
 
     '''You should read Django documentation to understand all the different types of fields you can have
     '''

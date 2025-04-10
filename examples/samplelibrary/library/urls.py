@@ -22,4 +22,7 @@ urlpatterns = [
     path('getBooks', views.service_getBooks),
     path('getInv', views.service_getInv),
     path('addInv', views.service_addInv),
+    path('random', views.randompage),
+    path('show_boooks', views.show_books),
+    path('show_dogs', views.show_dogs),
 ]

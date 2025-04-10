@@ -192,3 +192,22 @@ def service_addInv(request):
         return HttpResponse("Error: There is a database error in adding this book: " + str(e) + '\n', status=500)
 
     return HttpResponse(status=200)
+
+@csrf_exempt
+def show_dogs(request):
+    return HttpResponse("DOGS")
+
+
+@csrf_exempt
+def show_books(request):
+    data = Book.objects.all()
+    return render(request, 'show_books.html', {'data': data})
+
+@csrf_exempt
+def randompage(request):
+    if request.method == "GET":
+        print("randompage GET")
+        parameters = repr(request.GET.keys())  
+    return HttpResponse("You have reached the random page" + parameters, status=200)
+
+
