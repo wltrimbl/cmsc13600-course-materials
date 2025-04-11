@@ -23,88 +23,38 @@ table into a python class.
 
 #The first step is to import Django models.
 from django.db import models
-
+    
+'''You should read Django documentation to understand all the different types of fields you can have
+    '''
 
 '''To define a model, we create a class that extends the model.Model class
 '''
 class Book(models.Model):
-    '''docstrings for models should be informative. They will help you understand how to use them later on
-
-    For example,
-      
-      A book refers to an individual title in our inventory. Books are uniquely identified by an isbn-13 string
-      which is a 13 character long string. Each book also stores a title and an author reference.
-    '''
-    
-
     '''In Django, we define the DDL by creating new class attributes. These class attributes can be tagged to
     change their size, add constraints or add references.
     '''
-
-
-    '''The following define string attributes
-    '''
-
     #primary key of a book
     isbn = models.CharField(max_length=13, primary_key=True)
-
     #this is the english book title
     title = models.CharField(max_length=256, null=False)
-
     #this is the author field
     author = models.CharField(max_length=256, null=False)
-
-    '''The following define numerical attributes
-    '''
-
     #this is the year, can be null if unknown 
-    year = models.IntegerField(null=True )
+    year = models.IntegerField()
 
-    '''You should read Django documentation to understand all the different types of fields you can have
-    '''
-
-
-
-'''For completeness, let us also define an inventory model to see how referencing works.
-'''
 
 class Inventory(models.Model):
     '''An inventory record refers to a book in our library. Each record is uniquely identified with an integer
     and it refers to a book.
     '''
 
-    '''It is often useful to have an integer field that auto increments every time a new record is added.
-    '''
     #automatically incremented id number
     id = models.AutoField(primary_key=True)
-
-
-    '''Here's how you reference other models. You can even reference your self!
-    '''
-
     #foreign key reference to the Book
     book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
-
-    '''Just another field.
-    '''
     #has it been borrowed
     borrowed = models.BooleanField()
 
-
-
-'''Let's see this code in action. Once you define a set of models. You can "deploy" them with the following 
-commands.
-
-$python manage.py makemigrations library
-$python manage.py migrate
-
-Open db.sqlite3 in your sqlite browser to see the created database.
-'''
-
-
-'''Next, let's define the main API. This is how we work with this data. These functions should validate inputs, log
-what is going on, and generally safeguard the database
-'''
 
 #valuable for debugging
 import logging
