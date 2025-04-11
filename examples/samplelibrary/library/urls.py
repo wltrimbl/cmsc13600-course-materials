@@ -24,5 +24,6 @@ urlpatterns = [
     path('addInv', views.service_addInv),
     path('random', views.randompage),
     path('show_books', views.show_books),
+    path('show_inventory', views.show_inventory),
     path('show_dogs', views.show_dogs),
 ]

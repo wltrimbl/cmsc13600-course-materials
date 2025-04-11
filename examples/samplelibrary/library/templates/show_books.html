@@ -1,0 +1,18 @@
+<table>
+  <thead>
+    <tr>
+      <th>Year</th>
+      <th>Title</th>
+      <th>Author</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+    <tr>
+      <td>{{ item.year }}</td>
+      <td>{{ item.title }}</td>
+      <td>{{ item.author }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

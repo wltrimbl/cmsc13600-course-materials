@@ -204,6 +204,16 @@ def show_books(request):
     return render(request, 'show_books.html', {'data': data})
 
 @csrf_exempt
+def show_inventory(request):
+    data = Inventory.objects.all()
+    table = []
+    for book in data:
+        table.append( { "id":  book.id,
+                        "book": book.book,
+                        "borrowed": book.borrowed} ) 
+    return render(request, 'show_inventory.html', {'data': table})
+
+@csrf_exempt
 def randompage(request):
     if request.method == "GET":
         print("randompage GET")

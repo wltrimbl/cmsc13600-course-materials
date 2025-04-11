@@ -1,0 +1,18 @@
+<table>
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Book</th>
+      <th>Borrowed</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in data %}
+    <tr>
+      <td>{{ item.id}}</td>
+      <td>{{ item.book }}</td>
+      <td>{{ item.borrowed}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
