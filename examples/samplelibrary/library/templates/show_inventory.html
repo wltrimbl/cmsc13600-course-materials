@@ -1,17 +1,25 @@
 <table>
   <thead>
     <tr>
-      <th>Id</th>
-      <th>Book</th>
-      <th>Borrowed</th>
+      <th>Inventory.ID</th>
+      <th>Inventory.Book.title</th>
+      <th>Inventory.Borrowed</th>
     </tr>
   </thead>
   <tbody>
     {% for item in data %}
     <tr>
-      <td>{{ item.id}}</td>
-      <td>{{ item.book }}</td>
-      <td>{{ item.borrowed}}</td>
+      <td>{{ item.id }}</td>
+      <td>
+      {% if item.borrowed %}
+         <font color="red">
+      {% endif %}
+{{ item.title}}
+      {% if item.borrowed %}
+         </font>
+      {% endif %}
+     </td>
+      <td>{{ item.borrowed }}</td>
     </tr>
     {% endfor %}
   </tbody>

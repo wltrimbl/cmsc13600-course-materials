@@ -197,6 +197,11 @@ def service_addInv(request):
 def show_dogs(request):
     return HttpResponse("DOGS")
 
+@csrf_exempt
+def show_inventory(request):
+    data = Inventory.objects.all()
+    return render(request, 'show_inventory.html', {'data': data})
+
 
 @csrf_exempt
 def show_books(request):
@@ -210,6 +215,7 @@ def show_inventory(request):
     for book in data:
         table.append( { "id":  book.id,
                         "book": book.book,
+                        "title": book.book.title,
                         "borrowed": book.borrowed} ) 
     return render(request, 'show_inventory.html', {'data': table})
 

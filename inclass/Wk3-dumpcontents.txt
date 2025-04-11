@@ -1,3 +1,5 @@
+
+
 A search-engine request for "django views html table"  returns the following recipe:
 
 To display data from a Django view in an HTML table, data is first passed from the view to the template. The template then iterates through the data to dynamically generate table rows.
