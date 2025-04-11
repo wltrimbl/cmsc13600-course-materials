@@ -1,0 +1,31 @@
+So I have an enpoint in the samplelibrary app /show_books that outputs an (HTML-formatted!) table with all of the contents of the library card catalog.
+
+The task for today will be to join this table with the inventory table and give us a highlighted table showing which books are checked in and which are checked out.
+
+I make a copy of the library.views.show_books function, and change the name of the table from Books to Inventory, change the field names from author, year, title to id, book, and borrowed.  
+
+What do I need?  
+1.  a rule in library.urls.py to handle the show_inventory endpoint
+2.  code in library.views.py to retrieve the table
+    return render(request, 'show_inventory.html', {'data': Inventory.objects.all()})
+
+3.  an html template in samplelibrary/library/templates/show_inventory.html
+4.  Some code in the html template to change the color if the book is not available.  That will look something like this:
+
+    {% if item.borrowed %}
+      <font color="red">
+    {% endif %}
+
+5.  Some rows in the inventory table, it's kind of sparse right now.
+python manage.py runserver
+from library.models import Book, Inventory
+addInventory('9780446310789',2)  # Add 2 copies of TKAM
+from library.models import addInventory
+addInventory('9780446310789',2)  # Add 2 copies of TKAM
+for book in Inventory.objects.all():
+    print(book.id, book.book, book.borrowed)
+checkout(9780446310789)
+checkout (9781497438095)
+
+
+
