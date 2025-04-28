@@ -164,8 +164,8 @@ In an earlier homework you read data from an HTTP request and did a calculation 
 
 1. Start by creating two new URLs `/app/new` and `/app/createUser` and their corresponding functions in `views.py`.
    - `/app/new` should load a page with a webform that contains:
-     a. First Name
-     b. Last name
+     a. User Name
+<strike> b. Last name </strike>
      c. Email Address
      d. A password
      e. A "Sign Up" button that will create this user
@@ -187,7 +187,30 @@ Your API should be able to add a row to the user table (the first time) with thi
 ```
 curl -sS -d "user_name=boris&password=sk3j5n.k&is_admin=0&email=boris@school.edu" -X POST http://localhost:8000/app/createUser
 ```
-And then this user (and this password) should be able to log in at `http://localhost:8000/login`.
+And a very nice-to-have property is a HTTP 200 response that includes a message saying that the user has been successfully created.
+
+This user (and this password) should be able to log in at `http://localhost:8000/login`.
+
+## login page
+You should install a minimal login page (copied from the django documentation) at `app/templates/registration/login.html` : 
+
+    {% block content %}
+      <h2>Login</h2>
+      <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+        <button type="submit">Login</button>
+      </form>
+    {% endblock %}
+
+and modify `urls.py` to include
+
+    from django.contrib.auth import views as auth_views
+ 
+    urlpatterns = [ ...
+       path('login/', auth_views.LoginView.as_view(), name='login'), 
+       ] 
+
 
 ## What files do you need to change ?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
@@ -195,13 +218,18 @@ This assignment has a lot of moving parts. Here is a quick guide to help you kno
 2. `/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
 3. `/cloudysky/templates/app/...` You need to create a new html template files for `/app/new` and `index.html`.  These will contain the form and some django logic. 
 
-## Grading  (10 points) 
-1. (1 point) index page meets requirements (bio, centered, current time) 
-2. (2 points) Form at /app/new has required elements, GET/POST behavior
-3. (2 points) POST to /app/createUser returns success
-4. (1 point)  GET to /app/createUser returns error 
-5. (1 point) login attempt (POST) to /accounts/login returns success
-6. (2 points)  index page highlights current user
+## Grading  
+1. index page meets requirements (bio, centered, current time) 
+2. Form at /app/new has required elements, GET/POST behavior
+3. POST to /app/createUser returns success
+4. GET to /app/createUser returns error 
+5. login attempt (POST) to /accounts/login returns success, bad login attempts return errors
+6. index page highlights current user
+7. GET  `http://localhost:8000/`  returns something nice, differentiates between logged in and not-logged in.
+8. GET  `http://localhost:8000/index.html` similarly 
+9. GET  `http://localhost:8000/app/new`   returns a form
+10. POST to `http://localhost:8000/createUser`  with valid user data returns a success message
+11. Newly-created users can log in and get personalized `index.html` pages. 
   
 ## Bug bounty 
 Information leading to the updating of mistakes in the autograder is appreciated. 
