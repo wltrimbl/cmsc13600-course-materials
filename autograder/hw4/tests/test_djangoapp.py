@@ -43,7 +43,7 @@ class TestDjangoApp(unittest.TestCase):
                 "email": (random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase) +
                           "_test@test.org"),
-                "is_student": "0",
+                "is_admin": "0",
                 "password": "Password123"
                 }
         self.user_dict["user_name"] = "Charlie_" + self.user_dict["email"][0:2]
@@ -131,15 +131,15 @@ class TestDjangoApp(unittest.TestCase):
         name_check = re.search("user_name", form_page_text, re.IGNORECASE)
         email_check = re.search("email", form_page_text)
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
-        is_student_check = re.search("is_student", form_page_text)
+        is_admin_check = re.search("is_admin", form_page_text)
         password_check = re.search("password", form_page_text)
         createuser_check = re.search("createUser", form_page_text)
         self.assertTrue(name_check,
                         "Can't find 'user_name' field in app/new")
         self.assertTrue(radio_check,
                         "Can't find radio button in app/new")
-        self.assertTrue(is_student_check,
-                        "Can't find 'is_student' field in app/new")
+        self.assertTrue(is_admin_check,
+                        "Can't find 'is_admin' field in app/new")
         self.assertTrue(password_check,
                         "Can't find 'password' field in app/new")
         self.assertTrue(email_check,
@@ -210,7 +210,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["user_name"], "password": user_dict["password"],
+        logindata = {"user_name": user_dict["user_name"], "password": user_dict["password"],
                 "csrfmiddlewaretoken": csrfdata}
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
