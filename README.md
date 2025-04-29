@@ -6,13 +6,13 @@
 | HW 1 | setup git collaboration  |  Apr 4 |  MANUAL |  | 
 | HW 2 | setup/install django / ORM |Apr 11 |   | 
 | Exam 1 | databases & ORM | Apr 18 | MANUAL | 
-| HW 3 | define DDL  |  Apr 25|  | 
-| HW 4 | front end: login page |  |  | 
-| HW 5 | implementing the API |  |  |
-| HW 6 | Reporting, creating fixtures, puzzle | | | 
-| Exam 2 | architecture, hashing | | MANUAL  | 
+| HW 3 | define DDL  |  Apr 25| | 
+| HW 4 | front end: login page | May 2  |  | 
+| HW 5 | implementing the API | May 9 |  |
+| HW 6 | The frontend feed, proof-of-work puzzle | May 16 | | 
+| Exam 2 | architecture, hashing | May 14 | MANUAL  | 
 | HW 7 | Testing the app, writing tests  | May 23|  | 
-| Exam 3 |  pulling it all together |  TBA May 27-29 | MANUAL |
+| Exam 3 | Exam 3 pulling it all together |  May 28 12:30-2:30 | MANUAL |
 
 ## Homeworks
 
