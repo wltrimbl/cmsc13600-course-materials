@@ -1,0 +1,19 @@
+
+Docker image apparently used by gradescope:
+https://hub.docker.com/layers/gradescope/auto-builds/ubuntu-22.04/images/sha256-c9d9afe4936eb07e3e35bcc3fe3e48183da8ed9de5f87e2098b13a98dc16c9e4?context=explore
+Dockerfile inferred from gradescope output Jnauary 2024.
+
+
+Autograder requires the following three files
+
+setup.sh          # install linux packages so the testing environment can work
+run_autograder    # move files into the right place post-submission
+                  # and run python autograder
+run_tests.py      # entirely autograder / gradescope boilerplate
+
+Our tests go in 
+tests/
+
+There are some other files here:
+Dockerfile   # to facilitiate local debugging in the testing environment
+Makefile     # glorified shell-script manager
