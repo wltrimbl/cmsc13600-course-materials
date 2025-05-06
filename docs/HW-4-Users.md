@@ -108,14 +108,14 @@ Here's a basic overview of how HTML forms work with POST data:
    Example:
    ```html
    <form action="http://localhost:8000/myview" method="post">
-       <label for="username">Username:</label>
-       <input type="text" id="username" name="username"><br>
+       <label for="user_name">Username:</label>
+       <input type="text" id="user_name" name="user_name"><br>
        <label for="password">Password:</label>
        <input type="password" id="password" name="password"><br>
        <input type="submit" value="Submit">
    </form>
    ```
-When the user hits submit on the website, the browser sends a POST request to the endpoint myview.  Django consults `urls.py` and runs the function you've specified to respond to myview with POST data of username and password attached to the request.
+When the user hits submit on the website, the browser sends a POST request to the endpoint myview.  Django consults `urls.py` and runs the function you've specified to respond to myview with POST data of `user_name` and `password` attached to the request.
 
 2. **Form Attributes**: The `<form>` tag contains attributes that specify where the form data should be sent (`action` attribute) and which HTTP method should be used (`method` attribute). In the example above, the form data will be sent as an HTTP POST request to localhost:8000/myview 
 
@@ -125,7 +125,7 @@ When the user hits submit on the website, the browser sends a POST request to th
 
    ```
    def myView(request):
-       username = request.POST.get("username")
+       username = request.POST.get("user_name")
        password = request.POST.get("password")
        # ... do stuff here
    ```

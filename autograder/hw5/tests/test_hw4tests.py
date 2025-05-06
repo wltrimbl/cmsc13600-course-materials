@@ -24,9 +24,23 @@ else:
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
 
-
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of cloudysky API'''
+
+    def get_csrf_login_token(self):
+        session = requests.Session()
+        response0 = session.get("http://localhost:8000/accounts/login/")
+        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
+        if csrf:
+            csrfdata = csrf.groups()[0]
+        else:
+            raise ValueError("Can't find csrf token in accounts/login/ page")
+        self.csrfdata = csrfdata
+        self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
+                "http://localhost:8000/accounts/login/"}
+        return session   # session
+
+
     @classmethod
     def setUpClass(self):
         self.DEADSERVER = False
@@ -41,19 +55,20 @@ class TestDjangoApp(unittest.TestCase):
         else:
             self.DEADSERVER = True
             self.deadserver_error = p.communicate()
-
+        session = self.get_csrf_login_token(self)
         self.user_dict = {
                 "email": (random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase) +
                           "_test@test.org"),
                 "is_admin": "0",
-                "password": "Password123"
+                "password": "Password123",
                 }
-        self.user_dict["user_name"] = "Charlie_" + self.user_dict["email"][0:2]
+        self.user_dict["user_name"] = "Bob_" + self.user_dict["email"][0:2]
 
     @classmethod
     def tearDownClass(self):
         self.SERVER.terminate()
+
 
     @weight(0)
     @number("1.01")
@@ -158,7 +173,7 @@ class TestDjangoApp(unittest.TestCase):
         request = requests.post("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertNotEqual(request.status_code, 200,
-            "Server should return error for POST " + 
+            "Server should return error for POST " +
             "http://localhost:8000/app/new.\n" +
             "Content:{}".format(
             new_page_text))
@@ -168,8 +183,9 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_api(self):
         '''HW4: Checks that createUser endpoint responds with code 200
         when it should be successful'''
-        response = requests.post("http://localhost:8000/app/createUser",
-                                 data=self.user_dict)
+        session = self.get_csrf_login_token()
+        response = session.post("http://localhost:8000/app/createUser",
+                                 data=self.user_dict, headers=self.loginheaders)
         if response.status_code != 200:
             self.assertEqual(response.status_code, 200,
                              "Wrong response code - should pass - {}".format(
@@ -180,10 +196,11 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_duplicate_email_api(self):
         '''HW4: Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
-        dup_user["user_name"] = ( 
-             "TestUserName-" +  dup_user["email"][0:2]) 
+        dup_user["user_name"] = (
+             "TestUserName-" +  dup_user["email"][0:2])
+        loginheaders = {"X-CSRFToken": self.csrfdata}
         response = requests.post("http://localhost:8000/app/createUser",
-                                 data=dup_user)
+                                 data=dup_user, headers=loginheaders)
         if response.status_code == 200:
             self.assertNotEqual(response.status_code, 200,
                  "Wrong response code - should fail for duplicate email - {}".format(
@@ -206,7 +223,7 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_login(self):
         '''HW4: Checks accounts/login page for login success'''
         user_dict = self.user_dict
-        session = requests.Session()
+        session = self.get_csrf_login_token()
         # first get csrf token from login page
         response0 = session.get("http://localhost:8000/accounts/login/")
         csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
@@ -214,7 +231,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["user_name"], "password": user_dict["password"],
+        logindata = {"user_name": user_dict["user_name"], "password": user_dict["password"],
                 "csrfmiddlewaretoken": csrfdata}
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
@@ -243,7 +260,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["user_name"], 
+        logindata = {"username": user_dict["user_name"],
                      "password": user_dict["password"],
                      "csrfmiddlewaretoken": csrfdata}
         print(logindata)
@@ -251,7 +268,7 @@ class TestDjangoApp(unittest.TestCase):
                 "http://localhost:8000/accounts/login/"}
         print(csrfdata)
         # now attempt login
-        response1 = session.post("http://localhost:8000/accounts/login/", 
+        response1 = session.post("http://localhost:8000/accounts/login/",
                                  data=logindata, headers=loginheaders)
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
@@ -271,8 +288,8 @@ class TestDjangoApp(unittest.TestCase):
             user_dict["email"]), 'value=WRONGEMAIL')
         sanitized_text = sanitized_text.replace('value="{}"'.format(
             user_dict["user_name"]), 'value=WRONGLOGIN')
-        check_username = (user_dict["user_name"] in sanitized_text or  
-            user_dict["email"], sanitized_text) 
-        self.assertTrue(check_username, 
+        check_username = (user_dict["user_name"] in sanitized_text or
+            user_dict["email"], sanitized_text)
+        self.assertTrue(check_username,
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
