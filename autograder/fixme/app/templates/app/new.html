@@ -1,0 +1,41 @@
+<!--
+    Name
+    A password
+    Email
+    A "Sign Up" button that will create this student/instructor 
+-->
+
+{{ msg }}
+
+{% if False %}
+<strong> You cannot create a course as a student </strong>
+{% endif %}
+
+<fieldset>
+<form action="/app/createUser" method="post">
+  {% csrf_token %}
+  <label for="uname">Name:</label>
+  <input type="text" id="user_name" name="user_name"><br><br>
+  <label for="email">Email:</label>
+  <input type="text" id="email" name="email"><br><br>
+  <label for="password">Password:</label>
+  <input type="text" id="password" name="password"><br><br>
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio -->
+
+  <legend>Select your role:</legend>
+
+  <div>
+    <input type="radio" id="user" name="is_admin" value=1 checked />
+    <label for="normal user">Normal user</label>
+  </div>
+
+  <div>
+    <input type="radio" id="admin" name="is_admin" value=0 />
+    <label for="instructor">Admin / Censor</label>
+  </div>
+
+  <input type="submit" value="Sign up">
+</form>
+</fieldset>
+<HR>
