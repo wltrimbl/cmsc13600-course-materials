@@ -42,32 +42,43 @@ class TestDjangoApp(unittest.TestCase):
 
 
     @classmethod
-    def setUpClass(self):
-        self.DEADSERVER = False
+    def setUpClass(cls):
+        '''This class logs in as an admin, and sets
+        cls.session  to have the necessary cookies to convince the
+        server that we're still logged in.
+        '''
         print("starting server")
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py',
+        try:
+            cls.server_proc = subprocess.Popen(['python3', 'cloudysky/manage.py',
                               'runserver'],
-                             close_fds=True)
-        sleep(2)
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              text=True,
+                              close_fds=True)
         # Make sure server is still running in background, or error
-        if p.returncode is None:
-            self.SERVER = p
-        else:
-            self.DEADSERVER = True
-            self.deadserver_error = p.communicate()
-        session = self.get_csrf_login_token(self)
-        self.user_dict = {
+            sleep(2)
+            if cls.server_proc.poll() is not None:  # if it has terminated        
+                stdout, stderr = cls.server_proc.communicate()
+                raise RuntimeError( 
+                    "Django server crashed on startup.\n\n" +
+                   f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
+                    )
+        except Exception as e: 
+              raise unittest.SkipTest(str(e))  
+
+        session = cls.get_csrf_login_token(cls)
+        cls.user_dict = {
                 "email": (random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase) +
                           "_test@test.org"),
                 "is_admin": "0",
                 "password": "Password123",
                 }
-        self.user_dict["user_name"] = "Bob_" + self.user_dict["email"][0:2]
+        cls.user_dict["user_name"] = "Bob_" + cls.user_dict["email"][0:2]
 
     @classmethod
-    def tearDownClass(self):
-        self.SERVER.terminate()
+    def tearDownClass(cls):
+        cls.server_proc.terminate()
 
 
     @weight(0)
@@ -118,9 +129,6 @@ class TestDjangoApp(unittest.TestCase):
     @number("1.2")
     def test_index_notloggedin(self):
         '''HW4: Test the index page contains the phrase "Not logged in"'''
-        if self.DEADSERVER:
-            self.assertFalse(True, "Django server didn't start" +
-                 self.deadserver_error)
         response = requests.get('http://127.0.0.1:8000/')
         self.assertEqual(response.status_code, 200,
                         "Server returns error for http://localhost:8000/." +

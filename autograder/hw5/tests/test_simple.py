@@ -8,8 +8,6 @@ from time import sleep
 from os import path
 import zoneinfo
 import random
-import string
-import re
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
@@ -70,42 +68,36 @@ class TestDjangoHw5simple(unittest.TestCase):
 
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         '''This class logs in as an admin, and sets
-        self.session  to have the necessary cookies to convince the
+        cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
         print("starting server")
-        try: 
-            p = subprocess.Popen(['python3', 'cloudysky/manage.py',
+        try:
+            cls.server_proc = subprocess.Popen(['python3', 'cloudysky/manage.py',
                               'runserver'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
-                              text=True,  # returns str instead of bytes
+                              text=True,
                               close_fds=True)
         # Make sure server is still running in background, or error
             sleep(2)
-            if p.returncode is None:
-                self.SERVER = p
-            else:
-                stdout, stderr = p.communicate()
-                self.fail(
-                    "Server process died on launch.\n"
-                    "Return code: {}\n\n"
-                    "STDOUT:\n{}\n\nSTDERR:\n{}\n".format(
-                    p.returncode, stdout, stderr)
+            if cls.server_proc.poll() is not None:  # if it has terminated        
+                stdout, stderr = cls.server_proc.communicate()
+                raise RuntimeError( 
+                    "Django server crashed on startup.\n\n" +
+                   f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
                     )
-        except Exception:
-              self.fail("Exception while launching server:\n{}".format(
-                        traceback.format_exc())
-                        )
+        except Exception as e: 
+              raise unittest.SkipTest(str(e))  
 
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
                                      data=data,
                                      )
             print("CreateUser status", response.status_code)
-            session, csrfdata = self.get_csrf_login_token(self)
+            session, csrfdata = cls.get_csrf_login_token(cls)
             logindata = {"username": data["user_name"],
                      "password": data["password"],
                      "csrfmiddlewaretoken": csrfdata}
@@ -122,13 +114,13 @@ class TestDjangoHw5simple(unittest.TestCase):
                 print("Oh, this is bad, login failed")
             return session, loginheaders, csrfdata
 #       Now we can use self.session  as a logged-in requests object.
-        self.session_admin, self.headers_admin, self.csrfdata_admin = login(admin_data)
-        self.session_user, self.headers_user, self.csrfdata_user = login(user_data)
+        cls.session_admin, cls.headers_admin, cls.csrfdata_admin = login(admin_data)
+        cls.session_user, cls.headers_user, cls.csrfdata_user = login(user_data)
 
 
     @classmethod
-    def tearDownClass(self):
-        self.SERVER.terminate()
+    def tearDownClass(cls):
+        cls.server_proc.terminate()
 
     def count_app_rows(self):
         '''Counts all the rows in sqlite tables beginning

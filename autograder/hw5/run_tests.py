@@ -6,7 +6,11 @@ if __name__ == '__main__':
     try:
         with open('/autograder/results/results.json', 'w') as f:
             JSONTestRunner(visibility='visible',
-                       stdout_visibility = "visible", stream=f).run(suite)
+                       stdout_visibility = "visible", 
+                       stream=f, 
+                       failfast=True  # Stop after the first crash,
+                       # because tracebacks from crashed autograder aren't helpful
+                       ).run(suite)
     # In the case that the autograder crashes, preserve the autograder 
     # standard output and make sure it is visible
     except Exception as e:
