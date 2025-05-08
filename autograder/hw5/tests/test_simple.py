@@ -75,18 +75,30 @@ class TestDjangoHw5simple(unittest.TestCase):
         self.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
-        self.DEADSERVER = False
         print("starting server")
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py',
+        try: 
+            p = subprocess.Popen(['python3', 'cloudysky/manage.py',
                               'runserver'],
-                             close_fds=True)
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              text=True,  # returns str instead of bytes
+                              close_fds=True)
         # Make sure server is still running in background, or error
-        sleep(2)
-        if p.returncode is None:
-            self.SERVER = p
-        else:
-            self.DEADSERVER = True
-            self.deadserver_error = p.communicate()
+            sleep(2)
+            if p.returncode is None:
+                self.SERVER = p
+            else:
+                stdout, stderr = p.communicate()
+                self.fail(
+                    "Server process died on launch.\n"
+                    "Return code: {}\n\n"
+                    "STDOUT:\n{}\n\nSTDERR:\n{}\n".format(
+                    p.returncode, stdout, stderr)
+                    )
+        except Exception:
+              self.fail("Exception while launching server:\n{}".format(
+                        traceback.format_exc())
+                        )
 
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
