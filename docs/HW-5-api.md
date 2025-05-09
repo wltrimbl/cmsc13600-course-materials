@@ -113,16 +113,17 @@ python -m pip install gradescope_utils requests
 4.  To run a single test, it's `pytest test_simple.py::TestDjangoHw5simple::test_creat_epost_simple`
 
 ## Grading 
-You have five new API endpoints:
-1.  /app/createPost
-2.  /app/createComment
-3.  /app/hidePost
-4.  /app/hideComment
-5.  /app/dumpFeed  (returns JSON)
+You have five new API endpoints, and 12 autograder points:
+1.  /app/createPost     (4 points)
+2.  /app/createComment  (4 points)
+3.  /app/hidePost       (2 points)
+4.  /app/hideComment    (0 points, I don't trust the tests)
+5.  /app/dumpFeed       (2 points) (returns JSON for automoderator) 
 
 and two new views:
 1.   /app/new_post   (which sends data to /app/createPost)
 2.   /app/new_comment  (which sends data to /app/createComment)
+(There are no tests for these two views.)
 
 You don't need to create an HTML feed this week, and you don't need to implement the censorship logic in the feed or the views yet.
 

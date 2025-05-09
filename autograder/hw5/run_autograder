@@ -3,6 +3,8 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
+rm -Rf $( find /autograder/submission/cloudysky -name 'test_*.py' )  
+
 cp -r /autograder/submission/cloudysky /autograder/source
 
 cd /autograder/source

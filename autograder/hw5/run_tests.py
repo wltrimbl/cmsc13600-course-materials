@@ -10,7 +10,7 @@ if __name__ == '__main__':
                        visibility='visible',
                        stdout_visibility = "visible", 
                        stream=f, 
-                       failfast=True  # Stop after the first crash,
+#                       failfast=True  # Stop after the first crash,
                        # because tracebacks from crashed autograder aren't helpful
                        ).run(suite)
     # In the case that the autograder crashes, preserve the autograder 

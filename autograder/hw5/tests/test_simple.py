@@ -11,10 +11,10 @@ import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-if path.exists("/autograder"):
-    AG = "/autograder"
+if path.exists("/autograder/submission"):
+    AG = "/autograder/submission"
 else:
-    AG = "."
+    AG = ".."
 
 # DEsired tests:
 # /app/new_course  (HTML form/view to submit to createPost) PROVIDED
@@ -75,7 +75,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         print("starting server")
         try:
-            cls.server_proc = subprocess.Popen(['python3', 'cloudysky/manage.py',
+            cls.server_proc = subprocess.Popen(['python3', AG+'/'+'cloudysky/manage.py',
                               'runserver'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
@@ -90,7 +90,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                    f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
                     )
         except Exception as e: 
-              raise unittest.SkipTest(str(e))  
+              assert False, str(e)
 
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
@@ -179,7 +179,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 #           "Content:{}".format(request.text)
             )
 
-    @weight(0.5)
+    @weight(1)
     @number("10.2")
     def test_create_post_user_success(self):
         '''Test createPost endpoint by a user, which should succeed http://localhost:8000/app/createPost'''
@@ -243,7 +243,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 #           + "Content:{}".format(request.text)
             )
 
-    @weight(0.5)
+    @weight(1)
     @number("13.2")
     def test_hide_post_admin_success(self):
         '''Test hidePost endpoint by an admin which should succeed http://localhost:8000/app/hidePost'''
@@ -262,6 +262,29 @@ class TestDjangoHw5simple(unittest.TestCase):
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
             "http://localhost:8000/app/hidePost " +
+            "Data:{}".format(data)
+#           + "Content:{}".format(request.text)
+            )
+
+    @weight(0)
+    @number("13.2")
+    def test_hide_comment_admin_success(self):
+        '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
+        data = {'comment_id': "1",  "reason": "NIXON", 
+                'csrfmiddlewaretoken': self.csrfdata_admin
+               }
+        session = self.session_admin
+        request = session.post(
+            "http://localhost:8000/app/hideComment",
+             data=data, headers=self.headers_admin)
+        self.assertNotEqual(request.status_code, 404,
+            "Server returned 404 not found for http://localhost:8000/app/hideComment " +
+            "Data:{}".format(data)
+#           "Content:{}".format(response2.text)
+            )
+        self.assertEqual(request.status_code, 200,
+            "Server returns error for POST to " +
+            "http://localhost:8000/app/hideComment " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -311,7 +334,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Content:{}".format(response2.text)
             )
 
-    @weight(0.5)
+    @weight(1.0)
     @number("11.2")
     def test_create_comment_user_success(self):
         '''Tests createComment endpoint by a user, which should succeed.
@@ -362,6 +385,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         print("Calling http://localhost:8000/app/createPost with", data)
         response2 = session.post("http://localhost:8000/app/createPost",
                                  data=data, headers=self.headers_admin)
+        sleep(1)
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
                          "Cannot confirm createPost updated database" +
@@ -378,7 +402,26 @@ class TestDjangoHw5simple(unittest.TestCase):
         data = {"content": "Yes, I like fuzzy bunnies a lot." , "post_id": 1 }
         response2 = session.post("http://localhost:8000/app/createComment",
                                  data=data, headers=self.headers_admin)
+        sleep(1)
         after_rows = self.count_app_rows()
         self.assertGreater(after_rows - before_rows, 0,
             "Cannot confirm createComment updated database" +
-            "Content:{}".format(response2.text))
+            "Content:{}".format(response2.text) )
+
+    @weight(2)
+    @number("21")
+    def test_dump_feed_json(self):
+        '''Test that app/dumpFeed returns something
+        '''
+        session = self.session_admin
+        # Now hit createPost, now that we are logged in
+        print("Calling http://localhost:8000/app/dumpFeed")
+        response = session.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_admin)
+
+        self.assertGreater(len(response.content), 30)
+        try:
+            j = response.json()
+        except:
+            assert False, f"Couldn't decode JSON {response.content}"
+

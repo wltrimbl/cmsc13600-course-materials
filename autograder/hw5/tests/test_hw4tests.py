@@ -14,10 +14,10 @@ import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-if path.exists("/autograder"):
-    AG = "/autograder"
+if path.exists("/autograder/submission"):
+    AG = "/autograder/submission"
 else:
-    AG = "."
+    AG = ".."
 
 # HW4 tests with point values set to zero.
 
@@ -27,14 +27,16 @@ CDT = zoneinfo.ZoneInfo("America/Chicago")
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of cloudysky API'''
 
-    def get_csrf_login_token(self):
-        session = requests.Session()
+    def get_csrf_login_token(self, session=None):
+        if session is None:
+            session = requests.Session()
         response0 = session.get("http://localhost:8000/accounts/login/")
-        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
+        csrf = session.cookies.get("csrftoken")
         if csrf:
-            csrfdata = csrf.groups()[0]
+            csrfdata = csrf
         else:
-            raise ValueError("Can't find csrf token in accounts/login/ page")
+            print("Can't find csrf token in accounts/login/ page")
+            csrfdata = "BOGUSDATA"
         self.csrfdata = csrfdata
         self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
@@ -49,7 +51,7 @@ class TestDjangoApp(unittest.TestCase):
         '''
         print("starting server")
         try:
-            cls.server_proc = subprocess.Popen(['python3', 'cloudysky/manage.py',
+            cls.server_proc = subprocess.Popen(['python3', AG+"/"+ 'cloudysky/manage.py',
                               'runserver'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
@@ -57,14 +59,14 @@ class TestDjangoApp(unittest.TestCase):
                               close_fds=True)
         # Make sure server is still running in background, or error
             sleep(2)
-            if cls.server_proc.poll() is not None:  # if it has terminated        
+            if cls.server_proc.poll() is not None:  # if it has terminated
                 stdout, stderr = cls.server_proc.communicate()
-                raise RuntimeError( 
+                raise RuntimeError(
                     "Django server crashed on startup.\n\n" +
                    f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
                     )
-        except Exception as e: 
-              raise unittest.SkipTest(str(e))  
+        except Exception as e:
+              assert False, str(e)
 
         session = cls.get_csrf_login_token(cls)
         cls.user_dict = {
