@@ -3,6 +3,7 @@
 import unittest
 import subprocess
 import requests
+import socket
 from time import sleep
 from os import path
 from datetime import datetime
@@ -14,18 +15,33 @@ import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-if path.exists("/autograder/submission"):
-    AG = "/autograder/submission"
-else:
+AG = "."
+if path.exists("manage.py"):
     AG = ".."
+if path.exists("cloudysky/manage.py"):
+    AG = "."
+if path.exists("/autograder/submission/cloudysky/manage.py"):
+    AG = "/autograder/submission"
 
 # HW4 tests with point values set to zero.
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
+def restart_django_server():
+    '''restart django server if necessary'''
+
+def wait_for_server():
+    for _ in range(100):
+        try:
+            with socket.create_connection(("localhost", 8000), timeout=1):
+                return True
+        except (ConnectionRefusedError, socket.timeout):
+            sleep(0.2)
+    raise RuntimeError(f"Server did not start within 20 seconds")
 
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of cloudysky API'''
+
 
     def get_csrf_login_token(self, session=None):
         if session is None:
@@ -35,7 +51,7 @@ class TestDjangoApp(unittest.TestCase):
         if csrf:
             csrfdata = csrf
         else:
-            print("Can't find csrf token in accounts/login/ page")
+            print("ERROR: Can't find csrf token in accounts/login/ page")
             csrfdata = "BOGUSDATA"
         self.csrfdata = csrfdata
         self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
@@ -51,20 +67,22 @@ class TestDjangoApp(unittest.TestCase):
         '''
         print("starting server")
         try:
-            cls.server_proc = subprocess.Popen(['python3', AG+"/"+ 'cloudysky/manage.py',
-                              'runserver'],
+            cls.server_proc = subprocess.Popen(['python3', AG + '/cloudysky/manage.py',
+                              'runserver', '--noreload'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               text=True,
                               close_fds=True)
         # Make sure server is still running in background, or error
-            sleep(2)
+            wait_for_server()
             if cls.server_proc.poll() is not None:  # if it has terminated
                 stdout, stderr = cls.server_proc.communicate()
-                raise RuntimeError(
-                    "Django server crashed on startup.\n\n" +
-                   f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}"
-                    )
+                message = ("Django server crashed on startup.\n\n" +
+                   f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}")
+                if "already in use" in message:
+                    message =  ("Django server crashed on startup. " +
+                       f"{stderr.split('\n')[1]}")
+                raise RuntimeError(message)
         except Exception as e:
               assert False, str(e)
 
@@ -80,8 +98,27 @@ class TestDjangoApp(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.server_proc.terminate()
+        print("Stopping Django server...")
+        proc = getattr(cls, 'server_proc', None)
+        if proc and proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                print("Server did not terminate in time; killing it.")
+                proc.kill()
+                proc.wait()
 
+    
+    def setUp(cls):
+        if cls.server_proc.poll() is not None:  # if server is NOT running, restart it
+            cls.server_proc = subprocess.Popen(['python3', AG + '/cloudysky/manage.py',
+                              'runserver'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              text=True,
+                              close_fds=True)
+            sleep(2)
 
     @weight(0)
     @number("1.01")
@@ -233,8 +270,10 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_login(self):
         '''HW4: Checks accounts/login page for login success'''
         user_dict = self.user_dict
+        sleep(0.2)
         session = self.get_csrf_login_token()
         # first get csrf token from login page
+        sleep(0.2)
         response0 = session.get("http://localhost:8000/accounts/login/")
         csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
         if csrf:
