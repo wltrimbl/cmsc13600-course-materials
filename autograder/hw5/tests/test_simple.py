@@ -121,8 +121,9 @@ class TestDjangoHw5simple(unittest.TestCase):
                 message = ("Django server crashed on startup.\n\n" +
                    f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}")
                 if "already in use" in message:
+                    line = stderr.split("\n")[1]
                     message =  ("Django server crashed on startup. " +
-                       f"{stderr.split('\n')[1]}")
+                       f"{line}")
                 raise RuntimeError(message)
         except Exception as e:
               assert False, str(e)
@@ -179,9 +180,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         else:
             self.assertionError("Can't find cloudysky/db.sqlite3, this test won't work")
         print("LOOKING AT", db_location) 
-        tables = check_output(["sqlite3", db_location,
+        tables = check_output(["sqlite3", f"file:{db_location}?mode=ro&cache=shared",
             "SELECT name FROM sqlite_master WHERE type='table';"]).decode().split("\n")
-        print("TABLES", tables)
+        #print("TABLES", tables)
         apptables = [str(table) for table in tables if table[0:3] == 'app']
         print("APPTABLES", apptables)
         n = 0
@@ -425,41 +426,43 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_create_post_add(self):
         '''Test that createPost endpoint actually adds data
         '''
-        session = self.session_admin
+        session = self.session_user
         before_rows = self.count_app_rows()
         # Now hit createPost, now that we are logged in
         data = {'title': "I like fuzzy bunnies",  "content": "I like fuzzy bunnies.  Do you?" }
         print("Calling http://localhost:8000/app/createPost with", data)
         response2 = session.post("http://localhost:8000/app/createPost",
                                  data=data, headers=self.headers_admin)
-        for _ in range(10):
+        print("Response:{response2.text}\n")
+        for _ in range(20):
             after_rows = self.count_app_rows()
             if after_rows - before_rows > 0:
                 return
-            sleep(1)
+            sleep(2)
         self.assertGreater(after_rows - before_rows, 0,
                          "Cannot confirm createPost updated database\n" +
-                         "Content:{}".format(response2.text))
+                         "Response:{}".format(response2.text))
 
     @weight(2)
     @number("22")
     def test_create_comment_add(self):
         '''Test that createComment endpoint actually adds data
         '''
-        session = self.session_admin
+        session = self.session_user
         before_rows = self.count_app_rows()
         # Now hit createComment, now that we are logged in
         data = {"content": "Yes, I like fuzzy bunnies a lot." , "post_id": 1 }
         response2 = session.post("http://localhost:8000/app/createComment",
                                  data=data, headers=self.headers_admin)
-        for _ in range(10):
+        print("Response:{response2.text}\n")
+        for _ in range(20):
              after_rows = self.count_app_rows()
              if after_rows - before_rows > 0:
                   return
-             sleep(1)
+             sleep(2)
         self.assertGreater(after_rows - before_rows, 0,
             "Cannot confirm createComment updated database\n" +
-            "Content:{}".format(response2.text) )
+            "Response:{}".format(response2.text) )
 
     @weight(2)
     @number("21")

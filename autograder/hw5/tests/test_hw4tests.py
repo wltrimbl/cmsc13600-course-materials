@@ -32,11 +32,12 @@ def restart_django_server():
 
 def wait_for_server():
     for _ in range(100):
-        try:
-            with socket.create_connection(("localhost", 8000), timeout=1):
-                return True
-        except (ConnectionRefusedError, socket.timeout):
-            sleep(0.2)
+         try:
+             r = requests.get("http://localhost:8000/", timeout=1)
+             if r.status_code < 500:
+                 return
+         except:
+             sleep(0.2)
     raise RuntimeError(f"Server did not start within 20 seconds")
 
 class TestDjangoApp(unittest.TestCase):
@@ -80,8 +81,9 @@ class TestDjangoApp(unittest.TestCase):
                 message = ("Django server crashed on startup.\n\n" +
                    f"STDOUT:\n{stdout}\n\nSTDERR:\n{stderr}")
                 if "already in use" in message:
+                    line = stderr.split("\n")[1]
                     message =  ("Django server crashed on startup. " +
-                       f"{stderr.split('\n')[1]}")
+                       f"{line}")
                 raise RuntimeError(message)
         except Exception as e:
               assert False, str(e)
