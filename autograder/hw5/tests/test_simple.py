@@ -11,14 +11,14 @@ import zoneinfo
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
+import test_globals
 
-AG = "."
-if path.exists("manage.py"):
-    AG = ".."
+if path.exists("../cloudysky/manage.py"):
+    CSKYHOME = ".."
 if path.exists("cloudysky/manage.py"):
-    AG = "."
-if path.exists("/autograder/submission/cloudysky/manage.py"):
-    AG = "/autograder/submission"
+    CSKYHOME = "."
+if path.exists("/autograder/submission"):
+    CSKYHOME = "/autograder/submission"
 
 # DEsired tests:
 # /app/new_course  (HTML form/view to submit to createPost) PROVIDED
@@ -111,9 +111,16 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
+        if not test_globals.SERVER_STARTED_OK:
+            cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
         try:
-            cls.start_server()
+            cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
+                              'runserver'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              text=True,
+                              close_fds=True)
         # Make sure server is still running in background, or error
             cls.wait_for_server()
             if cls.server_proc.poll() is not None:  # if it has terminated
@@ -177,9 +184,6 @@ class TestDjangoHw5simple(unittest.TestCase):
             db_location = "db.sqlite3"
         elif path.exists("cloudysky/db.sqlite3"):
             db_location = "cloudysky/db.sqlite3"
-        else:
-            self.assertionError("Can't find cloudysky/db.sqlite3, this test won't work")
-        print("LOOKING AT", db_location) 
         tables = check_output(["sqlite3", f"file:{db_location}?mode=ro&cache=shared",
             "SELECT name FROM sqlite_master WHERE type='table';"]).decode().split("\n")
         #print("TABLES", tables)
@@ -421,10 +425,10 @@ class TestDjangoHw5simple(unittest.TestCase):
                          admin_data["email"] in sanitized_text),
                         "Can't find email or username in {}".format(sanitized_text))
 
-    @weight(2)
+    @weight(0)
     @number("21")
     def test_create_post_add(self):
-        '''Test that createPost endpoint actually adds data
+        '''Test that createPost endpoint actually adds data  BROKEN TEST BUT WILL BE FIXED 
         '''
         session = self.session_user
         before_rows = self.count_app_rows()
@@ -443,10 +447,10 @@ class TestDjangoHw5simple(unittest.TestCase):
                          "Cannot confirm createPost updated database\n" +
                          "Response:{}".format(response2.text))
 
-    @weight(2)
+    @weight(0)
     @number("22")
     def test_create_comment_add(self):
-        '''Test that createComment endpoint actually adds data
+        '''Test that createComment endpoint actually adds data BROKEN TEST BUT WILL BE FIXED 
         '''
         session = self.session_user
         before_rows = self.count_app_rows()

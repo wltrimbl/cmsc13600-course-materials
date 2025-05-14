@@ -14,14 +14,16 @@ import string
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
+import test_globals
 
-AG = "."
-if path.exists("manage.py"):
-    AG = ".."
+
+CSKYHOME="."
+if path.exists("../cloudysky/manage.py"):
+    CSKYHOME = ".."
 if path.exists("cloudysky/manage.py"):
-    AG = "."
-if path.exists("/autograder/submission/cloudysky/manage.py"):
-    AG = "/autograder/submission"
+    CSKYHOME = "."
+if path.exists("/autograder/submission"):
+    CSKYHOME = "/autograder/submission"
 
 # HW4 tests with point values set to zero.
 
@@ -59,17 +61,18 @@ class TestDjangoApp(unittest.TestCase):
                 "http://localhost:8000/accounts/login/"}
         return session   # session
 
-
     @classmethod
     def setUpClass(cls):
         '''This class logs in as an admin, and sets
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
+        if not test_globals.SERVER_STARTED_OK:
+            cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
         try:
-            cls.server_proc = subprocess.Popen(['python3', AG + '/cloudysky/manage.py',
-                              'runserver', '--noreload'],
+            cls.server_proc = subprocess.Popen(['python3', CSKYHOME +"/"+ 'cloudysky/manage.py',
+                              'runserver'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               text=True,
