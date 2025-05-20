@@ -1,0 +1,7 @@
+
+Experiment:  
+remove test_simple.py and test_hw4, leaving only test_00_startserver
+
+update autograder, test with Maggie Shi's submission
+	CRASH!! 
+

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Set up autograder files
+ln -s $(which python3) /usr/bin/python
+
+rm -Rf $( find /autograder/submission/cloudysky -name 'test_*.py' )  
+
+echo "PRAGMA journal_mode=DELETE;" | sqlite3 /autograder/submission/db.sqlite3
+echo >> /autograder/submission/cloudysky/cloudysky/settings.py 
+echo "import os" >> /autograder/submission/cloudysky/cloudysky/settings.py 
+echo "DATABASES = { 'default': { 'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), 'OPTIONS': { 'timeout': 20, 'uri': True, }, } }"  >> /autograder/submission/cloudysky/cloudysky/settings.py 
+
+cp -r /autograder/submission/cloudysky /autograder/source
+
+
+cd /autograder/source
+
+rm -Rf /autograder/source/examples/
+
+python3 run_tests.py
+
