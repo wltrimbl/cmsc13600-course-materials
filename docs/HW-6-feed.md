@@ -22,6 +22,17 @@ When a comment is suppressed, a placeholder like "This comment has been removed"
 Users do not have the authority to censor their own posts or comments.  
 
 ## Grading / testing  
+5 points for the "proof of work" 
+5 points for identifying the misspelled word from the qutoation.
 
 ## Submission
 Upload from github to gradescope.
+
+Create a file called `puzzle.py` that defines at least `puzzle_key` and `puzzle_misspell`, and assign an integer and a string to them, respectively, containing the key to the 9-digit puzzle and the (misspelled) word in the 9-digit `PUZZLE` that is misspelled. 
+
+   - puzzle_easy_key = 6346
+   - puzzle_easy_misspell = "Fabruart,"
+   - puzzle_key = # 9-digit number 
+   - puzzle_misspell = "" # Your answer here
+
+Include your `cloudysky` app too.
