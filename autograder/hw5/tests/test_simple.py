@@ -5,13 +5,16 @@ import subprocess
 from subprocess import check_output
 import requests
 import socket
+import os
 from time import sleep
 from os import path
 import zoneinfo
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
-import test_globals
+from . import test_globals
+
+CSKYHOME="."
 
 if path.exists("../cloudysky/manage.py"):
     CSKYHOME = ".."
@@ -76,7 +79,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 
         print("Starting Django server...")
         cls.server_proc = subprocess.Popen(
-            ['python3', AG + '/cloudysky/manage.py',
+            ['python3', CSKYHOME + '/cloudysky/manage.py',
                       'runserver', '--noreload'],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -111,7 +114,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
-        if not test_globals.SERVER_STARTED_OK:
+        if not test_globals.SERVER_STARTED_OK and os.path.exists("/autograder"):
             cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
         try:

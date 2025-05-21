@@ -9,12 +9,13 @@ from os import path
 from datetime import datetime
 import zoneinfo
 import re
+import os
 import json
 import string
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
-import test_globals
+from . import test_globals
 
 
 CSKYHOME="."
@@ -67,7 +68,7 @@ class TestDjangoApp(unittest.TestCase):
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
-        if not test_globals.SERVER_STARTED_OK:
+        if not test_globals.SERVER_STARTED_OK and os.path.exists("/autograder"):
             cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
         try:
@@ -117,7 +118,7 @@ class TestDjangoApp(unittest.TestCase):
     
     def setUp(cls):
         if cls.server_proc.poll() is not None:  # if server is NOT running, restart it
-            cls.server_proc = subprocess.Popen(['python3', AG + '/cloudysky/manage.py',
+            cls.server_proc = subprocess.Popen(['python3', CSKYHOME + '/cloudysky/manage.py',
                               'runserver'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,

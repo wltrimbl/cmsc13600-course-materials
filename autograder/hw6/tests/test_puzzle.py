@@ -30,6 +30,7 @@ class TestPuzzle(unittest.TestCase):
     @weight(5)
     @number("41.0")
     def test_puzzle_misspell(self):
+        print("puzzle_misspell:", puzzle_misspell)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", puzzle_misspell.encode("utf8"), "".encode("utf-8"), 1000000), 
             b'F\xa3M\x08\xa6\xe4\xde\xb2!xM\x91\xdb\x82$\xd4)\xd7\xbb_\xfaS\x02w\xdaJX\x9c;kp%', 
             "hash(puzzle_misspell) doesn't match hash(key)")
@@ -38,12 +39,13 @@ class TestPuzzle(unittest.TestCase):
     @weight(0.0)
     @number("40.0")
     def test_puzzle_easy_misspell(self):
+        print("puzzle_easy_misspell:", puzzle_easy_misspell)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", puzzle_easy_misspell.encode("utf8"), "".encode("utf-8"), 1000000), 
              b'\xfb\xd4\x9c\x1c\xf1\x7f?I\xd1\xfa+\x96\x94\xc3\x1b4!\x04\x1b\xde-\x89\xf1`er"\x05\x16GV/', 
             "hash(puzzle_easy_misspell) doesn't match hash(key)")
 
     @weight(5)
-    @number("41.0")
+    @number("41.5")
     def test_puzzle_key(self):
         print("puzzle_key:", puzzle_key)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", f"{puzzle_key:12d}".encode("utf8"), "".encode("utf-8"), 1000000), 
@@ -52,10 +54,9 @@ class TestPuzzle(unittest.TestCase):
 
 
     @weight(0.0)
-    @number("40.0")
+    @number("40.5")
     def test_puzzle_easy_key(self):
-        print("puzzle_easy_key")
-        print(puzzle_easy_key)
+        print("puzzle_easy_key", puzzle_easy_key)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", f"{puzzle_easy_key:12d}".encode("utf8"), "".encode("utf-8"), 1000000), 
             b'u\x16^[\x178\x95C#Z\xfe\x88\xebnt?^\xc6\xf3\xeb\xcf\xa8\xac>xu\x01\x83\x0e\rA\xbd', 
             "hash(puzzle_easy_key) doesn't match expected")

@@ -2,7 +2,7 @@ import unittest
 import subprocess
 import os
 
-import test_globals 
+from . import test_globals 
 
 def trunc(x):
     return x[-2000:] if x else ""

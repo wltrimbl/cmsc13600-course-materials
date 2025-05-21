@@ -11,6 +11,7 @@ echo "import os" >> /autograder/submission/cloudysky/cloudysky/settings.py
 echo "DATABASES = { 'default': { 'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), 'OPTIONS': { 'timeout': 20, 'uri': True, }, } }"  >> /autograder/submission/cloudysky/cloudysky/settings.py 
 
 cp -r /autograder/submission/cloudysky /autograder/source
+cp  /autograder/submission/puzzle.py /autograder/source
 
 
 cd /autograder/source
