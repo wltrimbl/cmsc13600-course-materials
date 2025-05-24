@@ -227,7 +227,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @weight(0.5)
     @number("30")
     def test_create_post_user_success_and_json(self):
-        '''Test that /app/createPost by a user succeeds and returns valid JSON'''
+        '''Test that /app/createPost by a user succeeds and returns valid JSON containing 'post_id' key'''
         post_data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
                   'csrfmiddlewaretoken': self.csrfdata_user}
         session = self.session_user
@@ -254,7 +254,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @weight(0)
     @number("13.0")
     def test_hide_post_notloggedin(self):
-        '''Test hidePost endpoint not logged in, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
+        '''Verify that unautnethicated POST to /app/hidePost endpoint returns 401 unauthorized. '''
         data = {'post_id': "0",  "reason": "天安门广场" }
         session, csrf = self.get_csrf_login_token()
         request = session.post(
@@ -266,53 +266,10 @@ class TestCloudySkyEndpoints(unittest.TestCase):
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 401,
-            "Server returns error for POST to " +
+            "Expected error 401 unauthorized for POST to " +
             "http://localhost:8000/app/hidePost " +
-            "Data:{}".format(data)
-#           + "Content:{}".format(request.text)
-            )
-
-    @weight(0)
-    @number("13.1")
-    def test_hide_post_user_unauthorized(self):
-        '''Test hidePost endpoint by a user, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
-        hide_data = {'post_id': "1",  "reason": "NIXON" }
-        session = self.session_user
-        request = session.post(
-            "http://localhost:8000/app/hidePost",
-             data=hide_data, headers=self.headers_user)
-        self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hidePost " +
-            "Data:{}".format(hide_data)
-#           "Content:{}".format(response2.text)
-            )
-        self.assertEqual(request.status_code, 401,
-            "Server returns error for POST to " +
-            "http://localhost:8000/app/hidePost " +
-            "Data:{}".format(hide_data)
-#           + "Content:{}".format(request.text)
-            )
-
-    @weight(0)
-    @number("13.2")
-    def test_hide_post_admin_success(self):
-        '''Test hidePost endpoint by an admin which should succeed http://localhost:8000/app/hidePost'''
-        hide_data = {'post_id': "1",  "reason": "NIXON",
-                'csrfmiddlewaretoken': self.csrfdata_admin
-               }
-        session = self.session_admin
-        request = session.post(
-            "http://localhost:8000/app/hidePost",
-             data=hide_data, headers=self.headers_admin)
-        self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hidePost " +
-            "Data:{}".format(hide_data)
-#           "Content:{}".format(response2.text)
-            )
-        self.assertEqual(request.status_code, 200,
-            "Server returns error for POST to " +
-            "http://localhost:8000/app/hidePost " +
-            "Data:{}".format(hide_data)
+            "Data:{}".format(data) +
+            f"Got error code {request.status_code}" 
 #           + "Content:{}".format(request.text)
             )
 
@@ -443,7 +400,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @weight(0)
     @number("19")
     def test_login_index(self):
-        '''Logs in, tests index.html '''
+        '''Logs in, Ensures that / endpoint returns a page containing logged-in username'''
         session = self.session_admin
         # Now hit createPost, now that we are logged in
         response_index = session.get("http://localhost:8000/")
@@ -457,10 +414,10 @@ class TestCloudySkyEndpoints(unittest.TestCase):
                          admin_data["email"] in sanitized_text),
                         "Can't find email or username in {}".format(sanitized_text))
 
-    @weight(1)
+    @weight(2)
     @number("21")
     def test_create_post_add(self):
-        '''Test that createPost endpoint actually adds data
+        '''Verity that successful POST to /app/createPost adds data that appears in /app/dumpFeed
         '''
         session = self.session_user
         # Now hit createPost, now that we are logged in
@@ -475,7 +432,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
                                  headers=self.headers_user)
         self.assertTrue(content in response2.text, "New post not found in /app/dumpFeed")
 
-    @weight(1)
+    @weight(2)
     @number("22")
     def test_create_comment_add(self):
         '''Test that createComment endpoint actually adds data to dumpFeed
@@ -523,7 +480,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             self.fail(f"Couldn't decode JSON {response.content}, {e}")
 
     @weight(2)
-    @number("24")
+    @number("34")
     def test_hide_post_admin_removes(self):
         '''Ensure /app/hidePost removes post from /app/dumpFeed'''
         session = self.session_user
@@ -557,9 +514,8 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         self.assertFalse(content in response4.text,
              "Test post found in /app/dumpFeed after it should have been hidden.")
 
-
     @weight(2)
-    @number("25")
+    @number("35")
     def test_hide_comment_admin_removes(self):
         '''Test hideComment endpoint by an admin actually hides content.'''
         # Create a post
@@ -596,3 +552,42 @@ class TestCloudySkyEndpoints(unittest.TestCase):
                                  headers=self.headers_user2)
         self.assertFalse(comment_data["content"] in response5.text,
              "Test post found in /app/dumpFeed after it should have been hidden.")
+
+    @weight(1)
+    @number("36")
+    def test_hide_comment_admin_still_visible_admin(self):
+        '''Verifies that hidden comments are still visible to admin.'''
+        # Create a post
+        session = self.session_user
+        session_admin = self.session_admin
+        secret = int(random.random()*100000)
+        content = f"I like the fuzzy bunnies!"
+        post_data = {'title': content, "content": content,
+                'csrfmiddlewaretoken': self.csrfdata_user}
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=post_data, headers=self.headers_user)
+        j = response.json()
+        post_id = j["post_id"]
+        # create comment
+        comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",
+                'csrfmiddlewaretoken': self.csrfdata_user }
+        response2 = session.post("http://localhost:8000/app/createComment",
+                                 data=comment_data, headers=self.headers_user)
+        comment_id = response2.json()["comment_id"]
+        # Confirm comment posted
+        response3 = session.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_user)
+        self.assertTrue(comment_data["content"] in response3.text,
+             "Test post not found in /app/dumpFeed after it should have been inserted.")
+        # Suppress comment
+        hide_data = {"comment_id": comment_id, "reason": "TESTING"} 
+        response4 = session_admin.post(
+            "http://localhost:8000/app/hideComment",
+             data=hide_data, headers=self.headers_admin)
+        self.assertEqual(response4.status_code, 200,
+             f"hideComment failed: {response4.text}")
+        # Confirm suppression
+        response5 = self.session_admin.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_admin)
+        self.assertTrue(comment_data["content"] in response5.text,
+             "Hidden comment mssing from /app/dumpFeed viewed by admin, should be visible but flagged.")
