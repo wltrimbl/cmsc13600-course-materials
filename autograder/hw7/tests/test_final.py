@@ -12,7 +12,13 @@ import zoneinfo
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
-from . import test_globals
+
+# First works on laptop, second 
+# necessary or autograder breaks
+try:
+    from . import test_globals 
+except ImportError:
+    import test_globals   
 
 CSKYHOME="."
 
@@ -50,13 +56,19 @@ user_data = {
                 "user_name": "Tester Student",
                 "password": "Password123"
                 }
+user2_data = {
+                "email": "user2_test@test.org",
+                "is_admin": "0",
+                "user_name": "Tester2 Student",
+                "password": "Password123"
+                }
 
 bunnytweets = [ "A bunny in your lap = therapy.", "A bunny is a cloud with ears.", "Adopt a bunny, gain calm.", "Anxious but adorable: the bunny way.", "Baby bunny yawns cure sadness.", "Bunnies are living plush toys.", "Bunnies don’t bite, they bless.", "Bunnies nap like tiny gods.", "Bunny feet are pure poetry.", "Bunny loaf = floof perfection.", "Bunny silence speaks comfort.", "Ears up, stress down.", "Flop = bunny trust unlocked.", "Floppy ears fix bad moods.", "Fuzzy bunnies are peace in tiny, hopping form.", "Holding a bunny resets your soul.", "Hops heal hearts.", "Nose wiggles say “I love you.”", "One bunny = less chaos.", "Quiet, cute, and salad-powered.", "Rabbits know the secret to rest.", "Snuggle-powered peace generator.", "Soft bunny = instant calm.", "Soft, silent, and perfect.", "Tiny paws, huge joy.",]
 
 
 
 
-class TestDjangoHw5simple(unittest.TestCase):
+class TestCloudySkyEndpoints(unittest.TestCase):
     '''Test functionality of cloudysky API'''
     server_proc = None
 
@@ -87,7 +99,6 @@ class TestDjangoHw5simple(unittest.TestCase):
         )
         cls.wait_for_server()
 
-    @classmethod
     def setUp(self):
         self.start_server()  # start or restart if needed
         self.wait_for_server()  # confirm it's responsive
@@ -136,7 +147,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                        f"{line}")
                 raise RuntimeError(message)
         except Exception as e:
-              self.fail(str(e))
+              cls.fail(str(e))
 
         def login(data):
             response = requests.post("http://localhost:8000/app/createUser",
@@ -162,6 +173,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 #       Now we can use self.session  as a logged-in requests object.
         cls.session_admin, cls.headers_admin, cls.csrfdata_admin = login(admin_data)
         cls.session_user, cls.headers_user, cls.csrfdata_user = login(user_data)
+        cls.session_user2, cls.headers_user2, cls.csrfdata_user2 = login(user2_data)
 
     @classmethod
     def tearDownClass(cls):
@@ -177,82 +189,60 @@ class TestDjangoHw5simple(unittest.TestCase):
                 proc.wait()
 
 
-    def count_app_rows(self):
-        '''Counts all the rows in sqlite tables beginning
-        with "app", to confirm that rows are being added.
-        '''
-        if not path.exists("cloudysky/db.sqlite3") and not path.exists('db.sqlite3'):
-            raise AssertionError("Cannot find cloudysky/db.sqlite3 or db.sqlite3, this test isn't going to work")
-        if path.exists("db.sqlite3"):
-            db_location = "db.sqlite3"
-        elif path.exists("cloudysky/db.sqlite3"):
-            db_location = "cloudysky/db.sqlite3"
-        tables = check_output(["sqlite3", f"file:{db_location}?mode=ro&cache=shared",
-            "SELECT name FROM sqlite_master WHERE type='table';"]).decode().split("\n")
-        #print("TABLES", tables)
-        apptables = [str(table) for table in tables if table[0:3] == 'app']
-        print("APPTABLES", apptables)
-        n = 0
-        for apptable in apptables:
-            contents = check_output(["sqlite3", db_location,
-                "SELECT * from " + apptable]).decode().split()
-            n += len(contents)
-            print("Apptable", apptable, len(contents), "rows")
-        return n
 
     @weight(0)
     @number("10.0")
     def test_create_post_admin_success(self):
         '''Check server responds with success to http://localhost:8000/app/createPost'''
         n = int(random.random() * 25)
-        data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n] }
+        post_data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n] }
         session = self.session_admin
-        request = session.post(
+        response = session.post(
             "http://localhost:8000/app/createPost",
-            data=data, headers=self.headers_admin)
-        self.assertLess(request.status_code, 203,  # 200 or 201 ok
+            data=post_data, headers=self.headers_admin)
+        self.assertLess(response.status_code, 203,  # 200 or 201 ok
             "Server returns error for POST to " +
             "http://localhost:8000/app/createPost " +
-            "Data:{}".format(data) +
-            "Content:{}".format(request.text)+
+            "Data:{}".format(post_data) +
+            "Content:{}".format(response.text)+
             "Headers:{}".format(self.headers_admin)
             )
 
     @weight(0)
     @number("10.1")
     def test_create_post_notloggedin(self):
-        '''Check server responds with success to http://localhost:8000/app/createPost'''
-        data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?" }
+        '''Check server responds with unauthorized to not-logged-in request to  http://localhost:8000/app/createPost'''
+        post_data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?" }
         session, csrf = self.get_csrf_login_token()  # not logged in
         request = session.post(
             "http://localhost:8000/app/createPost",
-            data=data)  # not logged in
+            data=post_data)  # not logged in
         self.assertEqual(request.status_code, 401,  # unauthorized
             "Server should return error 401 for not-logged-in POST to " +
             "http://localhost:8000/app/createPost " +
-            "Data:{}".format(data)
+            "Data:{}".format(post_data)
 #           "Content:{}".format(request.text)
             )
 
-    @weight(0)
+    @weight(0.5)
     @number("30")
     def test_create_post_user_success_and_json(self):
         '''Test that /app/createPost by a user succeeds and returns valid JSON'''
-        data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
+        post_data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
                   'csrfmiddlewaretoken': self.csrfdata_user}
         session = self.session_user
         response = session.post(
             "http://localhost:8000/app/createPost",
-             data=data, headers=self.headers_user)
+             data=post_data, headers=self.headers_user)
         self.assertNotEqual(response.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createPost " +
-            "Data:{}".format(data)
+            "Data:{}".format(post_data)
             )
         self.assertEqual(response.status_code, 200,
             "Server returns error for POST to " +
             "http://localhost:8000/app/createPost " +
             "which should succeed." +
-            "Data:{}".format(data)
+            "Data:{}".format(post_data)
 #           + "Content:{}".format(response.text)
             )
         try:
@@ -286,20 +276,20 @@ class TestDjangoHw5simple(unittest.TestCase):
     @number("13.1")
     def test_hide_post_user_unauthorized(self):
         '''Test hidePost endpoint by a user, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
-        data = {'post_id': "1",  "reason": "NIXON" }
+        hide_data = {'post_id': "1",  "reason": "NIXON" }
         session = self.session_user
         request = session.post(
             "http://localhost:8000/app/hidePost",
-             data=data, headers=self.headers_user)
+             data=hide_data, headers=self.headers_user)
         self.assertNotEqual(request.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/hidePost " +
-            "Data:{}".format(data)
+            "Data:{}".format(hide_data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 401,
             "Server returns error for POST to " +
             "http://localhost:8000/app/hidePost " +
-            "Data:{}".format(data)
+            "Data:{}".format(hide_data)
 #           + "Content:{}".format(request.text)
             )
 
@@ -307,114 +297,148 @@ class TestDjangoHw5simple(unittest.TestCase):
     @number("13.2")
     def test_hide_post_admin_success(self):
         '''Test hidePost endpoint by an admin which should succeed http://localhost:8000/app/hidePost'''
-        data = {'post_id': "1",  "reason": "NIXON",
+        hide_data = {'post_id': "1",  "reason": "NIXON",
                 'csrfmiddlewaretoken': self.csrfdata_admin
                }
         session = self.session_admin
         request = session.post(
             "http://localhost:8000/app/hidePost",
-             data=data, headers=self.headers_admin)
+             data=hide_data, headers=self.headers_admin)
         self.assertNotEqual(request.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/hidePost " +
-            "Data:{}".format(data)
+            "Data:{}".format(hide_data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
             "http://localhost:8000/app/hidePost " +
-            "Data:{}".format(data)
+            "Data:{}".format(hide_data)
 #           + "Content:{}".format(request.text)
             )
 
     @weight(0)
-    @number("13.2")
+    @number("13.3")
     def test_hide_comment_admin_success(self):
         '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
-        data = {'comment_id': "1",  "reason": "NIXON",
-                'csrfmiddlewaretoken': self.csrfdata_admin
-               }
-        session = self.session_admin
-        request = session.post(
+
+        # Step 1: Create a post
+        secret = int(random.random() * 100000)
+        content = f"I like fuzzy{secret:06d} bunnies!"
+        post_data = {
+            'title': content,
+            'content': content,
+            'csrfmiddlewaretoken': self.csrfdata_user
+        }
+        post_response = self.session_user.post(
+            "http://localhost:8000/app/createPost",
+            data=post_data, headers=self.headers_user
+        )
+        self.assertEqual(post_response.status_code, 200, f"Post creation failed: {post_response.text}")
+        post_id = post_response.json().get("post_id")
+
+        # Step 2: Create a comment
+        comment_text = f"Comment from bunny-lover {secret}"
+        comment_data = {
+            "post_id": post_id,
+            "content": comment_text
+        }
+        comment_response = self.session_user.post(
+            "http://localhost:8000/app/createComment",
+            data=comment_data, headers=self.headers_user
+        )
+        self.assertEqual(comment_response.status_code, 200, f"Comment creation failed: {comment_response.text}")
+        comment_id = comment_response.json()["comment_id"]
+
+       # Step 4: Hide the comment as admin
+        hide_data = {
+            'comment_id': comment_id,
+            'reason': "Off-topic bunny slander",
+            'csrfmiddlewaretoken': self.csrfdata_admin
+        }
+
+        hide_response = self.session_admin.post(
             "http://localhost:8000/app/hideComment",
-             data=data, headers=self.headers_admin)
-        self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hideComment " +
-            "Data:{}".format(data)
-#           "Content:{}".format(response2.text)
-            )
-        self.assertEqual(request.status_code, 200,
+             data=hide_data, headers=self.headers_admin)
+        print("HIDERESPONSE", hide_response, hide_response.text)
+        self.assertEqual(hide_response.status_code, 200,
             "Server returns error for POST to " +
             "http://localhost:8000/app/hideComment " +
-            "Data:{}".format(data)
-#           + "Content:{}".format(request.text)
+            "Data:{}".format(hide_data)
             )
+        updated_feed = self.session_user.get("http://localhost:8000/app/dumpFeed", headers=self.headers_user).text
+        self.assertNotIn(comment_text, updated_feed,
+                     "Comment still visible in /app/dumpFeed after hiding")
+
 
     @weight(0)
     @number("11.0")
     def test_create_comment_admin_success(self):
-        '''Test createComment endpoint.
-        '''
+        '''Ensure admin can successfully post a comment via 
+        /app/createComment'''
         session = self.session_admin
         # Now hit createComment, now that we are logged in
-        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
         response2 = session.post(
             "http://localhost:8000/app/createComment",
-            data=data,headers=self.headers_admin)
+            data=comment_data,headers=self.headers_admin)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data)
+            "Data:{}".format(comment_data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 200,
             "Server returns error for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data)+
+            "Data:{}".format(comment_data)+
             "Content:{}".format(response2.text)
             )
 
     @weight(0)
     @number("11.1")
     def test_create_comment_notloggedin(self):
-        '''Test createComment endpoint.
-        '''
+        '''Ensure unauthenticated comment POST returns 401 Unauthorized'''
         session, csrf = self.get_csrf_login_token()   # Not logged in
-        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
         response2 = session.post(
             "http://localhost:8000/app/createComment",
-            data=data)
+            data=comment_data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data)
+            "Data:{}".format(comment_data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 401, # Unauthorized
             "Server returns error for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data)+
+            "Data:{}".format(comment_data)+
             "Content:{}".format(response2.text)
             )
 
-    @weight(0)
-    @number("11.2")
-    def test_create_comment_user_success(self):
-        '''Tests createComment endpoint by a user, which should succeed.
-        '''
+    @weight(0.5)
+    @number("31.0")
+    def test_create_comment_user_success_and_json(self):
+        '''Ensure regular user can successfully post a comment 
+        via /app/createComment'''
         session = self.session_user
-        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
         response2 = session.post(
              "http://localhost:8000/app/createComment",
-             data=data, headers=self.headers_user)
+             data=comment_data, headers=self.headers_user)
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data)
+            "Data:{}".format(comment_data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 200,
             "Server returned an error for http://localhost:8000/app/createComment " +
-            "Data:{}".format(data) +
+            "Data:{}".format(comment_data) +
             "Content:{}".format(response2.text)
             )
-
+        try:
+            j = response2.json()
+        except Exception as e:
+            self.fail(f"http://localhost:8000/app/createPost did not return valid JSON on success: {response2.content}, {e}")
+        self.assertTrue("comment_id" in j.keys(), f"Response to /app/createComment does not contain 'comment_id': {j}")
 
     @weight(0)
     @number("19")
@@ -439,14 +463,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test that createPost endpoint actually adds data
         '''
         session = self.session_user
-        before_rows = self.count_app_rows()
         # Now hit createPost, now that we are logged in
         secret = int(random.random() * 100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
-        data = {'title': content, "content": content}
-        print("Calling http://localhost:8000/app/createPost with", data)
+        post_data = {'title': content, "content": content}
+        print(f"Calling http://localhost:8000/app/createPost with {post_data}")
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=data, headers=self.headers_user)
+                                 data=post_data, headers=self.headers_user)
         print(f"Response:{response.text}\n")
         response2 = session.get("http://localhost:8000/app/dumpFeed",
                                  headers=self.headers_user)
@@ -457,17 +480,31 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_create_comment_add(self):
         '''Test that createComment endpoint actually adds data to dumpFeed
         '''
+        # Step 1, create post
         session = self.session_user
-        before_rows = self.count_app_rows()
-        # Now hit createComment, now that we are logged in
         secret = int(random.random()*100000)
-        content = f"fuzzy{secret:06d} bunnies 4tw!"
-        data = {"content": content, "post_id": 1 }
-        response = session.post("http://localhost:8000/app/createComment",
-                                 data=data, headers=self.headers_user)
-        response2 = session.get("http://localhost:8000/app/dumpFeed",
-                                 data=data, headers=self.headers_user)
-        self.assertTrue(content in response2.text, "Test comment not found in /app/dumpFeed")
+        content = f"I like the fuzzy{secret:06d} bunnies!"
+        post_data = {'title': content, "content": content,
+                'csrfmiddlewaretoken': self.csrfdata_user}
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=post_data, headers=self.headers_user)
+        self.assertEqual(response.status_code, 200,
+             f"createPostfailed: {response.text}")
+
+        post_id = response.json()["post_id"]
+
+        # Now hit createComment
+        content2 = f"I like them too, fuzzy{secret:06d}bunny!"
+        comment_data = {"content": content2, "post_id": post_id }
+        response2 = session.post("http://localhost:8000/app/createComment",
+                                 data=comment_data, headers=self.headers_user)
+        self.assertEqual(response2.status_code, 200,
+             f"createComment failed: {response2.text}")
+
+        # Confirm new comment appears in dumpFeed
+        response3 = session.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_user)
+        self.assertTrue(content in response3.text, "Test comment not found in /app/dumpFeed")
 
     @weight(1)
     @number("20")
@@ -485,59 +522,77 @@ class TestDjangoHw5simple(unittest.TestCase):
         except Exception as e:
             self.fail(f"Couldn't decode JSON {response.content}, {e}")
 
-    @unittest.skip("not tested")
-    @weight(0)
+    @weight(2)
     @number("24")
     def test_hide_post_admin_removes(self):
-        '''Test hidePost endpoint actually hides content'''
+        '''Ensure /app/hidePost removes post from /app/dumpFeed'''
         session = self.session_user
         session_admin = self.session_admin
+        # Create a post
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
-        data = {'title': content, "content": content,
+        post_data = {'title': content, "content": content,
                 'csrfmiddlewaretoken': self.csrfdata_user}
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=data, headers=self.headers_user)
+                                 data=post_data, headers=self.headers_user)
         j = response.json()
         post_id = j["post_id"]
         hide_data = {'post_id': post_id,  "reason": "misanthropy",
                 'csrfmiddlewaretoken': self.csrfdata_admin
                }
+        # Confirm post posted
         response2 = session.get("http://localhost:8000/app/dumpFeed",
                                  headers=self.headers_user)
         self.assertTrue(content in response2.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
+        # Suppress post
         response3 = session_admin.post(
             "http://localhost:8000/app/hidePost",
              data=hide_data, headers=self.headers_admin)
         self.assertEqual(response3.status_code, 200,
              f"hidePost failed: {response3.text}")
+        # Confirm suppression
         response4 = session.get("http://localhost:8000/app/dumpFeed",
                                  headers=self.headers_user)
         self.assertFalse(content in response4.text,
              "Test post found in /app/dumpFeed after it should have been hidden.")
 
 
-    @unittest.skip("not tested")
-    @weight(0)
+    @weight(2)
     @number("25")
     def test_hide_comment_admin_removes(self):
         '''Test hideComment endpoint by an admin actually hides content.'''
-        data = {'comment_id': "1",  "reason": "NIXON",
-                'csrfmiddlewaretoken': self.csrfdata_admin
-               }
-        session = self.session_admin
-        request = session.post(
+        # Create a post
+        session = self.session_user
+        session_admin = self.session_admin
+        secret = int(random.random()*100000)
+        content = f"I like the fuzzy bunnies!"
+        post_data = {'title': content, "content": content,
+                'csrfmiddlewaretoken': self.csrfdata_user}
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=post_data, headers=self.headers_user)
+        j = response.json()
+        post_id = j["post_id"]
+        # create comment
+        comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",
+                'csrfmiddlewaretoken': self.csrfdata_user }
+        response2 = session.post("http://localhost:8000/app/createComment",
+                                 data=comment_data, headers=self.headers_user)
+        comment_id = response2.json()["comment_id"]
+        # Confirm comment posted
+        response3 = session.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_user)
+        self.assertTrue(comment_data["content"] in response3.text,
+             "Test post not found in /app/dumpFeed after it should have been inserted.")
+        # Suppress comment
+        hide_data = {"comment_id": comment_id, "reason": "TESTING"} 
+        response4 = session_admin.post(
             "http://localhost:8000/app/hideComment",
-             data=data, headers=self.headers_admin)
-        self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hideComment " +
-            "Data:{}".format(data)
-#           "Content:{}".format(response2.text)
-            )
-        self.assertEqual(request.status_code, 200,
-            "Server returns error for POST to " +
-            "http://localhost:8000/app/hideComment " +
-            "Data:{}".format(data)
-#           + "Content:{}".format(request.text)
-            )
+             data=hide_data, headers=self.headers_admin)
+        self.assertEqual(response4.status_code, 200,
+             f"hideComment failed: {response4.text}")
+        # Confirm suppression
+        response5 = self.session_user2.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.headers_user2)
+        self.assertFalse(comment_data["content"] in response5.text,
+             "Test post found in /app/dumpFeed after it should have been hidden.")

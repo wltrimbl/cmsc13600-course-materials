@@ -15,7 +15,12 @@ import string
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
-from . import test_globals
+# First works on laptop, second 
+# necessary or autograder breaks
+try:
+    from . import test_globals
+except ImportError:
+    import test_globals   
 
 
 CSKYHOME="."

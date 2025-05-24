@@ -2,7 +2,12 @@ import unittest
 import subprocess
 import os
 
-from . import test_globals 
+# First works on laptop, second 
+# necessary or autograder breaks
+try:
+    from . import test_globals
+except ImportError:
+    import test_globals   
 
 def trunc(x):
     return x[-2000:] if x else ""
