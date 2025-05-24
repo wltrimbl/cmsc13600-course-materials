@@ -11,14 +11,32 @@ There were some parts of the specification that were vague (and were not subject
 `dumpFeed` should include all the content of the posts and all the content of the comments (unless posts or comments are suppressed.)  The JSON should also flag which content is suppressed but still visible.  You might note that this will be unsustainable without pagination.  But no need to do this now.
 
 
+## New requirement:  `createComment` and `createPost` must return JSON
+
+The createPost endpoint and the createComment endpoint must return a JSON structure, minimally containing post_id and comment_id, respectively.
+
+For instance, 
+
+    message = {"message" : "Successfully created post",
+        'title': "Fuzzy bunnies suck!",
+        'content': "I hate fuzzy bunnies!",
+        'post_id': new_post.post_id}
+    return JsonResponse(message) # create_post
+
+
+Without this, the hideComment and hidePost tests are stabbing in the dark to remove content whose ids are not known to the testing framework.
+
+These requirements should be just a few lines, and shouldn't break any of the older tests.
+
 ## Show off (optional)
 With an API, a database, and a few HTML pages, can you do anything worth showing off?  The `dumpFeed` requirement was intended to make it easy for chatbots and automoderators to ingest content and make a decision on what content to add or what content to remove.  
 
 If you have implemented any interesting functionality beyond the specifcation, you can write a one-page description of what your code does and check it into your repository as `cloudysky.pdf`.    It is not a requirement that your additional funcitonality run in the autograder environment (which you can't easily configure), and you can choose whether to run your code inside the app or outside it, perhaps interacting only via the API.
 
 ## Grading / testing  
-4 points confirming that createPost and createComment change the content of (logged-in) dumpFeed.
-10 points on autograder for funcitonality connected to the feed, hidePost, hideComment
+
+- 4 points confirming that createPost and createComment change the content of (logged-in) dumpFeed.
+- 10 points on autograder for funcitonality connected to the feed, hidePost, hideComment
 
 ## Submission
 
