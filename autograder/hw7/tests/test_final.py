@@ -115,8 +115,13 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             print("ERROR: Can't find csrf token in accounts/login/ page")
             csrfdata = "BOGUSDATA"
         self.csrfdata = csrfdata
+        self.csrfdata_user = csrfdata
+        self.csrfdata_admin = csrfdata
         self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                 "http://localhost:8000/accounts/login/"}
+        self.headers_user = self.loginheaders
+        self.headers_admin = self.loginheaders
+
         return session, csrfdata   # session
 
     @classmethod
@@ -195,17 +200,17 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_create_post_admin_success(self):
         '''Check server responds with success to http://localhost:8000/app/createPost'''
         n = int(random.random() * 25)
+        session, csrf = self.get_csrf_login_token(session=self.session_admin)
         post_data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n] }
-        session = self.session_admin
         response = session.post(
             "http://localhost:8000/app/createPost",
-            data=post_data, headers=self.headers_admin)
+            data=post_data, headers=self.loginheaders)
         self.assertLess(response.status_code, 203,  # 200 or 201 ok
             "Server returns error for POST to " +
             "http://localhost:8000/app/createPost " +
             "Data:{}".format(post_data) +
             "Content:{}".format(response.text)+
-            "Headers:{}".format(self.headers_admin)
+            "Headers:{}".format(self.loginheaders)
             )
 
     @weight(0)
@@ -216,21 +221,22 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         session, csrf = self.get_csrf_login_token()  # not logged in
         request = session.post(
             "http://localhost:8000/app/createPost",
-            data=post_data)  # not logged in
+            data=post_data,
+            headers=self.loginheaders)  # not logged in
         self.assertEqual(request.status_code, 401,  # unauthorized
             "Server should return error 401 for not-logged-in POST to " +
             "http://localhost:8000/app/createPost " +
-            "Data:{}".format(post_data)
-#           "Content:{}".format(request.text)
+            f"Data:{post_data}\n"+ 
+            f"Content:{request.text}"
             )
 
     @weight(0.5)
     @number("30")
     def test_create_post_user_success_and_json(self):
         '''Test that /app/createPost by a user succeeds and returns valid JSON containing 'post_id' key'''
+        session, csrf =   self.get_csrf_login_token(session=self.session_user) 
         post_data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
-                  'csrfmiddlewaretoken': self.csrfdata_user}
-        session = self.session_user
+                  'csrfmiddlewaretoken': csrf}
         response = session.post(
             "http://localhost:8000/app/createPost",
              data=post_data, headers=self.headers_user)
@@ -242,8 +248,9 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             "Server returns error for POST to " +
             "http://localhost:8000/app/createPost " +
             "which should succeed." +
-            "Data:{}".format(post_data)
-#           + "Content:{}".format(response.text)
+            "Data:{}".format(post_data) +
+            "Content:{}".format(response.text)+
+            "Headers:{}".format(self.headers_user)
             )
         try:
             j = response.json()
@@ -254,12 +261,14 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @weight(0)
     @number("13.0")
     def test_hide_post_notloggedin(self):
-        '''Verify that unautnethicated POST to /app/hidePost endpoint returns 401 unauthorized. '''
+        '''Unauthenticated POST to /app/hidePost endpoint should return 401 unauthorized. '''
         data = {'post_id': "0",  "reason": "天安门广场" }
         session, csrf = self.get_csrf_login_token()
+        headers = {"X-CSRFToken": csrf, "Referer":
+                        "http://localhost:8000/accounts/login/"}
         request = session.post(
             "http://localhost:8000/app/hidePost",
-             data=data)
+             data=data, headers=headers)
         self.assertNotEqual(request.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/hidePost " +
             "Data:{}".format(data)
@@ -273,18 +282,74 @@ class TestCloudySkyEndpoints(unittest.TestCase):
 #           + "Content:{}".format(request.text)
             )
 
-    @weight(0)
+
+    @weight(0.5)
     @number("13.3")
     def test_hide_comment_admin_success(self):
         '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
-
         # Step 1: Create a post
+        secret = int(random.random() * 100000)
+        content = f"I like fuzzy{secret:06d} bunnies!"
+        session, csrf =  self.get_csrf_login_token(session=self.session_user) 
+        post_data = {
+            'title': content,
+            'content': content,
+            'csrfmiddlewaretoken': csrf
+        }
+        post_response = session.post(
+            "http://localhost:8000/app/createPost",
+            data=post_data, headers=self.headers_user
+        )
+        self.assertEqual(post_response.status_code, 200, f"Post creation failed: {post_response.text}")
+        post_id = post_response.json().get("post_id")
+        # Step 2: Create a comment
+        comment_text = f"Comment from bunny-lover {secret}"
+        comment_data = {
+            "post_id": post_id,
+            "content": comment_text,
+            'csrfmiddlewaretoken': csrf
+        }
+        comment_response = session.post(
+            "http://localhost:8000/app/createComment",
+            data=comment_data, headers=self.headers_user
+        )
+        self.assertEqual(comment_response.status_code, 200, f"Comment creation failed: {comment_response.text}")
+        comment_id = comment_response.json()["comment_id"]
+       # Step 4: Hide the comment as admin
+        session_admin, csrf =  self.get_csrf_login_token(session=self.session_user) 
+        hide_data = {
+            'comment_id': comment_id,
+            'reason': "Off-topic bunny slander",
+            'csrfmiddlewaretoken': csrf
+        }
+        hide_response = session_admin.post(
+            "http://localhost:8000/app/hideComment",
+             data=hide_data, headers=self.loginheaders)
+        print("HIDERESPONSE", hide_response, hide_response.text)
+       # Step 5:  confirm post hidden to user2
+        self.assertEqual(hide_response.status_code, 200,
+            "Server returns error for POST to " +
+            "http://localhost:8000/app/hideComment " +
+            "Data:{}".format(hide_data) +
+            "Content:{}".format(hide_response.text)+
+            "Headers:{}".format(self.loginheaders)
+            )
+        updated_feed = self.session_user2.get("http://localhost:8000/app/dumpFeed", headers=self.loginheaders).text
+        self.assertNotIn(comment_text, updated_feed,
+                     "Comment still visible in /app/dumpFeed after hiding")
+
+    @weight(0.5)
+    @number("13.4")
+    def test_hide_comment_still_visible_author(self):
+        '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
+        # Step 1: Create a post
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
         secret = int(random.random() * 100000)
         content = f"I like fuzzy{secret:06d} bunnies!"
         post_data = {
             'title': content,
             'content': content,
-            'csrfmiddlewaretoken': self.csrfdata_user
+            'csrfmiddlewaretoken': csrf
         }
         post_response = self.session_user.post(
             "http://localhost:8000/app/createPost",
@@ -292,39 +357,42 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         )
         self.assertEqual(post_response.status_code, 200, f"Post creation failed: {post_response.text}")
         post_id = post_response.json().get("post_id")
-
         # Step 2: Create a comment
         comment_text = f"Comment from bunny-lover {secret}"
         comment_data = {
             "post_id": post_id,
-            "content": comment_text
+            "content": comment_text,
+            'csrfmiddlewaretoken': csrf
         }
         comment_response = self.session_user.post(
             "http://localhost:8000/app/createComment",
-            data=comment_data, headers=self.headers_user
+            data=comment_data, headers=self.loginheaders
         )
         self.assertEqual(comment_response.status_code, 200, f"Comment creation failed: {comment_response.text}")
         comment_id = comment_response.json()["comment_id"]
-
        # Step 4: Hide the comment as admin
+        session_admin, csrf = self.get_csrf_login_token(session=self.session_user)
         hide_data = {
             'comment_id': comment_id,
             'reason': "Off-topic bunny slander",
-            'csrfmiddlewaretoken': self.csrfdata_admin
+            'csrfmiddlewaretoken': csrf
         }
-
-        hide_response = self.session_admin.post(
+        hide_response = session_admin.post(
             "http://localhost:8000/app/hideComment",
-             data=hide_data, headers=self.headers_admin)
+             data=hide_data, headers=self.loginheaders)
         print("HIDERESPONSE", hide_response, hide_response.text)
+       # Step 5:  confirm post hidden to user2
         self.assertEqual(hide_response.status_code, 200,
             "Server returns error for POST to " +
             "http://localhost:8000/app/hideComment " +
-            "Data:{}".format(hide_data)
+            "Data:{}".format(hide_data) +
+            "Content:{}".format(hide_response.text)+
+            "Headers:{}".format(self.loginheaders)
             )
-        updated_feed = self.session_user.get("http://localhost:8000/app/dumpFeed", headers=self.headers_user).text
-        self.assertNotIn(comment_text, updated_feed,
-                     "Comment still visible in /app/dumpFeed after hiding")
+        updated_feed = self.session_user.get("http://localhost:8000/app/dumpFeed", 
+                           headers=self.headers_user).text
+        self.assertIn(comment_text, updated_feed,
+                     "Comment not still visible in comment author's /app/dumpFeed after hiding")
 
 
     @weight(0)
@@ -332,12 +400,15 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_create_comment_admin_success(self):
         '''Ensure admin can successfully post a comment via 
         /app/createComment'''
-        session = self.session_admin
+        session_admin, csrf  = self.get_csrf_login_token(session=self.session_admin)  
         # Now hit createComment, now that we are logged in
-        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
-        response2 = session.post(
+        
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", 
+                     "csrfmiddlewaretoken": csrf}
+
+        response2 = session_admin.post(
             "http://localhost:8000/app/createComment",
-            data=comment_data,headers=self.headers_admin)
+            data=comment_data, headers=self.loginheaders)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
@@ -355,10 +426,12 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_create_comment_notloggedin(self):
         '''Ensure unauthenticated comment POST returns 401 Unauthorized'''
         session, csrf = self.get_csrf_login_token()   # Not logged in
-        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", 
+                     "csrfmiddlewaretoken": csrf}
         response2 = session.post(
             "http://localhost:8000/app/createComment",
-            data=comment_data)
+            data=comment_data, 
+            headers = self.loginheaders)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
@@ -376,11 +449,15 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_create_comment_user_success_and_json(self):
         '''Ensure regular user can successfully post a comment 
         via /app/createComment'''
-        session = self.session_user
-        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
+        session, csrf =  self.get_csrf_login_token(session=self.session_user)    
+        headers = {"X-CSRFToken": csrf, "Referer":
+                        "http://localhost:8000/accounts/login/"}                                                           
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1, 
+                     "csrfmiddlewaretoken": csrf}
+
         response2 = session.post(
              "http://localhost:8000/app/createComment",
-             data=comment_data, headers=self.headers_user)
+             data=comment_data, headers=self.loginheaders)
         self.assertNotEqual(response2.status_code, 404,
             "Server returned 404 not found for http://localhost:8000/app/createComment " +
             "Data:{}".format(comment_data)
@@ -394,16 +471,16 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         try:
             j = response2.json()
         except Exception as e:
-            self.fail(f"http://localhost:8000/app/createPost did not return valid JSON on success: {response2.content}, {e}")
+            self.fail(f"http://localhost:8000/app/createComment did not return valid JSON on success: {response2.content}, {e}")
         self.assertTrue("comment_id" in j.keys(), f"Response to /app/createComment does not contain 'comment_id': {j}")
 
     @weight(0)
     @number("19")
     def test_login_index(self):
         '''Logs in, Ensures that / endpoint returns a page containing logged-in username'''
-        session = self.session_admin
+        session, csrf =  self.get_csrf_login_token(session=self.session_user)
         # Now hit createPost, now that we are logged in
-        response_index = session.get("http://localhost:8000/")
+        response_index = session.get("http://localhost:8000/", headers=self.loginheaders)
         sanitized_text = response_index.text.replace('value="{}"'.format(
             admin_data["email"]), 'value=WRONGEMAIL')
         self.assertLess(response_index.status_code, 203,
@@ -416,52 +493,101 @@ class TestCloudySkyEndpoints(unittest.TestCase):
 
     @weight(2)
     @number("21")
-    def test_create_post_add(self):
-        '''Verity that successful POST to /app/createPost adds data that appears in /app/dumpFeed
+    def test_create_post_add_dumpfeed(self):
+        '''Verify that successful POST to /app/createPost adds data that appears in /app/dumpFeed
         '''
-        session = self.session_user
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
+
         # Now hit createPost, now that we are logged in
         secret = int(random.random() * 100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
-        post_data = {'title': content, "content": content}
+        post_data = {'title': content, "content": content, 
+                     "csrfmiddlewaretoken": csrf}
+
         print(f"Calling http://localhost:8000/app/createPost with {post_data}")
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=post_data, headers=self.headers_user)
+                                 data=post_data, headers=self.loginheaders)
         print(f"Response:{response.text}\n")
         response2 = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
-        self.assertTrue(content in response2.text, "New post not found in /app/dumpFeed")
+                                 headers=self.loginheaders)
+        self.assertIn(content, response2.text, 
+                        f"New post not found in /app/dumpFeed")
+
+    @weight(1)
+    @number("21.5")
+    def test_create_post_add_feed(self):
+        '''Verify that successful POST to /app/createPost adds data that appears in (logged-in) /app/feed
+        '''
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
+        # Now hit createPost, now that we are logged in
+        secret = int(random.random() * 100000)
+        content = f"I like the fuzzy{secret:06d} bunnies!"
+        post_data = {'title': content, "content": content, 
+                     "csrfmiddlewaretoken": csrf}
+        print(f"Calling http://localhost:8000/app/createPost with {post_data}")
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=post_data, headers=self.loginheaders)
+        print(f"Response:{response.text}\n")
+        response2 = session.get("http://localhost:8000/app/feed",
+                                 headers=self.loginheaders)
+        self.assertIn(content, response2.text, "New post not found in /app/feed")
 
     @weight(2)
     @number("22")
-    def test_create_comment_add(self):
+    def test_create_comment_add_dumpFeed(self):
         '''Test that createComment endpoint actually adds data to dumpFeed
         '''
         # Step 1, create post
-        session = self.session_user
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
         post_data = {'title': content, "content": content,
-                'csrfmiddlewaretoken': self.csrfdata_user}
+                'csrfmiddlewaretoken': csrf}
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=post_data, headers=self.headers_user)
+                                 data=post_data, headers=self.loginheaders)
         self.assertEqual(response.status_code, 200,
              f"createPostfailed: {response.text}")
-
         post_id = response.json()["post_id"]
-
         # Now hit createComment
         content2 = f"I like them too, fuzzy{secret:06d}bunny!"
         comment_data = {"content": content2, "post_id": post_id }
         response2 = session.post("http://localhost:8000/app/createComment",
-                                 data=comment_data, headers=self.headers_user)
+                                 data=comment_data, headers=self.loginheaders)
         self.assertEqual(response2.status_code, 200,
              f"createComment failed: {response2.text}")
-
         # Confirm new comment appears in dumpFeed
         response3 = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
-        self.assertTrue(content in response3.text, "Test comment not found in /app/dumpFeed")
+                                 headers=self.loginheaders)
+        self.assertIn(content, response3.text, "Test comment not found in /app/dumpFeed")
+
+    @weight(1)
+    @number("22.5")
+    def test_create_comment_add_feed(self):
+        '''Verify that successful createComment POST request actually adds data to (logged-in) /app/feed 
+        '''
+        # Step 1, create post
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
+        secret = int(random.random()*100000)
+        content = f"I like the fuzzy{secret:06d} bunnies!"
+        post_data = {'title': content, "content": content,
+                'csrfmiddlewaretoken': csrf}
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=post_data, headers=self.loginheaders)
+        self.assertEqual(response.status_code, 200,
+             f"createPostfailed: {response.text}")
+        post_id = response.json()["post_id"]
+        # Now hit createComment
+        content2 = f"I like them too, fuzzy{secret:06d}bunny!"
+        comment_data = {"content": content2, "post_id": post_id }
+        response2 = session.post("http://localhost:8000/app/createComment",
+                                 data=comment_data, headers=self.loginheaders)
+        self.assertEqual(response2.status_code, 200,
+             f"createComment failed: {response2.text}")
+        # Confirm new comment appears in dumpFeed
+        response3 = session.get("http://localhost:8000/app/feed",
+                                 headers=self.loginheaders)
+        self.assertIn(content, response3.text, 
+                        f"Test comment not found in /app/feed:\n{response3.text}")
 
     @weight(1)
     @number("20")
@@ -471,7 +597,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         session = self.session_user
         print("Calling http://localhost:8000/app/dumpFeed")
         response = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
+                                 headers=self.loginheaders)
 
         self.assertGreater(len(response.content), 30)
         try:
@@ -483,35 +609,38 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @number("34")
     def test_hide_post_admin_removes(self):
         '''Ensure /app/hidePost removes post from /app/dumpFeed'''
-        session = self.session_user
-        session_admin = self.session_admin
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
+
         # Create a post
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
         post_data = {'title': content, "content": content,
-                'csrfmiddlewaretoken': self.csrfdata_user}
+                'csrfmiddlewaretoken': csrf}
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=post_data, headers=self.headers_user)
+                                 data=post_data, headers=self.loginheaders)
         j = response.json()
         post_id = j["post_id"]
-        hide_data = {'post_id': post_id,  "reason": "misanthropy",
-                'csrfmiddlewaretoken': self.csrfdata_admin
-               }
         # Confirm post posted
         response2 = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
-        self.assertTrue(content in response2.text,
+                                 headers=self.loginheaders)
+        self.assertIn(content, response2.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
         # Suppress post
+        session_admin, csrf = self.get_csrf_login_token(session=self.session_admin)
+        hide_data = {'post_id': post_id,  "reason": "misanthropy",
+                'csrfmiddlewaretoken': csrf}
         response3 = session_admin.post(
             "http://localhost:8000/app/hidePost",
-             data=hide_data, headers=self.headers_admin)
+             data=hide_data, headers=self.loginheaders)
         self.assertEqual(response3.status_code, 200,
              f"hidePost failed: {response3.text}")
         # Confirm suppression
-        response4 = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
-        self.assertFalse(content in response4.text,
+        session2, csrf = self.get_csrf_login_token(session=self.session_user2)
+        loginheaders = {"X-CSRFToken": csrf, "Referer":
+                "http://localhost:8000/accounts/login/"}
+        response4 = session2.get("http://localhost:8000/app/dumpFeed",
+                                 headers=loginheaders)
+        self.assertNotIn(content, response4.text,
              "Test post found in /app/dumpFeed after it should have been hidden.")
 
     @weight(2)
@@ -519,38 +648,40 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_hide_comment_admin_removes(self):
         '''Test hideComment endpoint by an admin actually hides content.'''
         # Create a post
-        session = self.session_user
-        session_admin = self.session_admin
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
         secret = int(random.random()*100000)
         content = f"I like the fuzzy bunnies!"
         post_data = {'title': content, "content": content,
-                'csrfmiddlewaretoken': self.csrfdata_user}
+                'csrfmiddlewaretoken': csrf}
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=post_data, headers=self.headers_user)
+                                 data=post_data, headers=self.loginheaders)
         j = response.json()
         post_id = j["post_id"]
         # create comment
         comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",
-                'csrfmiddlewaretoken': self.csrfdata_user }
+                'csrfmiddlewaretoken': csrf}
         response2 = session.post("http://localhost:8000/app/createComment",
-                                 data=comment_data, headers=self.headers_user)
+                                 data=comment_data, headers=self.loginheaders)
         comment_id = response2.json()["comment_id"]
         # Confirm comment posted
         response3 = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user)
+                                 headers=self.loginheaders)
         self.assertTrue(comment_data["content"] in response3.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
         # Suppress comment
-        hide_data = {"comment_id": comment_id, "reason": "TESTING"} 
+        session_admin, csrf = self.get_csrf_login_token(session=self.session_admin)
+        hide_data = {"comment_id": comment_id, "reason": "We don't talk about Bruno.", 
+                'csrfmiddlewaretoken': csrf}
         response4 = session_admin.post(
             "http://localhost:8000/app/hideComment",
-             data=hide_data, headers=self.headers_admin)
+             data=hide_data, headers=self.loginheaders)
         self.assertEqual(response4.status_code, 200,
              f"hideComment failed: {response4.text}")
         # Confirm suppression
-        response5 = self.session_user2.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_user2)
-        self.assertFalse(comment_data["content"] in response5.text,
+        session2, csrf = self.get_csrf_login_token(session=self.session_user2)
+        response5 = session2.get("http://localhost:8000/app/dumpFeed",
+                                 headers=self.loginheaders)
+        self.assertNotIn(comment_data["content"], response5.text,
              "Test post found in /app/dumpFeed after it should have been hidden.")
 
     @weight(1)
@@ -558,19 +689,18 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     def test_hide_comment_admin_still_visible_admin(self):
         '''Verifies that hidden comments are still visible to admin.'''
         # Create a post
-        session = self.session_user
-        session_admin = self.session_admin
+        session, csrf = self.get_csrf_login_token(session=self.session_user)
         secret = int(random.random()*100000)
         content = f"I like the fuzzy bunnies!"
         post_data = {'title': content, "content": content,
-                'csrfmiddlewaretoken': self.csrfdata_user}
+                'csrfmiddlewaretoken': csrf}
         response = session.post("http://localhost:8000/app/createPost",
-                                 data=post_data, headers=self.headers_user)
+                                 data=post_data, headers=self.loginheaders)
         j = response.json()
         post_id = j["post_id"]
         # create comment
         comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",
-                'csrfmiddlewaretoken': self.csrfdata_user }
+                'csrfmiddlewaretoken': csrf}
         response2 = session.post("http://localhost:8000/app/createComment",
                                  data=comment_data, headers=self.headers_user)
         comment_id = response2.json()["comment_id"]
@@ -580,14 +710,16 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         self.assertTrue(comment_data["content"] in response3.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
         # Suppress comment
-        hide_data = {"comment_id": comment_id, "reason": "TESTING"} 
+        session_admin, csrf = self.get_csrf_login_token(session=self.session_admin)
+        hide_data = {"comment_id": comment_id, "reason": "TESTING", 
+                     "csrfmiddlewaretoken": csrf}
         response4 = session_admin.post(
             "http://localhost:8000/app/hideComment",
-             data=hide_data, headers=self.headers_admin)
+             data=hide_data, headers=self.loginheaders)
         self.assertEqual(response4.status_code, 200,
              f"hideComment failed: {response4.text}")
         # Confirm suppression
         response5 = self.session_admin.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_admin)
-        self.assertTrue(comment_data["content"] in response5.text,
+                                 headers=self.loginheaders)
+        self.assertIn(comment_data["content"], response5.text,
              "Hidden comment mssing from /app/dumpFeed viewed by admin, should be visible but flagged.")

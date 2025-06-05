@@ -436,51 +436,44 @@ class TestDjangoHw5simple(unittest.TestCase):
         session = self.session_user
         before_rows = self.count_app_rows()
         # Now hit createPost, now that we are logged in
-        data = {'title': "I like fuzzy bunnies",  "content": "I like fuzzy bunnies.  Do you?" }
+        secret = int(random.random()*100000)
+        content = f"I like the fuzzy{secret:06d} bunnies!"
+        data = {'title': content,  "content": content}
         print("Calling http://localhost:8000/app/createPost with", data)
-        response2 = session.post("http://localhost:8000/app/createPost",
-                                 data=data, headers=self.headers_admin)
-        print("Response:{response2.text}\n")
-        for _ in range(20):
-            after_rows = self.count_app_rows()
-            if after_rows - before_rows > 0:
-                return
-            sleep(2)
-        self.assertGreater(after_rows - before_rows, 0,
-                         "Cannot confirm createPost updated database\n" +
-                         "Response:{}".format(response2.text))
+        response = session.post("http://localhost:8000/app/createPost",
+                                 data=data, headers=self.headers_user)
+        print("Response:{response.text}\n")
+        response2 = session.get("http://localhost:8000/app/dumpFeed",
+                                 data=data, headers=self.headers_user)
+        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")  
 
     @weight(0)
     @number("22")
     def test_create_comment_add(self):
-        '''Test that createComment endpoint actually adds data BROKEN TEST BUT WILL BE FIXED 
+        '''Test that createComment endpoint actually adds data 
         '''
         session = self.session_user
         before_rows = self.count_app_rows()
         # Now hit createComment, now that we are logged in
-        data = {"content": "Yes, I like fuzzy bunnies a lot." , "post_id": 1 }
-        response2 = session.post("http://localhost:8000/app/createComment",
-                                 data=data, headers=self.headers_admin)
-        print("Response:{response2.text}\n")
-        for _ in range(20):
-             after_rows = self.count_app_rows()
-             if after_rows - before_rows > 0:
-                  return
-             sleep(2)
-        self.assertGreater(after_rows - before_rows, 0,
-            "Cannot confirm createComment updated database\n" +
-            "Response:{}".format(response2.text) )
+        secret = int(random.random()*100000)
+        content = f"fuzzy{secret:06d} bunnies 4tw!"
+        data = {"content": content, "post_id": 1 }
+        response = session.post("http://localhost:8000/app/createComment",
+                                 data=data, headers=self.headers_user)
+        response2 = session.get("http://localhost:8000/app/dumpFeed",
+                                 data=data, headers=self.headers_user)
+        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")  
 
     @weight(2)
-    @number("21")
+    @number("23")
     def test_dump_feed_json(self):
-        '''Test that app/dumpFeed returns something
+        '''Test that app/dumpFeed returns valid JSON
         '''
-        session = self.session_admin
+        session = self.session_user
         # Now hit createPost, now that we are logged in
         print("Calling http://localhost:8000/app/dumpFeed")
         response = session.get("http://localhost:8000/app/dumpFeed",
-                                 headers=self.headers_admin)
+                                 headers=self.headers_user)
 
         self.assertGreater(len(response.content), 30)
         try:
