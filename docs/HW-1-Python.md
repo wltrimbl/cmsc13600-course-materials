@@ -1,4 +1,4 @@
-# HW 1. python - git authorization  (due Friday, April 4, 2025) 
+# HW 1. python - git authorization  (due Friday, Oct 10, 2025) 
 I'm sure most of you know how program in Python, but some of you may have only encountered Python in a notebook environment. This assignment will make sure that everyone knows how to work with stand-alone python programs.
 
 ## Step 0. Installing Python

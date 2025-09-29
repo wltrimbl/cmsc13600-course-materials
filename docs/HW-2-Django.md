@@ -1,4 +1,4 @@
-# HW 2. Python Django  (Due Friday week 3, April 11, 2025)
+# HW 2. Python Django  (Due Friday week 3, Oct 17, 2025)
 Django is a free and open-source, Python-based web framework that runs on a web server. It follows the model–template–views architectural pattern. This assignment will assume that you have mastered git and the command line. See course staff if you are lost.
 
 ## Step 1. Setting Up A Virtual Environment

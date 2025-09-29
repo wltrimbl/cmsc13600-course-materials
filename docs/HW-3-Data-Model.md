@@ -1,4 +1,4 @@
-# HW 3. Data Model  (due 5th week, Apr 25)
+# HW 3. Data Model  (due 5th week, Oct 31)
 A relational data model is a way of structuring data in a database using tables, where each table represents a specific entity or concept. The data in a relational database is organized into tables that have rows and columns. Each row in a table represents a single record or instance of the entity being modeled, while each column represents an attribute or characteristic of that entity.
 
 The relational data model is based on the principles of mathematical set theory and emphasizes the relationships between tables. In a relational database, these relationships are established through the use of foreign keys, which link records in one table to records in another table.
