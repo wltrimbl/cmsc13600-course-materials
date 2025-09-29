@@ -1,4 +1,4 @@
-# HW0. Using Git For Version Control  (Due Mar 27, 2025, but late additions to the class need not worry)
+# HW0. Using Git For Version Control  (Due Oct 3, 2025, but late additions to the class need not worry)
 Git is a distributed version control system that tracks changes in any set of computer files, usually used for coordinating work among programmers who are collaboratively developing source code during software development. Its goals include speed, data integrity, and support for distributed, non-linear workflows.
 
 Almost every data science and software engineering project uses a framework like Git to allow for multiple engineers to collaborate on a project.
@@ -112,6 +112,8 @@ https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/a
 
 This Medium post describes creating an SSH key pair and configuring it for use with github:
 https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
+
+The "create personal access token" workflow is also effective.
 
 2. How do I get started on Windows:
 * https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
