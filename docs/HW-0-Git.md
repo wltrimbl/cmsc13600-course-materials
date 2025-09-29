@@ -10,11 +10,12 @@ Set up git by following the instructions here: https://git-scm.com/book/en/v2/Ge
 
 Complete the following steps to actually use git for the class:
 1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow this github classroom invite link:  https://classroom.github.com/XXXXXXXXXXXXXXXXXXXXXXXXX 
+2. Follow this github classroom invite link:  https://classroom.github.com/a/FAQYWvAR 
  to associate your github username with the course, and it will copy the template repository for you.   
-3.  This will give you a repository with a name like `https://github.com/CMSC-13600-Data-Engineering/project-YOURUSERNAME`.  This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
+3.  This will give you a repository with a name like `https://github.com/CMSC136-Aut2025/homeworks-YOURUSERNAME`
+This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
 
-4.  The command `git clone git@github.com:CMSC13600-XXXXXX/cmsc13600-project-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
+4.  The command `git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
 
 The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
@@ -36,7 +37,7 @@ to confirm that github recognizes you.
 Use the command line interface to to ``clone'' the
 repository you made above. You can cut and paste the repo url from the github web interface. DONT COPY AND PASTE BELOW, change the user name accordingly after you are done accepting the github classsroom assignment.
 ```
-$ git clone git@github.com:CMSC13600-XXXXXX/cmsc13600-project-YOURUSERNAME.git 
+$ git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git
 ```
 Cloning creates a local copy of the code (named cmsc13600-project-YOURUSERNAME) and you can now work on it!
 
