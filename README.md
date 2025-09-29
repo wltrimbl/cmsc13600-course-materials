@@ -1,18 +1,20 @@
 # CMSC 13600 Assignments / Course Project 
 
+Autumn 2025
+
 | number | topic | date | grading | 
 | --- | --- | -- |  ---|  
-| HW 0 | setup git / public key authentication |  Mar 28|  AUTOGRADER | 
-| HW 1 | setup git collaboration  |  Apr 4 |  MANUAL |  | 
-| HW 2 | setup/install django / ORM |Apr 11 |   | 
-| Exam 1 | databases & ORM | Apr 18 | MANUAL | 
-| HW 3 | define DDL  |  Apr 25| | 
-| HW 4 | front end: login page | May 2  |  | 
-| HW 5 | implementing the API | May 9 |  |
-| HW 6 | The frontend feed, proof-of-work puzzle | May 16 | | 
-| Exam 2 | architecture, hashing | May 14 | MANUAL  | 
-| HW 7 | Testing the app, writing tests  | May 23|  | 
-| Exam 3 | Exam 3 pulling it all together |  May 28 12:30-2:30 | MANUAL |
+| HW 0 | setup git / public key authentication | Oct 3 |  AUTOGRADER | 
+| HW 1 | setup git collaboration  |  Oct 10 |  MANUAL |  | 
+| HW 2 | setup/install django / ORM |Oct 17 |  AUTOGRADER  | 
+| Exam 1 | databases & ORM | Oct 24 |  | 
+| HW 3 | define DDL  |  Oct 31 | MANUAL | 
+| HW 4 | front end: login page | Nov 7| AUTOGRADER  | 
+| HW 5 | implementing the API | Nov 14  | AUTOGRADER |
+| Exam 2 | architecture, hashing | Nov 19 | MANUAL  | 
+| HW 6 | The frontend feed, proof-of-work puzzle | Nov 21 | | 
+| HW 7 | Writing tests for the app  | Dec 5|  | 
+| Exam 3 | Exam 3 pulling it all together |  TBA Dec 9-11 | MANUAL |
 
 ## Homeworks
 
