@@ -39,10 +39,10 @@ repository you made above. You can cut and paste the repo url from the github we
 ```
 $ git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git
 ```
-Cloning creates a local copy of the code (named cmsc13600-project-YOURUSERNAME) and you can now work on it!
+Cloning creates a local copy of the code (named homeworks-YOURUSERNAME) and you can now work on it!
 
 ```
- $ cd cmsc13600-project-YOURUSERNAME
+ $ cd homeworks-YOURUSERNAME
  $ git status
 On branch main
 Your branch is up to date with 'origin/main'.
@@ -91,7 +91,7 @@ For instance,
 
 
 ## Specification
-0.  Use github classroom to fork the cmsc13600-project repository as above and connect github to gradescope so that you make homework submissions.
+0.  Use github classroom to fork the `homeworks` repository as above and connect github to gradescope so that you make homework submissions.
 1.  Add a file to your repository called `names.txt` that has the names and github IDs of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include just your name and github id.
 2.  Remove the file `unneeded_data.csv` from the repository.
 3.  Download the table of nobel laureates from here https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category .  This is an approx. 1000-line text file that (surprisingly) takes up 260Mb on disk.  iIt contains a very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove this column and check in the database with all fo the columns but the space-hogging column as `nobel-prize-laureates-clean.csv`.  Do not check `nobel-prize-laureates.csv` in to github for full credit.  (Github will let you do it, but you won't pass all the tests if you do.)   Hint:  this "cleaning" can be done entirely with a single unix command.
