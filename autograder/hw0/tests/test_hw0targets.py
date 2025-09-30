@@ -14,7 +14,7 @@ else:
     AG = "/autograder/submission/"
 
 
-class TestHelloWorld(unittest.TestCase):
+class TestHW0(unittest.TestCase):
     '''Test targets for hw0: names.txt, nobel-prize-laureates-clean.csv,
     unneeded_data.csv'''
     def setUp(self):
