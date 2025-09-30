@@ -63,7 +63,7 @@ $ git checkout main
 $ git pull
 ```
 2. In past quarters, we suggested that different weeks' homework be tracked in different git branches.  This ended up confusing all the instructional staff when hw6's content was in the branch named hw2_final.
-```
+
 3. Read the project spec for the homework assignment.  
 
 4. After you are done add all of the new files or modified files to the repo:
@@ -71,7 +71,9 @@ $ git pull
 ```
  $ git add <files go here>
 ```
+
 For instance, 
+
 ```
  $ git add names.txt
 ```
@@ -83,6 +85,7 @@ For instance,
 ```
 
 6. Push your changes; this copies your local history and all the changes you have **committed** and shares them with the git history on github.  
+
 ```
  $ git push --set-upstream origin hw_0
 ```
