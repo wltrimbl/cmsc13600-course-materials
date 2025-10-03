@@ -15,7 +15,7 @@ Complete the following steps to actually use git for the class:
 3.  This will give you a repository with a name like `https://github.com/CMSC136-Aut2025/homeworks-YOURUSERNAME`
 This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
 
-4.  The command `git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.  
+4.  The command `git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.   On some systems this doesn't work and `git clone https://github.com/CMSC136-Aut2025/homeworks-YOURUSERNAME.git` is successful.
 
 The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
