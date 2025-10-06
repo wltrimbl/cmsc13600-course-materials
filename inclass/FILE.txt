@@ -1,2 +1,2 @@
 This is the first line
-File content 1
+FILE CONTENT 2
