@@ -26,5 +26,10 @@ python manage.py migrate library
 # In a separate window, I'll open db.sqlite3  with an sqlite client.
 # This will let me issue SELECT commands to see what the python is doing.
 
+# The meat of the ormexamples/ormintro/library app is code contained in
+# `ormintro/library/models.py`, which defines the DDM, and 
+# `ormintro/library/views.py`, which defines methods that manipulate the data.
 
+# Note, this "app" does not initally contain any data; it is an empty database 
+# but with a schema that we'll need to reverse engineer.
 
