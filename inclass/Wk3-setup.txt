@@ -1,0 +1,30 @@
+# How to get ormlibrary demo working: 
+
+#  Install django.   On OSX, this entails
+conda create
+conda create --name django
+conda activate django
+conda install -y  Django pytest cgi 
+
+# This creates a conda virtual environment named 'django' in a directory
+# managed by conda, where the ORM framework and all its files will be stored
+# separate from your files and from your other applications.
+
+
+# Next, we have a few magical incantations to create
+# django's database, which must be run from the directory containing
+# manage.py, namely `cmsc13600-course-materials/ormexamples/ormintro`:
+
+python manage.py makemigrations
+python manage.py makemigrations library
+python manage.py migrate
+python manage.py migrate library
+
+# Now we can start.  I'll use ipython, a one-line-at-a-time python interpreter
+# that has slight enhancements (color, autocomplete) for interactive use.
+
+# In a separate window, I'll open db.sqlite3  with an sqlite client.
+# This will let me issue SELECT commands to see what the python is doing.
+
+
+
