@@ -1,5 +1,16 @@
-new_book.save()
+# Some boilerplate code to get things running
+# This depends on the ormintro django project, particularly the
+# databases defined in ormintro/models.py
 
+import os
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "ormintro.settings")
+
+# needed for interactive demo https://stackoverflow.com/questions/61926359/django-synchronousonlyoperation-you-cannot-call-this-from-an-async-context-u 
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+django.setup()
 
 # When invoked via 
 # python manage.py shell, 
