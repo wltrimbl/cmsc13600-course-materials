@@ -22,5 +22,9 @@ The workflow for submitting your work on github to gradescope is well described 
 
 The requirements for the homeworks are described by files in the docs directory.  
 
+## Ed Discussion
+
+https://edstem.org/us/courses/88129
+
 ## Architecture
 BleakSky will be built on `python-django` (https://www.djangoproject.com/). Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design. It takes care of much of the hassle of web development, so you can focus on writing your app without needing to reinvent the wheel. Django can run a local web-server and can easily interface with a database backend. We will be using a SQLite databaase backend. SQLite is a database engine written in the C programming language. It is not a standalone app; rather, it is a library that software developers embed in their apps.
