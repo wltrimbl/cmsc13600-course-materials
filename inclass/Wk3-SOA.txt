@@ -1,0 +1,6 @@
+A rant from 2011 about Service Oriented Architecture and Amazon's adoption of it in the early aughts which played a role in Amazon shifting from a bookstore to a technology services provider can be found at 
+https://gist.github.com/chitchcock/1281611
+
+This describes the "API-first mandate", that Amazon engineers were asked to treat internal users as if they were customers, making formal interfaces for all buiness/data interactions.
+
+Building a formal API and forcing all transactions through it carries costs and benefits.  Constraints in general raise costs so being told you must publish and implement an API is going to make it harder to meet deadlines. 

@@ -1,0 +1,16 @@
+The chinook.db database contians "record store" type of inventory and transaction data in a handful of tables.
+
+For SELECT... WHERE...
+1.  List the names of all customers who live in the USA.
+2. Show all tracks that cost more than $0.99.
+3. List all employees who report to “Andrew Adams.”
+4.  List all tracks credited to "Johann Sebastian Bach"
+
+For JOINs
+
+5.  List all tracks along with their album titles and artist names.
+6.  Show all invoices with the customer’s full name and country.
+7.  Find all tracks purchased by customer “Luís Gonçalves.”A
+8.  List all employees and the customers they support.
+
+
