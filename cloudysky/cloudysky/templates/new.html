@@ -1,0 +1,17 @@
+<form action="/app/createUser/" method="post">
+    {% csrf_token %}
+<div>
+  <label for="email">Your name: </label>
+    <input id="email" type="text" name="email" value="nobody@nihilist.com">
+</div>
+<div>
+  <label for="password">Password: </label>
+    <input id="password" type="text" name="password" value="">
+
+</div>
+<div>
+
+<div>
+    <input type="submit" value="Submit">
+</div>
+</form>

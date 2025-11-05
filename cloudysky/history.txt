@@ -1,0 +1,35 @@
+#  Commands to configure local testing with test_djangoapp.py
+conda create --name venv
+conda activate venv
+pip install Django pytest legacy-cgi
+conda install -y Django pytest cgi 
+conda install -y Django pytest legacy-cgi
+cd cmsc13600-course-materials
+django-admin startproject cloudysky cloudysky
+mkdir cloudysky
+django-admin startproject cloudysky cloudysky
+cd cloudysky
+git add .
+git status
+git commit -m "Added blank project cloudysky"
+conda activate venv
+python manage.py runserver 
+cp ../hw4/tests/test_djangoapp.py .
+pytest  # won't run because of installs 
+conda install -y requests bs4
+pytest  # won't run because needs gradescope_utils
+pip install gradescope_utils
+pytest  # passes 3 out of 12 tests
+edit cloudysky/urls.py
+conda info --envs   # where does django keep all its files?
+edit cloudysky/views.py
+pytest
+edit cloudysky/templates/new.html
+edit cloudysky/views.py
+edit cloudysky/settings.py  # added cloudysky to INSTALLED_APPS
+# copy-and-pasted from Firefox - > Tools -> Browser tools -> Web developer tools -> Network -> POST -> (right-click) -> Copy Value -> copy as cURL
+
+curl 'http://localhost:8000/app/createUser/' \\n  -X POST \\n  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:144.0) Gecko/20100101 Firefox/144.0' \\n  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \\n  -H 'Accept-Language: en-US,en;q=0.5' \\n  -H 'Accept-Encoding: gzip, deflate, br, zstd' \\n  -H 'Referer: http://localhost:8000/app/new' \\n  -H 'Content-Type: application/x-www-form-urlencoded' \\n  -H 'Origin: http://localhost:8000' \\n  -H 'Connection: keep-alive' \\n  -H 'Cookie: wltwikiUserID=1; wltwikiUserName=Wltrimbl; wltwikiToken=33a90d643756542cae7ae7d4cc0606af; csrftoken=fZ7cIWY5RLbX5gmmuEn8u0z0ZFI3mqDq; username-localhost-8891="2|1:0|10:1760106195|23:username-localhost-8891|204:eyJ1c2VybmFtZSI6ICIzNTNmM2ZkOTZjYTI0ZjQzYTFhYjRmMTM1OTU0ZTZiYiIsICJuYW1lIjogIkFub255bW91cyBUaGVseGlub2UiLCAiZGlzcGxheV9uYW1lIjogIkFub255bW91cyBUaGVseGlub2UiLCAiaW5pdGlhbHMiOiAiQVQiLCAiY29sb3IiOiBudWxsfQ==|4e9aac98dad6226a5973ec477ac7ddbed6c66b8bdb3b038878284a6a0c1d73b3"; username-localhost-8892="2|1:0|10:1760642039|23:username-localhost-8892|184:eyJ1c2VybmFtZSI6ICJkNDU4NzMyZGQ2YWU0YTAyYTBkYjIzMjZiMjc2MWJlNiIsICJuYW1lIjogIkFub255bW91cyBJbyIsICJkaXNwbGF5X25hbWUiOiAiQW5vbnltb3VzIElvIiwgImluaXRpYWxzIjogIkFJIiwgImNvbG9yIjogbnVsbH0=|56ca555d59be078c1a55a8f43a61f8fdf9960f70be12f7328f4b0e527418a6c2"; username-localhost-8893="2|1:0|10:1760657758|23:username-localhost-8893|184:eyJ1c2VybmFtZSI6ICI0YzUxOGFlMTFkYjk0YWU5OTkyYWY5MmZlM2QzZmJjYyIsICJuYW1lIjogIkFub255bW91cyBJbyIsICJkaXNwbGF5X25hbWUiOiAiQW5vbnltb3VzIElvIiwgImluaXRpYWxzIjogIkFJIiwgImNvbG9yIjogbnVsbH0=|b33ddc76331a13331373cafc36c8006ca4fa12c4941fce5bdc38aef1073c3b46"; username-localhost-8889="2|1:0|10:1760971302|23:username-localhost-8889|200:eyJ1c2VybmFtZSI6ICIxMzA5YjE5YTNjMjM0Yjg2OThmNDY0ZWVmMWQ0NGE3OCIsICJuYW1lIjogIkFub255bW91cyBUaGVtaXN0byIsICJkaXNwbGF5X25hbWUiOiAiQW5vbnltb3VzIFRoZW1pc3RvIiwgImluaXRpYWxzIjogIkFUIiwgImNvbG9yIjogbnVsbH0=|6464ba8e935b7351ced8898e2b3b8ed941f4c91dee83791586441b68574cdf03"; _xsrf=2|06127648|03fe9f0a1f6b174af9c9de24b615feba|1760971302; username-localhost-8890="2|1:0|10:1761839421|23:username-localhost-8890|196:eyJ1c2VybmFtZSI6ICI4NGMxN2M2ZTgwNTI0MDM5YTZhMTA1YzhkNzUxNGU3OCIsICJuYW1lIjogIkFub255bW91cyBUaHlvbmUiLCAiZGlzcGxheV9uYW1lIjogIkFub255bW91cyBUaHlvbmUiLCAiaW5pdGlhbHMiOiAiQVQiLCAiY29sb3IiOiBudWxsfQ==|fb7e69a105ed6b721bf3e3d4d27505bb4f348fb82db276b2b34ca92f1f0acff8"' \\n  -H 'Upgrade-Insecure-Requests: 1' \\n  -H 'Sec-Fetch-Dest: document' \\n  -H 'Sec-Fetch-Mode: navigate' \\n  -H 'Sec-Fetch-Site: same-origin' \\n  -H 'Sec-Fetch-User: ?1' \\n  -H 'Priority: u=0, i' \\n  --data-raw 'csrfmiddlewaretoken=1X6jpR9OR3aeEoxw7S4BY3AjI5tyXGCW6M3lXDXJyEb1zuJIrmhziTZ9xA1r9W5c&email=nobody%40nihilist.com&password=asdfkj'
+pytest
+
+
