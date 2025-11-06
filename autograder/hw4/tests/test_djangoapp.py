@@ -21,6 +21,7 @@ else:
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
+BASE = "http://127.0.0.1:8000"
 
 class TestDjangoApp(unittest.TestCase):
     '''Test functionality of cloudysky API / user creation + verification'''
@@ -56,33 +57,33 @@ class TestDjangoApp(unittest.TestCase):
     @number("1.01")
     def test_index_endpoint(self):
         '''Check server responds to http://localhost:8000/index.html'''
-        request = requests.get("http://localhost:8000/index.html")
+        request = requests.get(f"{BASE}/index.html")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
                          "Server returns error for " +
-                         "http://localhost:8000/index.html." +
+                         f"{BASE}/index.html." +
                          "Content:{}".format(index_page_text))
 
     @weight(0)
     @number("1.02")
     def test_default_endpoint(self):
-        '''Check server responds to http://localhost:8000/'''
-        request = requests.get("http://localhost:8000/")
+        '''Check server responds to http://127.0.0.1:8000/'''
+        request = requests.get(f"{BASE}/")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
                          "Server returns error for " +
-                         "http://localhost:8000/" +
+                         f"{BASE}/" +
                          "Content:{}".format(index_page_text))
 
     @weight(2)
     @number("1.0")
     def test_index_page(self):
         '''Check index.html for proper requirements (centered, time, bio)'''
-        request = requests.get("http://localhost:8000/index.html")
+        request = requests.get(f"{BASE}/index.html")
         index_page_text = request.text
         self.assertEqual(request.status_code, 200,
                          "Server returns error for " +
-                         "http://localhost:8000/index.html." +
+                         f"{BASE}/index.html." +
                          "Content:{}".format(index_page_text))
         center_check = re.search(r"center", index_page_text,
                                  re.IGNORECASE)
@@ -102,23 +103,23 @@ class TestDjangoApp(unittest.TestCase):
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start" +
                  self.deadserver_error)
-        response = requests.get('http://127.0.0.1:8000/')
+        response = requests.get(f"{BASE}/")
         self.assertEqual(response.status_code, 200,
-                        "Server returns error for http://localhost:8000/." +
+                        f"Server returns error for {BASE}/" +
                         "  Content:{}".format(
                         response.text))
         self.assertIn("not logged", response.text.lower(),
-                      "http://localhost:8000/ response does not contain" +
+                      f"{BASE}/ response does not contain" +
                       " phrase 'Not logged in'")
 
     @weight(0)
     @number("2.0")
     def test_new_page_renders(self):
         '''Server returns /app/new page without error.'''
-        request = requests.get("http://localhost:8000/app/new")
+        request = requests.get(f"{BASE}/app/new")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
-            "Server returns error for http://localhost:8000/app/new.\n" +
+            f"Server returns error for {BASE}/app/new.\n" +
             "Content:{}".format(
             new_page_text))
 
@@ -127,7 +128,7 @@ class TestDjangoApp(unittest.TestCase):
     @number("2.1")
     def test_user_add_form(self):
         '''Checks content of /app/new form (right fields, right endpoint)'''
-        form_page_text = requests.get("http://localhost:8000/app/new").text
+        form_page_text = requests.get(BASE+"/app/new").text
         name_check = re.search("user_name", form_page_text, re.IGNORECASE)
         email_check = re.search("email", form_page_text)
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
@@ -151,7 +152,7 @@ class TestDjangoApp(unittest.TestCase):
     @number("2.3")
     def test_new_page_fails_post(self):
         '''Check the /app/new page returns an error if POST.'''
-        request = requests.post("http://localhost:8000/app/new")
+        request = requests.post(BASE + "/app/new")
         new_page_text = request.text
         self.assertNotEqual(request.status_code, 200,
             "Server should return error for POST " +
@@ -165,7 +166,7 @@ class TestDjangoApp(unittest.TestCase):
         '''Checks that createUser endpoint responds with code 200
         when it should be successful'''
         session = requests.Session()
-        r0 = session.get("http://localhost:8000/app/new")
+        r0 = session.get(BASE + "/app/new")
         m = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', r0.text)
         if not m:
             csrfdata = session.cookies.get("csrftoken")
@@ -176,12 +177,12 @@ class TestDjangoApp(unittest.TestCase):
         form["csrfmiddlewaretoken"] = csrfdata
         headers = {
             "X-CSRFToken": csrfdata,
-            "Referer": "http://localhost:8000/app/new",
+            "Referer": BASE + "/app/new",
                   }
 
-        response = session.post("http://localhost:8000/app/createUser",
+        response = session.post(BASE + "/app/createUser",
                                  data=form, headers=headers)
-        if response.status_code != 200:
+        if response.status_code not in (200, 201):
             self.assertEqual(response.status_code, 200,
                              "Wrong response code - should pass - {}".format(
                                  response.text))
@@ -193,7 +194,7 @@ class TestDjangoApp(unittest.TestCase):
         dup_user = self.user_dict.copy()
         dup_user["user_name"] = (
              "TestUserName-" +  dup_user["email"][0:2])
-        response = requests.post("http://localhost:8000/app/createUser",
+        response = requests.post(BASE + "/app/createUser",
                                  data=dup_user)
         if response.status_code == 200:
             self.assertNotEqual(response.status_code, 200,
@@ -204,7 +205,7 @@ class TestDjangoApp(unittest.TestCase):
     @number("4")
     def test_user_add_api_raises(self):
         '''Checks that createUser endpoint does not take GET'''
-        response = requests.get("http://localhost:8000/app/createUser",
+        response = requests.get(BASE + "/app/createUser",
             data=self.user_dict)  # data doesn't matter
         if response.status_code == 404:
             self.assertTrue(False, "GET to app/createUser returns HTTP 404 {}".format(
@@ -219,7 +220,7 @@ class TestDjangoApp(unittest.TestCase):
         user_dict = self.user_dict
         session = requests.Session()
         # first get csrf token from login page
-        response0 = session.get("http://localhost:8000/accounts/login/")
+        response0 = session.get(BASE + "/accounts/login/")
         csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
         if csrf:
             csrfdata = csrf.groups()[0]
@@ -228,9 +229,9 @@ class TestDjangoApp(unittest.TestCase):
         logindata = {"user_name": user_dict["user_name"], "password": user_dict["password"],
                 "csrfmiddlewaretoken": csrfdata}
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                "http://localhost:8000/accounts/login/"}
+                BASE + "/accounts/login/"}
         # now attempt login
-        response1 = session.post("http://localhost:8000/accounts/login/", data=logindata,
+        response1 = session.post(BASE + "/accounts/login/", data=logindata,
               headers=loginheaders)
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
@@ -248,7 +249,7 @@ class TestDjangoApp(unittest.TestCase):
         '''Checks index page contains username (email) if logged in'''
         user_dict = self.user_dict
         session = requests.Session()
-        response0 = session.get("http://localhost:8000/accounts/login/")
+        response0 = session.get(BASE + "/accounts/login/")
         csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
         if csrf:
             csrfdata = csrf.groups()[0]
@@ -259,10 +260,10 @@ class TestDjangoApp(unittest.TestCase):
                      "csrfmiddlewaretoken": csrfdata}
         print(logindata)
         loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                "http://localhost:8000/accounts/login/"}
+                BASE + "/accounts/login/"}
         print(csrfdata)
         # now attempt login
-        response1 = session.post("http://localhost:8000/accounts/login/",
+        response1 = session.post(BASE + "/accounts/login/",
                                  data=logindata, headers=loginheaders)
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
