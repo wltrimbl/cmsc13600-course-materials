@@ -154,7 +154,7 @@ class TestDjangoApp(unittest.TestCase):
         request = requests.post("http://localhost:8000/app/new")
         new_page_text = request.text
         self.assertNotEqual(request.status_code, 200,
-            "Server should return error for POST " + 
+            "Server should return error for POST " +
             "http://localhost:8000/app/new.\n" +
             "Content:{}".format(
             new_page_text))
@@ -164,8 +164,23 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_api(self):
         '''Checks that createUser endpoint responds with code 200
         when it should be successful'''
-        response = requests.post("http://localhost:8000/app/createUser",
-                                 data=self.user_dict)
+        session = requests.Session()
+        r0 = session.get("http://localhost:8000/app/new")
+        m = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', r0.text)
+        if not m:
+            csrfdata = session.cookies.get("csrftoken")
+        else:
+            csrfdata = m.group(1)
+        self.assertTrue(csrfdata, "Could not obtain CSRF token for createUser POST")
+        form = dict(self.user_dict)
+        form["csrfmiddlewaretoken"] = csrfdata
+        headers = {
+            "X-CSRFToken": csrfdata,
+            "Referer": "http://localhost:8000/app/new",
+                  }
+
+        response = session.post("http://localhost:8000/app/createUser",
+                                 data=form, headers=headers)
         if response.status_code != 200:
             self.assertEqual(response.status_code, 200,
                              "Wrong response code - should pass - {}".format(
@@ -176,8 +191,8 @@ class TestDjangoApp(unittest.TestCase):
     def test_user_add_duplicate_email_api(self):
         '''Checks that createUser responds with an error adding duplicate email user'''
         dup_user = self.user_dict.copy()
-        dup_user["user_name"] = ( 
-             "TestUserName-" +  dup_user["email"][0:2]) 
+        dup_user["user_name"] = (
+             "TestUserName-" +  dup_user["email"][0:2])
         response = requests.post("http://localhost:8000/app/createUser",
                                  data=dup_user)
         if response.status_code == 200:
@@ -239,7 +254,7 @@ class TestDjangoApp(unittest.TestCase):
             csrfdata = csrf.groups()[0]
         else:
             raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"username": user_dict["user_name"], 
+        logindata = {"username": user_dict["user_name"],
                      "password": user_dict["password"],
                      "csrfmiddlewaretoken": csrfdata}
         print(logindata)
@@ -247,7 +262,7 @@ class TestDjangoApp(unittest.TestCase):
                 "http://localhost:8000/accounts/login/"}
         print(csrfdata)
         # now attempt login
-        response1 = session.post("http://localhost:8000/accounts/login/", 
+        response1 = session.post("http://localhost:8000/accounts/login/",
                                  data=logindata, headers=loginheaders)
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
@@ -267,9 +282,9 @@ class TestDjangoApp(unittest.TestCase):
             user_dict["email"]), 'value=WRONGEMAIL')
         sanitized_text = sanitized_text.replace('value="{}"'.format(
             user_dict["user_name"]), 'value=WRONGLOGIN')
-        check_username = (user_dict["user_name"] in sanitized_text or  
-            user_dict["email"], sanitized_text) 
-        self.assertTrue(check_username, 
+        check_username = (user_dict["user_name"] in sanitized_text or
+            user_dict["email"], sanitized_text)
+        self.assertTrue(check_username,
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
         # Allow either email or Username
