@@ -199,7 +199,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         request = post_with_csrf(session,
             BASE + "/app/createPost/",
             data=data)
-        self.assertLess(request.status_code, 203,  # 200 or 201 ok
+        self.assertEqual(request.status_code, 201,  # HTTP 201 Created required
             "Server returns error for POST to " +
             BASE + "/app/createPost/ " +
             "Data:{}".format(data) +
@@ -237,7 +237,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
-        self.assertEqual(request.status_code, 200,
+        self.assertEqual(request.status_code, 201,
             "Server returns error for POST to " +
             BASE + "/app/createPost/ " +
             "Data:{}".format(data)
