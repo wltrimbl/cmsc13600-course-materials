@@ -12,7 +12,7 @@ import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-CSKYHOME="."
+CSKYHOME = "."
 
 if path.exists("../cloudysky/manage.py"):
     CSKYHOME = ".."
@@ -21,8 +21,8 @@ if path.exists("cloudysky/manage.py"):
 if path.exists("/autograder/submission"):
     CSKYHOME = "/autograder/submission"
 
-BASE = "http://localhost:8000" 
 BASE = "http://54.167.194.197"
+BASE = "http://localhost:8000"
 
 # DEsired tests:
 # /app/new_course  (HTML form/view to submit to createPost) PROVIDED
@@ -71,7 +71,7 @@ def post_with_csrf(session: requests.Session, url=None, headers=None, data=None)
     url= BASE+"/accounts/login" if url is None else url
     token = get_fresh_csrf(session)
     headers["X-CSRFToken"] = token
-    headers["Referer"] = BASE+"/accounts/login" 
+    headers["Referer"] = BASE+"/accounts/login"
     data["csrfmiddlewaretoken"] = token
     response = session.post(url, headers=headers, data=data)
     return response
@@ -104,7 +104,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         if False and os.path.exists("/autograder"):
             cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
-        try:
+        r = requests.get(BASE+"/", timeout=1)
+        if not r.status_code < 500:
+          try:
             cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
                               'runserver', '--noreload'],
                               stdout=None,
@@ -122,7 +124,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                     message =  ("Django server crashed on startup. " +
                        f"{line}")
                 raise RuntimeError(message)
-        except Exception as e:
+          except Exception as e:
               assert False, str(e)
 
         def login(data):
@@ -134,7 +136,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             print("CreateUser status", response.status_code)
             logindata = {"username": data["user_name"],
                      "password": data["password"]}
-            response1 = post_with_csrf(session, "http://localhost:8000/accounts/login/",
+            response1 = post_with_csrf(session, BASE + "/accounts/login/",
                         data=logindata)
             print("LOGINDATA", logindata)
             print("LOGINCODE", response1.status_code)
@@ -189,16 +191,16 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.0")
     def test_create_post_admin_success(self):
-        '''Check server responds with success to http://localhost:8000/app/createPost'''
+        '''Check server responds with success to /app/createPost'''
         n = int(random.random()* 25)
         data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n]}
         session = self.session_admin
         request = post_with_csrf(session,
-            "http://localhost:8000/app/createPost",
+            BASE + "/app/createPost",
             data=data)
         self.assertLess(request.status_code, 203,  # 200 or 201 ok
             "Server returns error for POST to " +
-            "http://localhost:8000/app/createPost " +
+            BASE + "/app/createPost " +
             "Data:{}".format(data) +
             "Content:{}".format(request.text)
             )
@@ -206,7 +208,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.1")
     def test_create_post_notloggedin(self):
-        '''Check server responds with success to http://localhost:8000/app/createPost'''
+        '''Check server responds with success to /app/createPost'''
         data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?"}
         url = BASE + "/app/createPost"
         request = post_with_csrf(requests.Session(),
@@ -222,21 +224,21 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(1)
     @number("10.2")
     def test_create_post_user_success(self):
-        '''Test createPost endpoint by a user, which should succeed http://localhost:8000/app/createPost'''
+        '''Test createPost endpoint by a user, which should succeed /app/createPost'''
         data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
                }
         session = self.session_user
         request = post_with_csrf(session,
-            "http://localhost:8000/app/createPost",
+            BASE + "/app/createPost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/createPost " +
+            "Server returned 404 not found for /app/createPost " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
-            "http://localhost:8000/app/createPost " +
+            BASE + "/app/createPost " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -244,19 +246,19 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("13.0")
     def test_hide_post_notloggedin(self):
-        '''Test hidePost endpoint not logged in, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
+        '''Test hidePost endpoint not logged in, which should fail with 401 unauthorized /app/hidePost'''
         data = {'post_id': "0",  "reason": "hostility to bunnies"}
         request = post_with_csrf(requests.Session(),
-            "http://localhost:8000/app/hidePost",
+             BASE+"/app/hidePost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hidePost " +
+            "Server returned 404 not found for /app/hidePost " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 401,
             "Server returns error for POST to " +
-            "http://localhost:8000/app/createPost " +
+            BASE + "/app/createPost " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -264,20 +266,20 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("13.1")
     def test_hide_post_user_unauthorized(self):
-        '''Test hidePost endpoint by a user, which should fail with 401 unauthorized http://localhost:8000/app/createPost'''
+        '''Test hidePost endpoint by a user, which should fail with 401 unauthorized /app/createPost'''
         data = {'post_id': "1",  "reason": "NIXON"}
         session = self.session_user
         request = post_with_csrf(session,
-            "http://localhost:8000/app/hidePost",
+            BASE + "/app/hidePost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hidePost " +
+            "Server returned 404 not found for /app/hidePost " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 401,
             "Server returns error for POST to " +
-            "http://localhost:8000/app/hidePost " +
+            BASE + "/app/hidePost " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -285,21 +287,21 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(1)
     @number("13.2")
     def test_hide_post_admin_success(self):
-        '''Test hidePost endpoint by an admin which should succeed http://localhost:8000/app/hidePost'''
+        '''Test hidePost endpoint by an admin which should succeed /app/hidePost'''
         data = {'post_id': "1",  "reason": "NIXON",
                }
         session = self.session_admin
         request = post_with_csrf(session,
-            "http://localhost:8000/app/hidePost",
+            BASE + "/app/hidePost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hidePost " +
+            "Server returned 404 not found for /app/hidePost " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
-            "http://localhost:8000/app/hidePost " +
+            BASE + "/app/hidePost " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -307,21 +309,21 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0)
     @number("13.3")
     def test_hide_comment_admin_success(self):
-        '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
+        '''Test hideComment endpoint by an admin which should succeed /app/hideComment'''
         data = {'comment_id': "1",  "reason": "NIXON",
                }
         session = self.session_admin
         request = post_with_csrf(session,
-            "http://localhost:8000/app/hideComment",
+            BASE + "/app/hideComment",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/hideComment " +
+            "Server returned 404 not found for /app/hideComment " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
-            "http://localhost:8000/app/hideComment " +
+            BASE + "/app/hideComment " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -335,16 +337,16 @@ class TestDjangoHw5simple(unittest.TestCase):
         # Now hit createComment, now that we are logged in
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
         response2 = post_with_csrf(session,
-            "http://localhost:8000/app/createComment",
+            BASE + "/app/createComment",
             data=data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 201,
-            "Server returns error for http://localhost:8000/app/createComment " +
+            f"Server returns error for {BASE}/app/createComment " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
             )
@@ -356,16 +358,16 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
         response2 = post_with_csrf(requests.Session(),
-            "http://localhost:8000/app/createComment",
+            BASE + "/app/createComment",
             data=data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 401, # Unauthorized
-            "Server returns error for http://localhost:8000/app/createComment " +
+            f"Server returns error for {BASE}/app/createComment " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
             )
@@ -378,15 +380,15 @@ class TestDjangoHw5simple(unittest.TestCase):
         session = self.session_user
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
         response2 = post_with_csrf(session,
-             "http://localhost:8000/app/createComment",
+             BASE + "/app/createComment",
              data=data)
         self.assertNotEqual(response2.status_code, 404,
-            "Server returned 404 not found for http://localhost:8000/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 201,
-            "Server returned an error for http://localhost:8000/app/createComment " +
+            f"Server returned an error for {BASE}/app/createComment " +
             "Data:{}".format(data) +
             "Content:{}".format(response2.text)
             )
@@ -397,11 +399,11 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Logs in, tests index.html '''
         session = self.session_admin
         # Now hit createPost, now that we are logged in
-        response_index = session.get("http://localhost:8000/")
+        response_index = session.get(BASE+"/")
         sanitized_text = response_index.text.replace('value="{}"'.format(
             admin_data["email"]), 'value=WRONGEMAIL')
         self.assertLess(response_index.status_code, 203,
-                         "Server returns error for GET to http://localhost:8000/ " +
+                         f"Server returns error for GET to {BASE}/ " +
                          "Content:{}".format(response_index.text))
         print(sanitized_text)
         self.assertTrue((admin_data["user_name"] in sanitized_text or
@@ -419,12 +421,12 @@ class TestDjangoHw5simple(unittest.TestCase):
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
         data = {'title': content,  "content": content}
-        print("Calling http://localhost:8000/app/createPost with", data)
-        response = post_with_csrf(session, "http://localhost:8000/app/createPost",
+        print(f"Calling {BASE}/app/createPost with", data)
+        response = post_with_csrf(session, BASE + "/app/createPost",
                                  data=data)
         print(f"Response:{response.text}\n")
-        response2 = session.get("http://localhost:8000/app/dumpFeed",
-                                 data=data) 
+        response2 = session.get(BASE+"/app/dumpFeed",
+                                 data=data)
         self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")
 
     @weight(0)
@@ -438,12 +440,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         secret = int(random.random()*100000)
         content = f"fuzzy{secret:06d} bunnies 4tw!"
         data = {"content": content, "post_id": 1}
-        response = post_with_csrf(session, "http://localhost:8000/app/createComment",
-                                 data=data) 
+        response = post_with_csrf(session,
+              BASE+"/app/createComment",
+                                 data=data)
         self.assertEqual(response.status_code, 201,
-             "Server did not return HTTP 201 for http://localhost:8000/app/createComment ")
+             f"Server did not return HTTP 201 for {BASE}/app/createComment ")
 
-        response2 = session.get("http://localhost:8000/app/dumpFeed",
+        response2 = session.get(BASE+"/app/dumpFeed",
                                  data=data)
         self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")
 
@@ -454,8 +457,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         session = self.session_user
         # Now hit createPost, now that we are logged in
-        print("Calling http://localhost:8000/app/dumpFeed")
-        response = session.get("http://localhost:8000/app/dumpFeed",
+        print(f"Calling {BASE}/app/dumpFeed")
+        response = session.get(BASE+"/app/dumpFeed",
                                 )
 
         self.assertGreater(len(response.content), 30)
