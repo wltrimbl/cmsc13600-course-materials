@@ -23,6 +23,9 @@ if path.exists("cloudysky/manage.py"):
 if path.exists("/autograder/submission"):
     CSKYHOME = "/autograder/submission"
 
+BASE = "http://localhost:8000" 
+
+
 # DEsired tests:
 # /app/new_course  (HTML form/view to submit to createPost) PROVIDED
 # /app/new_lecture (HTML form/view to submit to createComment) PROVIDED
@@ -35,7 +38,7 @@ if path.exists("/autograder/submission"):
 # TEST that row is actually added with valid input  (3)
 # three tests with invalid input, something essential not defined (3)
 
-
+BASE = "http://localhost:8000"
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 admin_data = {
@@ -51,10 +54,28 @@ user_data = {
                 "password": "Password123"
                 }
 
-bunnytweets = [ "A bunny in your lap = therapy.", "A bunny is a cloud with ears.", "Adopt a bunny, gain calm.", "Anxious but adorable: the bunny way.", "Baby bunny yawns cure sadness.", "Bunnies are living plush toys.", "Bunnies don’t bite, they bless.", "Bunnies nap like tiny gods.", "Bunny feet are pure poetry.", "Bunny loaf = floof perfection.", "Bunny silence speaks comfort.", "Ears up, stress down.", "Flop = bunny trust unlocked.", "Floppy ears fix bad moods.", "Fuzzy bunnies are peace in tiny, hopping form.", "Holding a bunny resets your soul.", "Hops heal hearts.", "Nose wiggles say “I love you.”", "One bunny = less chaos.", "Quiet, cute, and salad-powered.", "Rabbits know the secret to rest.", "Snuggle-powered peace generator.", "Soft bunny = instant calm.", "Soft, silent, and perfect.", "Tiny paws, huge joy.",] 
+bunnytweets = [ "A bunny in your lap = therapy.", "A bunny is a cloud with ears.", "Adopt a bunny, gain calm.", "Anxious but adorable: the bunny way.", "Baby bunny yawns cure sadness.", "Bunnies are living plush toys.", "Bunnies don’t bite, they bless.", "Bunnies nap like tiny gods.", "Bunny feet are pure poetry.", "Bunny loaf = floof perfection.", "Bunny silence speaks comfort.", "Ears up, stress down.", "Flop = bunny trust unlocked.", "Floppy ears fix bad moods.", "Fuzzy bunnies are peace in tiny, hopping form.", "Holding a bunny resets your soul.", "Hops heal hearts.", "Nose wiggles say “I love you.”", "One bunny = less chaos.", "Quiet, cute, and salad-powered.", "Rabbits know the secret to rest.", "Snuggle-powered peace generator.", "Soft bunny = instant calm.", "Soft, silent, and perfect.", "Tiny paws, huge joy."]
+
+def extract_csrf_from_html(html: str):
+    soup = BeautifulSoup(html, "html.parser")
+    tag = soup.find("input", {"name": "csrfmiddlewaretoken"})
+    return tag["value"] if tag and tag.has_attr("value") else None
+
+def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login"):
+    r = session.get(form_url, timeout=8)
+    token = extract_csrf_from_html(r.text) or session.cookies.get("csrftoken")
+    if not token:
+        raise AssertionError(f"Could not obtain CSRF token from {form_url}")
+    return token
 
 
-
+def post_with_csrf(session: requests.Session, url, headers={}, data={}):
+    token = get_fresh_csrf(session)
+    headers["X-CSRFToken"] = token
+    headers["Referer"] = "http://localhost:8000/accounts/login/"
+    data["csrfmiddlewaretoken"] = token
+    response = session.post(url, headers=headers, data=data)
+    return response
 
 class TestDjangoHw5simple(unittest.TestCase):
     '''Test functionality of cloudysky API'''
@@ -62,46 +83,30 @@ class TestDjangoHw5simple(unittest.TestCase):
 
     @classmethod
     def wait_for_server(cls):
+        exception = None
         for _ in range(100):
             try:
                 r = requests.get("http://localhost:8000/", timeout=1)
                 if r.status_code < 500:
                     return
-            except:
-                sleep(0.2)
-        raise RuntimeError(f"Server did not start within 20 seconds")
+            except requests.RequestException as e:
+                exception = e
+            sleep(0.2)
+        raise RuntimeError(f"Server did not start within ~20 seconds: {exception}")
 
 
     @classmethod
-    def start_server(cls):
-        if cls.server_proc and cls.server_proc.poll() is None:
-            return  # Already running
-
-        print("Starting Django server...")
-        cls.server_proc = subprocess.Popen(
-            ['python3', CSKYHOME + '/cloudysky/manage.py',
-                      'runserver', '--noreload'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        cls.wait_for_server()
-   
-    @classmethod
-    def setUp(cls):
-        cls.start_server()  # start or restart if needed
-        cls.wait_for_server()  # confirm it's responsive
- 
-    @classmethod
-    def get_csrf_login_token(self, session=None):
+    def get_csrf_login_token(self, session=None, url = "http://localhost:8000/accounts/login"):
         if session is None:
             session = requests.Session()
-        response0 = session.get("http://localhost:8000/accounts/login/")
+        response0 = session.get(url)
         csrf = session.cookies.get("csrftoken")
+        csrf = extract_csrf_from_html(response0.text)
+
         if csrf:
             csrfdata = csrf
         else:
-            print("ERROR: Can't find csrf token in accounts/login/ page")
+            print(f"ERROR: Can't find csrf token in {url} page")
             csrfdata = "BOGUSDATA"
         self.csrfdata = csrfdata
         self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
@@ -119,7 +124,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         print("starting server")
         try:
             cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
-                              'runserver'],
+                              'runserver', '--noreload'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               text=True,
@@ -139,8 +144,13 @@ class TestDjangoHw5simple(unittest.TestCase):
               assert False, str(e)
 
         def login(data):
-            response = requests.post("http://localhost:8000/app/createUser",
-                                     data=data,
+        #    get_csrf_login_token
+            session = requests.Session()
+            form_url = BASE+"/accounts/login/"
+            token = get_fresh_csrf(session, form_url)
+            headers = {"X-CSRFToken": token, "Referer": form_url}
+            response = post_with_csrf(session, "http://localhost:8000/app/createUser",
+                                     data=data, headers=headers,
                                      )
             print("CreateUser status", response.status_code)
             session, csrfdata = cls.get_csrf_login_token()
@@ -149,7 +159,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                      "csrfmiddlewaretoken": csrfdata}
             loginheaders = {"X-CSRFToken": csrfdata, "Referer":
                             "http://localhost:8000/accounts/login/"}
-            response1 = session.post("http://localhost:8000/accounts/login/",
+            response1 = post_with_csrf(session, "http://localhost:8000/accounts/login/",
                         data=logindata,
                         headers=loginheaders)
             print("LOGINDATA", logindata)
@@ -176,6 +186,9 @@ class TestDjangoHw5simple(unittest.TestCase):
                 proc.kill()
                 proc.wait()
 
+    def setUp(self):
+        cls = self.__class__
+        cls.wait_for_server()  # confirm it's responsive
 
     def count_app_rows(self):
         '''Counts all the rows in sqlite tables beginning
@@ -207,13 +220,13 @@ class TestDjangoHw5simple(unittest.TestCase):
         n = int(random.random()* 25)
         data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n] }
         session = self.session_admin
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/createPost",
             data=data, headers=self.headers_admin)
         self.assertLess(request.status_code, 203,  # 200 or 201 ok
             "Server returns error for POST to " +
             "http://localhost:8000/app/createPost " +
-            "Data:{}".format(data) + 
+            "Data:{}".format(data) +
             "Content:{}".format(request.text)+
             "Headers:{}".format(self.headers_admin)
             )
@@ -224,7 +237,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Check server responds with success to http://localhost:8000/app/createPost'''
         data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?" }
         session, csrf = self.get_csrf_login_token()  # not logged in
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/createPost",
             data=data)  # not logged in
         self.assertEqual(request.status_code, 401,  # unauthorized
@@ -241,7 +254,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
                   'csrfmiddlewaretoken': self.csrfdata_user}
         session = self.session_user
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/createPost",
              data=data, headers=self.headers_user)
         self.assertNotEqual(request.status_code, 404,
@@ -260,9 +273,9 @@ class TestDjangoHw5simple(unittest.TestCase):
     @number("13.0")
     def test_hide_post_notloggedin(self):
         '''Test hidePost endpoint not logged in, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
-        data = {'post_id': "0",  "reason": "天安门广场" }
+        data = {'post_id': "0",  "reason": "hostility to bunnies" }
         session, csrf = self.get_csrf_login_token()
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/hidePost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
@@ -283,7 +296,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test hidePost endpoint by a user, which should fail with 401 unauthorized http://localhost:8000/app/createPost'''
         data = {'post_id': "1",  "reason": "NIXON" }
         session = self.session_user
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/hidePost",
              data=data, headers=self.headers_user)
         self.assertNotEqual(request.status_code, 404,
@@ -302,11 +315,11 @@ class TestDjangoHw5simple(unittest.TestCase):
     @number("13.2")
     def test_hide_post_admin_success(self):
         '''Test hidePost endpoint by an admin which should succeed http://localhost:8000/app/hidePost'''
-        data = {'post_id': "1",  "reason": "NIXON", 
+        data = {'post_id': "1",  "reason": "NIXON",
                 'csrfmiddlewaretoken': self.csrfdata_admin
                }
         session = self.session_admin
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/hidePost",
              data=data, headers=self.headers_admin)
         self.assertNotEqual(request.status_code, 404,
@@ -322,14 +335,14 @@ class TestDjangoHw5simple(unittest.TestCase):
             )
 
     @weight(0)
-    @number("13.2")
+    @number("13.3")
     def test_hide_comment_admin_success(self):
         '''Test hideComment endpoint by an admin which should succeed http://localhost:8000/app/hideComment'''
-        data = {'comment_id': "1",  "reason": "NIXON", 
+        data = {'comment_id': "1",  "reason": "NIXON",
                 'csrfmiddlewaretoken': self.csrfdata_admin
                }
         session = self.session_admin
-        request = session.post(
+        request = post_with_csrf(session,
             "http://localhost:8000/app/hideComment",
              data=data, headers=self.headers_admin)
         self.assertNotEqual(request.status_code, 404,
@@ -352,7 +365,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         session = self.session_admin
         # Now hit createComment, now that we are logged in
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
-        response2 = session.post(
+        response2 = post_with_csrf(session,
             "http://localhost:8000/app/createComment",
             data=data,headers=self.headers_admin)
 #        404 pages are too bulky to show in gradescope
@@ -374,7 +387,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         session, csrf = self.get_csrf_login_token()   # Not logged in
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
-        response2 = session.post(
+        response2 = post_with_csrf(session,
             "http://localhost:8000/app/createComment",
             data=data)
 #        404 pages are too bulky to show in gradescope
@@ -396,7 +409,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''
         session = self.session_user
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1 }
-        response2 = session.post(
+        response2 = post_with_csrf(session,
              "http://localhost:8000/app/createComment",
              data=data, headers=self.headers_user)
         self.assertNotEqual(response2.status_code, 404,
@@ -431,7 +444,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0)
     @number("21")
     def test_create_post_add(self):
-        '''Test that createPost endpoint actually adds data  BROKEN TEST BUT WILL BE FIXED 
+        '''Test that createPost endpoint actually adds data  BROKEN TEST BUT WILL BE FIXED
         '''
         session = self.session_user
         before_rows = self.count_app_rows()
@@ -440,17 +453,17 @@ class TestDjangoHw5simple(unittest.TestCase):
         content = f"I like the fuzzy{secret:06d} bunnies!"
         data = {'title': content,  "content": content}
         print("Calling http://localhost:8000/app/createPost with", data)
-        response = session.post("http://localhost:8000/app/createPost",
+        response = post_with_csrf(session, "http://localhost:8000/app/createPost",
                                  data=data, headers=self.headers_user)
-        print("Response:{response.text}\n")
+        print(f"Response:{response.text}\n")
         response2 = session.get("http://localhost:8000/app/dumpFeed",
                                  data=data, headers=self.headers_user)
-        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")  
+        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")
 
     @weight(0)
     @number("22")
     def test_create_comment_add(self):
-        '''Test that createComment endpoint actually adds data 
+        '''Test that createComment endpoint actually adds data
         '''
         session = self.session_user
         before_rows = self.count_app_rows()
@@ -458,11 +471,11 @@ class TestDjangoHw5simple(unittest.TestCase):
         secret = int(random.random()*100000)
         content = f"fuzzy{secret:06d} bunnies 4tw!"
         data = {"content": content, "post_id": 1 }
-        response = session.post("http://localhost:8000/app/createComment",
+        response = post_with_csrf(session, "http://localhost:8000/app/createComment",
                                  data=data, headers=self.headers_user)
         response2 = session.get("http://localhost:8000/app/dumpFeed",
                                  data=data, headers=self.headers_user)
-        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")  
+        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment")
 
     @weight(2)
     @number("23")
