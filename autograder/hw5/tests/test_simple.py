@@ -11,7 +11,6 @@ import zoneinfo
 import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
-from . import test_globals
 
 CSKYHOME="."
 
@@ -23,7 +22,7 @@ if path.exists("/autograder/submission"):
     CSKYHOME = "/autograder/submission"
 
 BASE = "http://localhost:8000" 
-
+BASE = "http://54.167.194.197"
 
 # DEsired tests:
 # /app/new_course  (HTML form/view to submit to createPost) PROVIDED
@@ -36,8 +35,6 @@ BASE = "http://localhost:8000"
 # TESTS FOR HTTP  200 or 201 response...  (4)
 # TEST that row is actually added with valid input  (3)
 # three tests with invalid input, something essential not defined (3)
-
-BASE = "http://localhost:8000"
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 admin_data = {
@@ -74,7 +71,7 @@ def post_with_csrf(session: requests.Session, url=None, headers=None, data=None)
     url= BASE+"/accounts/login" if url is None else url
     token = get_fresh_csrf(session)
     headers["X-CSRFToken"] = token
-    headers["Referer"] = url 
+    headers["Referer"] = BASE+"/accounts/login" 
     data["csrfmiddlewaretoken"] = token
     response = session.post(url, headers=headers, data=data)
     return response
@@ -98,36 +95,20 @@ class TestDjangoHw5simple(unittest.TestCase):
 
 
     @classmethod
-    def get_csrf_login_token(self, session=None, url = "http://localhost:8000/accounts/login"):
-        session = requests.Session() if session is None else session
-        response0 = session.get(url)
-        csrf = session.cookies.get("csrftoken")
-        csrf = extract_csrf_from_html(response0.text)
-
-        if csrf:
-            csrfdata = csrf
-        else:
-            print(f"ERROR: Can't find csrf token in {url} page")
-            csrfdata = "BOGUSDATA"
-        self.loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                "http://localhost:8000/accounts/login/"}
-        return session, csrfdata   # session
-
-    @classmethod
     def setUpClass(cls):
         '''This class logs in as an admin, and sets
-        random.seed(42)
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
-        if not test_globals.SERVER_STARTED_OK and os.path.exists("/autograder"):
+        random.seed(42)
+        if False and os.path.exists("/autograder"):
             cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
         try:
             cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
                               'runserver', '--noreload'],
-                              stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE,
+                              stdout=None,
+                              stderr=None,
                               text=True,
                               close_fds=True)
         # Make sure server is still running in background, or error
@@ -146,7 +127,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 
         def login(data):
             session = requests.Session()
-            form_url = BASE+"/accounts/login/"
+            form_url = BASE+"/app/createUser/"
             response = post_with_csrf(session, form_url,
                                      data=data
                                      )
@@ -227,12 +208,13 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_create_post_notloggedin(self):
         '''Check server responds with success to http://localhost:8000/app/createPost'''
         data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?"}
+        url = BASE + "/app/createPost"
         request = post_with_csrf(requests.Session(),
-            "http://localhost:8000/app/createPost",
+            url,
             data=data)  # not logged in
         self.assertEqual(request.status_code, 401,  # unauthorized
             "Server returns error for POST to " +
-            "http://localhost:8000/app/createPost " +
+            url +
             "Data:{}".format(data)
 #           "Content:{}".format(request.text)
             )
@@ -264,8 +246,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_hide_post_notloggedin(self):
         '''Test hidePost endpoint not logged in, which should fail with 401 unauthorized http://localhost:8000/app/hidePost'''
         data = {'post_id': "0",  "reason": "hostility to bunnies"}
-        session, csrf = self.get_csrf_login_token()
-        request = post_with_csrf(session,
+        request = post_with_csrf(requests.Session(),
             "http://localhost:8000/app/hidePost",
              data=data)
         self.assertNotEqual(request.status_code, 404,
@@ -348,7 +329,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("11.0")
     def test_create_comment_admin_success(self):
-        '''Test createComment endpoint.
+        '''Test that createComment endpoint succeeds with 201 with admin login.
         '''
         session = self.session_admin
         # Now hit createComment, now that we are logged in
@@ -362,7 +343,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
-        self.assertEqual(response2.status_code, 200,
+        self.assertEqual(response2.status_code, 201,
             "Server returns error for http://localhost:8000/app/createComment " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
@@ -371,11 +352,10 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("11.1")
     def test_create_comment_notloggedin(self):
-        '''Test createComment endpoint.
+        '''Test that createComment endpoint fails with 401 unauthorized when not logged in.
         '''
-        session, csrf = self.get_csrf_login_token()   # Not logged in
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
-        response2 = post_with_csrf(session,
+        response2 = post_with_csrf(requests.Session(),
             "http://localhost:8000/app/createComment",
             data=data)
 #        404 pages are too bulky to show in gradescope
@@ -393,7 +373,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(1.0)
     @number("11.2")
     def test_create_comment_user_success(self):
-        '''Tests createComment endpoint by a user, which should succeed.
+        '''Tests createComment endpoint by a user, which should succeed with code 201.
         '''
         session = self.session_user
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
@@ -405,7 +385,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
-        self.assertEqual(response2.status_code, 200,
+        self.assertEqual(response2.status_code, 201,
             "Server returned an error for http://localhost:8000/app/createComment " +
             "Data:{}".format(data) +
             "Content:{}".format(response2.text)
