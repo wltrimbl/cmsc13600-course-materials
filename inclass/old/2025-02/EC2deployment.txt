@@ -20,7 +20,7 @@ After creating new instance, take note of its ip and add the following four line
 your (local) ~/.ssh/config: 
 
 	Host AMAZON
-	Hostname         34.207.69.6 
+	Hostname         54.167.194.197
 	User ubuntu
 	Identityfile   /Users/grover/.ssh/amazonkey.pem
 
@@ -43,7 +43,7 @@ pip3 install  --break-system-packages gradescope_utils
 
 And the magic happens when we
 unzip cloudysky.zip
-python3 cloudysky/manage.py runserver 0.0.0.0:8000
+python3 cloudysky/manage.py runserver 0.0.0.0:80
 
 We have to change cloudysky/cloudysky/settings.py to instruct the web server
 to actually listen on the internet.
@@ -52,7 +52,7 @@ ALLOWED_HOSTS = ["*"]
 to permit django to actually respond to requests from The Internet.
 
 Now I can go to 
-http://34.207.69.6:8000/app/index.html
+http://54.167.194.197:80/app/index.html
 
 and see the server I have deployed.  
 
