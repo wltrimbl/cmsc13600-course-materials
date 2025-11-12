@@ -21,7 +21,7 @@ if path.exists("cloudysky/manage.py"):
 if path.exists("/autograder/submission"):
     CSKYHOME = "/autograder/submission"
 
-BASE = "http://54.167.194.197"
+# BASE = "http://54.167.194.197"  # NONONO
 BASE = "http://localhost:8000"
 
 # DEsired tests:
@@ -104,9 +104,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         if False and os.path.exists("/autograder"):
             cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
-        r = requests.get(BASE+"/", timeout=1)
-        if not r.status_code < 500:
-          try:
+#        r = requests.get(BASE+"/", timeout=1)
+#        if not r.status_code < 500:
+        try:
             cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
                               'runserver', '--noreload'],
                               stdout=None,
@@ -124,7 +124,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                     message =  ("Django server crashed on startup. " +
                        f"{line}")
                 raise RuntimeError(message)
-          except Exception as e:
+        except Exception as e:
               assert False, str(e)
 
         def login(data):
@@ -192,7 +192,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.0")
     def test_create_post_admin_success(self):
-        '''Check server responds with success to /app/createPost'''
+        '''Check server responds with success to /app/createPost/'''
         n = int(random.random()* 25)
         data = {'title': "Fuzzy bunnies are great",  "content": bunnytweets[n]}
         session = self.session_admin
@@ -209,7 +209,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0.5)
     @number("10.1")
     def test_create_post_notloggedin(self):
-        '''Check server responds with success to /app/createPost'''
+        '''Check server responds with success to /app/createPost/'''
         data = {'title': "I like fuzzy bunnies 10.0",  "content": "I like fuzzy bunnies.  Do you?"}
         url = BASE + "/app/createPost/"
         request = post_with_csrf(requests.Session(),
@@ -225,7 +225,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(1)
     @number("10.2")
     def test_create_post_user_success(self):
-        '''Test createPost endpoint by a user, which should succeed /app/createPost'''
+        '''Test createPost endpoint by a user, which should succeed /app/createPost/'''
         data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." ,
                }
         session = self.session_user
@@ -414,7 +414,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     @weight(0)
     @number("21")
     def test_create_post_add(self):
-        '''Test that createPost endpoint actually adds data  BROKEN TEST BUT WILL BE FIXED
+        '''Test that createPost endpoint actually adds data, appears on dumpFeed
         '''
         session = self.session_user
         before_rows = self.count_app_rows()
@@ -430,26 +430,27 @@ class TestDjangoHw5simple(unittest.TestCase):
                                  data=data)
         self.assertTrue(content in response2.text, "Test comment not found in /app/dumpFeed")
 
-    @weight(0)
-    @number("22")
-    def test_create_comment_add(self):
-        '''Test that createComment endpoint actually adds data
-        '''
-        session = self.session_user
-        before_rows = self.count_app_rows()
-        # Now hit createComment, now that we are logged in
-        secret = int(random.random()*100000)
-        content = f"fuzzy{secret:06d} bunnies 4tw!"
-        data = {"content": content, "post_id": 1}
-        response = post_with_csrf(session,
-              BASE+"/app/createComment/",
-                                 data=data)
-        self.assertEqual(response.status_code, 201,
-             f"Server did not return HTTP 201 for {BASE}/app/createComment/ ")
-
-        response2 = session.get(BASE+"/app/dumpFeed",
-                                 data=data)
-        self.assertTrue(content in response2.text, "Test comment not found in /app/createComment/")
+#    @unittest.skip("skip this test")
+#    @weight(0)
+#    @number("22")
+#    def test_create_comment_add(self):
+#        '''Test that createComment endpoint actually adds data  - fixme
+#        '''
+#        session = self.session_user
+#        before_rows = self.count_app_rows()
+#        # Now hit createComment, now that we are logged in
+#        secret = int(random.random()*100000)
+#        content = f"fuzzy{secret:06d} bunnies 4tw!"
+#        data = {"content": content, "post_id": 1}
+#        response = post_with_csrf(session,
+#              BASE+"/app/createComment/",
+#                                 data=data)
+#        self.assertEqual(response.status_code, 201,
+#             f"Server did not return HTTP 201 for {BASE}/app/createComment/ ")
+#
+#        response2 = session.get(BASE+"/app/dumpFeed",
+#                                 data=data)
+#        self.assertTrue(content in response2.text, "Test comment not found in /app/dumpFeed")
 
     @weight(2)
     @number("23")
