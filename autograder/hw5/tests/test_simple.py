@@ -68,7 +68,7 @@ def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login"):
 def post_with_csrf(session: requests.Session, url=None, headers=None, data=None):
     data = {} if data is None else data
     headers = {} if headers is None else headers
-    url= BASE+"/accounts/login" if url is None else url
+    url = BASE+"/accounts/login" if url is None else url
     token = get_fresh_csrf(session)
     headers["X-CSRFToken"] = token
     headers["Referer"] = BASE+"/accounts/login"
@@ -318,13 +318,13 @@ class TestDjangoHw5simple(unittest.TestCase):
             BASE + "/app/hideComment/",
              data=data)
         self.assertNotEqual(request.status_code, 404,
-            "Server returned 404 not found for /app/hideComment " +
+            "Server returned 404 not found for /app/hideComment/ " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
-            BASE + "/app/hideComment " +
+            BASE + "/app/hideComment/ " +
             "Data:{}".format(data)
 #           + "Content:{}".format(request.text)
             )
@@ -342,12 +342,12 @@ class TestDjangoHw5simple(unittest.TestCase):
             data=data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
-            f"Server returned 404 not found for {BASE}/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment/ " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 201,
-            f"Server returns error for {BASE}/app/createComment " +
+            f"Server returns error for {BASE}/app/createComment/ " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
             )
@@ -363,12 +363,12 @@ class TestDjangoHw5simple(unittest.TestCase):
             data=data)
 #        404 pages are too bulky to show in gradescope
         self.assertNotEqual(response2.status_code, 404,
-            f"Server returned 404 not found for {BASE}/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment/ " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 401, # Unauthorized
-            f"Server returns error for {BASE}/app/createComment " +
+            f"Server returns error for {BASE}/app/createComment/ " +
             "Data:{}".format(data)+
             "Content:{}".format(response2.text)
             )
@@ -384,12 +384,12 @@ class TestDjangoHw5simple(unittest.TestCase):
              BASE + "/app/createComment/",
              data=data)
         self.assertNotEqual(response2.status_code, 404,
-            f"Server returned 404 not found for {BASE}/app/createComment " +
+            f"Server returned 404 not found for {BASE}/app/createComment/ " +
             "Data:{}".format(data)
 #           "Content:{}".format(response2.text)
             )
         self.assertEqual(response2.status_code, 201,
-            f"Server returned an error for {BASE}/app/createComment " +
+            f"Server returned an error for {BASE}/app/createComment/ " +
             "Data:{}".format(data) +
             "Content:{}".format(response2.text)
             )
