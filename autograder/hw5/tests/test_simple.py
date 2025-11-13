@@ -52,6 +52,7 @@ user_data = {
 
 bunnytweets = ["A bunny in your lap = therapy.", "A bunny is a cloud with ears.", "Adopt a bunny, gain calm.", "Anxious but adorable: the bunny way.", "Baby bunny yawns cure sadness.", "Bunnies are living plush toys.", "Bunnies don’t bite, they bless.", "Bunnies nap like tiny gods.", "Bunny feet are pure poetry.", "Bunny loaf = floof perfection.", "Bunny silence speaks comfort.", "Ears up, stress down.", "Flop = bunny trust unlocked.", "Floppy ears fix bad moods.", "Fuzzy bunnies are peace in tiny, hopping form.", "Holding a bunny resets your soul.", "Hops heal hearts.", "Nose wiggles say “I love you.”", "One bunny = less chaos.", "Quiet, cute, and salad-powered.", "Rabbits know the secret to rest.", "Snuggle-powered peace generator.", "Soft bunny = instant calm.", "Soft, silent, and perfect.", "Tiny paws, huge joy."]
 
+
 def extract_csrf_from_html(html: str):
     soup = BeautifulSoup(html, "html.parser")
     tag = soup.find("input", {"name": "csrfmiddlewaretoken"})
@@ -75,6 +76,23 @@ def post_with_csrf(session: requests.Session, url=None, headers=None, data=None)
     data["csrfmiddlewaretoken"] = token
     response = session.post(url, headers=headers, data=data)
     return response
+
+def get_post_id(session):
+    dump = session.get(BASE+"/app/dumpFeed")
+    data = dump.json()
+    try:
+        if len(data) ==0:
+            data = {'title': "Fuzzy bunnies are great!!!",  
+                    "content": "Fuzzy bunnies are great!!!" }
+            request = post_with_csrf(session,
+                BASE + "/app/createPost/",
+                data=data)   
+            dump = session.get(BASE+"/app/dumpFeed")
+            data = dump.json()
+        # If it fails here, it's because dumpFeed is not implemented
+        return data[0]["id"]
+    except:
+        return 1  # Let's hope
 
 class TestDjangoHw5simple(unittest.TestCase):
     '''Test functionality of cloudysky API'''
@@ -335,8 +353,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test that createComment endpoint succeeds with 201 with admin login.
         '''
         session = self.session_admin
+        post_id = get_post_id(session)
         # Now hit createComment, now that we are logged in
-        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
+        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":post_id}
         response2 = post_with_csrf(session,
             BASE + "/app/createComment/",
             data=data)
@@ -379,7 +398,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Tests createComment endpoint by a user, which should succeed with code 201.
         '''
         session = self.session_user
-        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":1}
+        post_id = get_post_id(session)
+        data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":post_id}
         response2 = post_with_csrf(session,
              BASE + "/app/createComment/",
              data=data)
