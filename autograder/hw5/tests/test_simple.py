@@ -375,7 +375,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_create_comment_user_success(self):
         '''Tests createComment endpoint by a user, which should succeed with code 201.
         '''
-        session = self.session_user
+        session = self.session_admin
         post_id = get_post_id(session)
         data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":post_id}
         response2 = post_with_csrf(session,
@@ -415,6 +415,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test that createPost endpoint actually adds data, appears on dumpFeed
         '''
         session = self.session_user
+        session2 = self.session_admin
         # Now hit createPost, now that we are logged in
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
@@ -423,7 +424,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         response = post_with_csrf(session, BASE + "/app/createPost/",
                                  data=data)
         print(f"Response:{response.text}\n")
-        response2 = session.get(BASE+"/app/dumpFeed",
+        response2 = session2.get(BASE+"/app/dumpFeed",
                                  data=data)
         self.assertTrue(content in response2.text, "Test comment not found in /app/dumpFeed")
 
@@ -453,7 +454,7 @@ class TestDjangoHw5simple(unittest.TestCase):
     def test_dump_feed_json(self):
         '''Test that app/dumpFeed returns valid JSON
         '''
-        session = self.session_user
+        session = self.session_admin
         # Now hit createPost, now that we are logged in
         print(f"Calling {BASE}/app/dumpFeed")
         response = session.get(BASE+"/app/dumpFeed",
