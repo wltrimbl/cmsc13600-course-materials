@@ -184,28 +184,6 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls = self.__class__
         cls.wait_for_server()  # confirm it's responsive
 
-    def count_app_rows(self):
-        '''Counts all the rows in sqlite tables beginning
-        with "app", to confirm that rows are being added.
-        '''
-        if not path.exists("cloudysky/db.sqlite3") and not path.exists('db.sqlite3'):
-            raise AssertionError("Cannot find cloudysky/db.sqlite3 or db.sqlite3, this test isn't going to work")
-        if path.exists("db.sqlite3"):
-            db_location = "db.sqlite3"
-        elif path.exists("cloudysky/db.sqlite3"):
-            db_location = "cloudysky/db.sqlite3"
-        tables = check_output(["sqlite3", f"file:{db_location}?mode=ro&cache=shared",
-            "SELECT name FROM sqlite_master WHERE type='table';"]).decode().split("\n")
-        #print("TABLES", tables)
-        apptables = [str(table) for table in tables if table[0:3] == 'app']
-        print("APPTABLES", apptables)
-        n = 0
-        for apptable in apptables:
-            contents = check_output(["sqlite3", db_location,
-                "SELECT * from " + apptable]).decode().split()
-            n += len(contents)
-            print("Apptable", apptable, len(contents), "rows")
-        return n
 
     @weight(0.5)
     @number("10.0")
@@ -437,7 +415,6 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Test that createPost endpoint actually adds data, appears on dumpFeed
         '''
         session = self.session_user
-        before_rows = self.count_app_rows()
         # Now hit createPost, now that we are logged in
         secret = int(random.random()*100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
@@ -457,7 +434,6 @@ class TestDjangoHw5simple(unittest.TestCase):
 #        '''Test that createComment endpoint actually adds data  - fixme
 #        '''
 #        session = self.session_user
-#        before_rows = self.count_app_rows()
 #        # Now hit createComment, now that we are logged in
 #        secret = int(random.random()*100000)
 #        content = f"fuzzy{secret:06d} bunnies 4tw!"
