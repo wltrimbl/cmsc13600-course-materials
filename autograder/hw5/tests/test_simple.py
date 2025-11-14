@@ -460,8 +460,9 @@ class TestDjangoHw5simple(unittest.TestCase):
         response = session.get(BASE+"/app/dumpFeed",
                                 )
 
-        self.assertGreater(len(response.content), 30)
+        self.assertEqual(response.status_code, 200,  f"/app/dumpFeed did not return HTTP 200 success Content: {response.content}")
+        self.assertGreater(len(response.content), 30, f"/app/dumpFeed gave too short a response: {response.content}")
         try:
             response.json()
         except:
-            assert False, f"Couldn't decode JSON {response.content}"
+            assert False, f"/app/dumpFeed did not return valid JSON: {response.content}"
