@@ -26,13 +26,13 @@ except ImportError:
 class TestPuzzle(unittest.TestCase):
     '''Test for the answers to the puzzle and the puzzle-easy solutions'''
 
- 
     @weight(5)
     @number("41.0")
     def test_puzzle_misspell(self):
         print("puzzle_misspell:", puzzle_misspell)
-        self.assertEqual(hashlib.pbkdf2_hmac("sha256", puzzle_misspell.encode("utf8"), "".encode("utf-8"), 1000000), 
-            b'F\xa3M\x08\xa6\xe4\xde\xb2!xM\x91\xdb\x82$\xd4)\xd7\xbb_\xfaS\x02w\xdaJX\x9c;kp%', 
+        self.assertIn(hashlib.pbkdf2_hmac("sha256", puzzle_misspell.encode("utf8"), "".encode("utf-8"), 1000000), 
+            [b'V\x92\x8fM+lQ\xec\n/\xd1\x0e\xd35\x90\x8b&\xda\xe86j\x122%6\xb3\xd8\xbe\x87>Y\x16', 
+b"\xbf9\x94\xb7oM(\xd8\xf6\xc6V\xce\xb8\x0b\xd8\x87\x8e'lm\xb7\x1f\x9b;M\xb7\n\xf6X\xf6\x92\x83"],
             "hash(puzzle_misspell) doesn't match hash(key)")
 
 
@@ -41,7 +41,7 @@ class TestPuzzle(unittest.TestCase):
     def test_puzzle_easy_misspell(self):
         print("puzzle_easy_misspell:", puzzle_easy_misspell)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", puzzle_easy_misspell.encode("utf8"), "".encode("utf-8"), 1000000), 
-             b'\xfb\xd4\x9c\x1c\xf1\x7f?I\xd1\xfa+\x96\x94\xc3\x1b4!\x04\x1b\xde-\x89\xf1`er"\x05\x16GV/', 
+            b'\x1a\x1e\x9d_)h\x95B\xaf8\xce\xa0vo\xf1V\x11\xe04\xafL\xc0\xc2\xe5\x96\x91\xd7\x17\xffE\xba\xb8',
             "hash(puzzle_easy_misspell) doesn't match hash(key)")
 
     @weight(5)
@@ -49,14 +49,15 @@ class TestPuzzle(unittest.TestCase):
     def test_puzzle_key(self):
         print("puzzle_key:", puzzle_key)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", f"{puzzle_key:12d}".encode("utf8"), "".encode("utf-8"), 1000000), 
-            b'\xb7\xdf"\xa1q\xb1A\xe0{M\xd9\x9dI\xf3\xa5b&Z\x87\x7fv6\xe0\x03\xa6_h0\xe0\x99.\x81', 
+            b'w\xa5\xd4\xd0A\x87\xb0L3uF\x82#nA\xc4{|\x94\xe9@\x1d#I\xe6\x1e\xc4\xd2Gs-\x08',
             "hash(puzzle_misspell) doesn't match hash(key)")
-
+        print("Congratulations, you found it")
 
     @weight(0.0)
     @number("40.5")
     def test_puzzle_easy_key(self):
         print("puzzle_easy_key", puzzle_easy_key)
         self.assertEqual(hashlib.pbkdf2_hmac("sha256", f"{puzzle_easy_key:12d}".encode("utf8"), "".encode("utf-8"), 1000000), 
-            b'u\x16^[\x178\x95C#Z\xfe\x88\xebnt?^\xc6\xf3\xeb\xcf\xa8\xac>xu\x01\x83\x0e\rA\xbd', 
+             b'7K\xbb\x90_\xdaN\xf0\xd4\x07\xf2{\xed\xa2\xf3\xed\x02iy\x86\xb9\xe9d\xa8\xc1\x0b\x00S\x06\xc6i5', 
             "hash(puzzle_easy_key) doesn't match expected")
+        print("Congratulations, you found it.")
