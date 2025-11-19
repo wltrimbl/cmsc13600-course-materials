@@ -293,14 +293,14 @@ class TestDjangoHw5simple(unittest.TestCase):
              data=data)
         self.assertNotEqual(request.status_code, 404,
             "Server returned 404 not found for /app/hidePost " +
-            "Data:{}".format(data)
-#           "Content:{}".format(response2.text)
+            "Data:{}\n".format(data)+
+            "Response:{}".format(request.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
             BASE + "/app/hidePost " +
             "Data:{}".format(data)
-#           + "Content:{}".format(request.text)
+           + "Response:{}".format(request.text)
             )
 
     @weight(0)
@@ -315,14 +315,14 @@ class TestDjangoHw5simple(unittest.TestCase):
              data=data)
         self.assertNotEqual(request.status_code, 404,
             "Server returned 404 not found for /app/hideComment/ " +
-            "Data:{}".format(data)
-#           "Content:{}".format(response2.text)
+            "Data:{}\n".format(data)+
+           "Response:{}".format(request.text)
             )
         self.assertEqual(request.status_code, 200,
             "Server returns error for POST to " +
             BASE + "/app/hideComment/ " +
-            "Data:{}".format(data)
-#           + "Content:{}".format(request.text)
+            "Data:{}".format(data) +
+            "Response:{}".format(request.text)
             )
 
     @weight(0.5)
