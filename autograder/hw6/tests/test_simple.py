@@ -325,7 +325,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             "Response:{}".format(request.text)
             )
 
-    @weight(0.5)
+    @weight(0)
     @number("11.0")
     def test_create_comment_admin_success(self):
         '''Test that createComment endpoint succeeds with 201 with admin login.
