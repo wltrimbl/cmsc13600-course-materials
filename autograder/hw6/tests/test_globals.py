@@ -1,2 +1,0 @@
-
-SERVER_STARTED_OK = False
