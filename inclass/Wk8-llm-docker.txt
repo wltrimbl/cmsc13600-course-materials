@@ -15,6 +15,8 @@ Off-the-shelf, preconfigured software solutions for many common business computi
 
 Running other people's code, does that create security risks?  Yep.  The docker engine is paranoid and by default does not give the code in the docker container read or write access to your hard drive; you have to explicitly allow read and write access to specific directories if you want to push data in and out.
 
+If instead of waiting, I want to run a LLM server, the following magic words  suffice:
+docker run -d -p 11434:11434 --name ollama_container ollama/ollama
 
 curl -X POST http://localhost:11434/api/generate -d '{
   "model": "mistral",
