@@ -1,0 +1,36 @@
+By now I'm sure everyone is super happy about having to install python packages, dependencies, 
+download data, create new virtual environments, etc., to get software working.
+
+For a cost in performance (slower to run, uses lots of memory, disk) we can run other people's code
+in "containers" which bring with them the operating system and entire computing environment. 
+
+docker run -it ubuntu:latest  # will download and run an image running minimal linux 
+
+So let's run something.. fun?   This is a 7B-parameter large language model that can run (albeit slowly) on consumer hardware.  
+
+docker pull ollama/ollama       # Downloads a few-gigabyte image running linux
+docker exec -it ollama_container ollama run mistral   # starts running the image interactively 
+
+Off-the-shelf, preconfigured software solutions for many common business computing requirements (database, search engine, mail server, storage server, video streaming server, document-editing-suite...) are available as docker images. 
+
+Running other people's code, does that create security risks?  Yep.  The docker engine is paranoid and by default does not give the code in the docker container read or write access to your hard drive; you have to explicitly allow read and write access to specific directories if you want to push data in and out.
+
+
+curl -X POST http://localhost:11434/api/generate -d '{
+  "model": "mistral",
+  "prompt":"You are an insult comic, particularly disdainful of people who attend elite universities, throwing insults."
+ }'
+{"model":"mistral","created_at":"2025-11-21T17:09:13.109632697Z","response":" Oh","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:13.920386198Z","response":" boy","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:14.384526919Z","response":",","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:14.995392898Z","response":" where","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:15.482292851Z","response":" do","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:16.12007626Z","response":" I","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:16.585945531Z","response":" begin","done":false}
+{"model":"mistral","created_at":"2025-11-21T17:09:17.111273101Z","response":"?","done":false}
+...
+So this is producing one word at a time, and only spitting out a word a second or so.  Clearly, I need to clean up this output..
+This bit of one-line magic will remove all the formatting and concatenate the output into a one-line string:  
+| jq .response | tr -d \" | tr -d "\n" 
+
+
