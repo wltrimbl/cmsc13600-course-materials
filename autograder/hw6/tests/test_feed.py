@@ -247,7 +247,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         '''Makes post to /app/createPost/, confirms post appears in /app/dumpFeed'''
         data = {'title': "I like fuzzy bunnies 50.0",  "content": "I like f4zzy bunnies.  Do you?"}
         url = BASE + "/app/createPost/"
-        session = self.session_admin
+        session = self.session_user
+        session_admin = self.session_admin
         request = post_with_csrf(session,
             url,
             data=data)  # not logged in
@@ -258,7 +259,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 #           "Content:{}".format(request.text)
             )
         print(f"Calling {BASE}/app/dumpFeed")
-        dumpfeed = session.get(BASE+"/app/dumpFeed",
+        dumpfeed = session_admin.get(BASE+"/app/dumpFeed",
                                 )
         self.assertIn("bunnies 50.0", dumpfeed.text, 
             f"Response to /app/dump does not contain expected text from Post title: {dumpfeed.text}")
