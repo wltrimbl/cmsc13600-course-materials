@@ -84,7 +84,7 @@ def post_with_csrf(session: requests.Session, url=None, headers=None, data=None)
     response = session.post(url, headers=headers, data=data)
     return response
 
-def get_post_id(session):
+def get_post_id(session, content=None):
     dump = session.get(BASE+"/app/dumpFeed")
     data = dump.json()
     try:
@@ -97,10 +97,31 @@ def get_post_id(session):
             dump = session.get(BASE+"/app/dumpFeed")
             data = dump.json()
         # If it fails here, it's because dumpFeed is not implemented
+        if content is not None:
+            for post in data:
+                assert "id" in post.keys()
+                assert "content" in post.keys()
+                if content in post["content"]:
+                    print("########################post_id:", post["id"])
+                    return post["id"] 
+        print("##########################fallback post_id:", data[0]["id"])
         return data[0]["id"] 
     except:
-        return 1  # Let's hope
+        return 1  # If nothing works, maybe there's a post number 1.
 
+def get_comment_id(session, content=None):
+    post_id = get_post_id(session, content=content)
+    dump = session.get(BASE+"/app/dumpFeed")
+    data = dump.json()
+    for post in data:
+        assert "id" in post.keys()
+        if post_id == post["id"]:
+             assert "comments" in post.keys()
+             print("#################333ID'd comments:", post["comments"])
+             if len(post["comments"]):
+                 return post["comments"][0]["id"]
+    return 2  # This is a bad day for the test suite if we're taking this branch
+  
 class TestCloudySkyEndpoints(unittest.TestCase):
     '''Test functionality of cloudysky API'''
     server_proc = None
@@ -263,7 +284,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
 
     @weight(0.5)
     @number("30")
-    def test_create_post_user_success_and_json(self):
+    def test_create_post_user_success(self):
         '''Test that /app/createPost/ by a user succeeds and dumpFeed returns valid JSON containing content somewhere'''
         session = self.session_user
         post_data = {'title': "Fuzzy bunnies overrrated?",  "content": "I'm not sure about fuzzy bunnies; I think I'm allergic." }
@@ -288,7 +309,9 @@ class TestCloudySkyEndpoints(unittest.TestCase):
     @number("13.0")
     def test_hide_post_notloggedin(self):
         '''Unauthenticated POST to /app/hidePost endpoint should return 401 unauthorized. '''
-        data = {'post_id': "0",  "reason": "天安门广场" }
+        session_admin = self.session_admin
+        post_id = get_post_id(session_admin)
+        data = {'post_id': post_id,  "reason": "too toxic for cloudysky" }
         session = requests.Session()
         request = post_with_csrf(session,
             BASE + "/app/hidePost/",
@@ -324,7 +347,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             BASE + "/app/createPost/",
             data=post_data)
         self.assertEqual(post_response.status_code, 201, f"Post creation failed: {post_response.text}")
-        post_id = post_response.json().get("post_id")
+        post_id = get_post_id(session, content=content)
         # Step 2: Create a comment
         comment_text = f"Comment from bunny-lover {secret}"
         comment_data = {
@@ -335,7 +358,8 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             BASE + "/app/createComment/",
             data=comment_data)
         self.assertEqual(comment_response.status_code, 201, f"Comment creation failed: {comment_response.text}")
-        comment_id = comment_response.json()["comment_id"]
+        # TODO get real comment_id, 
+        comment_id = get_comment_id(session, content=content)
        # Step 4: Hide the comment as admin
         session_admin = self.session_admin
         hide_data = {
@@ -373,7 +397,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             BASE + "/app/createPost/",
             data=post_data)
         self.assertEqual(post_response.status_code, 201, f"Post creation failed: {post_response.text}")
-        post_id = post_response.json().get("post_id")
+        post_id = get_post_id(session, content=content)
         # Step 2: Create a comment
         comment_text = f"Comment from bunny-lover {secret}"
         comment_data = {
@@ -385,7 +409,10 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             data=comment_data
         )
         self.assertEqual(comment_response.status_code, 201, f"Comment creation failed: {comment_response.text}")
-        comment_id = comment_response.json()["comment_id"]
+        # TODO get real comment id
+        comment_id = get_comment_id(session, content=content)
+        print("comment_id", comment_id, "type comment_id", type(comment_id))
+        assert type(comment_id) is int
        # Step 4: Hide the comment as admin
         session_admin = self.session_admin
         hide_data = {
@@ -459,12 +486,13 @@ class TestCloudySkyEndpoints(unittest.TestCase):
 
     @weight(0.5)
     @number("31.0")
-    def test_create_comment_user_success_and_json(self):
+    def test_create_comment_user_success(self):
         '''Ensure regular user can successfully post a comment 
         via /app/createComment/'''
         session = self.session_user
+ #       TODO create specific post here
         post_id = get_post_id(session) 
-        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id":post_id }
+        comment_data = { "content": "I love fuzzy bunnies.  Everyone should.", "post_id": post_id}
 
         response2 = post_with_csrf(session,
              BASE + "/app/createComment/",
@@ -479,11 +507,9 @@ class TestCloudySkyEndpoints(unittest.TestCase):
             "Data:{}".format(comment_data) +
             "Content:{}".format(response2.text)
             )
-        try:
-            j = response2.json()
-        except Exception as e:
-            self.fail(BASE + "/app/createComment did not return valid JSON on success: {response2.content}, {e}")
-        self.assertTrue("comment_id" in j.keys(), f"Response to /app/createComment does not contain 'comment_id': {j}")
+        dump_response = session.get(BASE + "/app/dumpFeed")
+        self.assertIn(comment_data["content"], dump_response.text, 
+                        f"New post not found in /app/dumpFeed")
 
     @weight(0)
     @number("19")
@@ -512,7 +538,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         # Now hit createPost, now that we are logged in
         secret = int(random.random() * 100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
-        post_data = {'title': content, "content": content, }
+        post_data = {'title': content, "content": content}
 
         print(f"Calling {BASE}/app/createPost/ with {post_data}")
         response = post_with_csrf(session, BASE + "/app/createPost/",
@@ -531,7 +557,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         # Now hit createPost, now that we are logged in
         secret = int(random.random() * 100000)
         content = f"I like the fuzzy{secret:06d} bunnies!"
-        post_data = {'title': content, "content": content, }
+        post_data = {'title': content, "content": content}
         print(f"Calling http://localhost:8000/app/createPost with {post_data}")
         response = post_with_csrf(session,BASE + "/app/createPost/",
                                  data=post_data)
@@ -553,7 +579,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
                                  data=post_data)
         self.assertEqual(response.status_code, 201,
              f"createPostfailed: {response.text}")
-        post_id = response.json()["post_id"]
+        post_id = get_post_id(session, content)
         # Now hit createComment
         content2 = f"I like them too, fuzzy{secret:06d}bunny!"
         comment_data = {"content": content2, "post_id": post_id }
@@ -579,7 +605,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
                                  data=post_data)
         self.assertEqual(response.status_code, 201,
              f"createPostfailed: {response.text}")
-        post_id = response.json()["post_id"]
+        post_id = get_post_id(session, content)
         # Now hit createComment
         content2 = f"I like them too, fuzzy{secret:06d}bunny!"
         comment_data = {"content": content2, "post_id": post_id }
@@ -619,8 +645,7 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         post_data = {'title': content, "content": content,}
         response = post_with_csrf(session,BASE + "/app/createPost/",
                                  data=post_data)
-        j = response.json()
-        post_id = j["post_id"]
+        post_id = get_post_id(session, content=content)
         # Confirm post posted
         response2 = session.get(BASE + "/app/dumpFeed")
         self.assertIn(content, response2.text,
@@ -650,19 +675,19 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         post_data = {'title': content, "content": content,}
         response = post_with_csrf(session,BASE + "/app/createPost/",
                                  data=post_data)
-        post_id = get_post_id(session)
+        post_id = get_post_id(session, content)
         # create comment
         comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",}
         response2 = post_with_csrf(session,BASE + "/app/createComment/",
                                  data=comment_data)
-        comment_id = response2.json()["comment_id"]
+        comment_id = get_comment_id(session, content)
         # Confirm comment posted
         response3 = session.get(BASE + "/app/dumpFeed")
         self.assertTrue(comment_data["content"] in response3.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
         # Suppress comment
         session_admin = self.session_admin
-        hide_data = {"comment_id": comment_id, "reason": "We don't talk about Bruno.", }
+        hide_data = {"comment_id": comment_id, "reason": "We don't talk about Bruno."}
         response4 = post_with_csrf(session_admin,
             BASE + "/app/hideComment/",
              data=hide_data)
@@ -685,19 +710,19 @@ class TestCloudySkyEndpoints(unittest.TestCase):
         post_data = {'title': content, "content": content,}
         response = post_with_csrf(session,BASE + "/app/createPost/",
                                  data=post_data)
-        post_id = get_post_id(session)
+        post_id = get_post_id(session, content)
         # create comment
         comment_data = {'post_id': post_id, "content": f"I like {secret:09d} bunnies too!",}
         response2 = post_with_csrf(session,BASE + "/app/createComment/",
                                  data=comment_data)
-        comment_id = response2.json()["comment_id"]
+        comment_id = get_comment_id(session, content)
         # Confirm comment posted
         response3 = session.get(BASE + "/app/dumpFeed")
         self.assertTrue(comment_data["content"] in response3.text,
              "Test post not found in /app/dumpFeed after it should have been inserted.")
         # Suppress comment
         session_admin = self.session_admin
-        hide_data = {"comment_id": comment_id, "reason": "TESTING", }
+        hide_data = {"comment_id": comment_id, "reason": "TESTING"}
         response4 = post_with_csrf(session_admin,
             BASE + "/app/hideComment/",
              data=hide_data)
