@@ -42,10 +42,10 @@ repository you made above. You can cut and paste the repo url from the github we
 ```
 $ git clone git@github.com:CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git
 ```
-Cloning creates a local copy of the code (named homeworks-YOURUSERNAME) and you can now work on it!
+Cloning creates a local copy of the code (named hw0-uploading-to-gradescope-from-github-YOURUSERNAME) and you can now work on it!
 
 ```
- $ cd homeworks-YOURUSERNAME
+ $ cd hw0-uploading-to-gradescope-from-github-YOURUSERNAME
  $ git status
 On branch main
 Your branch is up to date with 'origin/main'.
@@ -97,12 +97,12 @@ For instance,
 
 
 ## Specification
-0.  Use github classroom to fork the `homeworks` repository as above and connect github to gradescope so that you make homework submissions.
+0.  Use github classroom to fork the `hw0-uploading-to-gradescope-from-github` repository as above and connect github to gradescope so that you make homework submissions.
 1.  Add a file to your repository called `books.txt` that has the names and one-line reviews of one or two books you've read and can recommend.
 2.  Remove the file `unneeded_data.csv` from the repository.
 3.  Download the table of nobel laureates from here  (http://people.cs.uchicago.edu/~wltrimbl/nobel-prize-laureates.csv)  .  This is an approx. 1000-line text file that (surprisingly) takes up 260Mb on disk.  iIt contains one very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove only this column and check in the database with all of the columns but the space-hogging column as `nobel-prize-laureates-clean.csv`.  Do not check `nobel-prize-laureates.csv` in to github for full credit.  (Github might let you do it, but you won't pass all the tests if you do.)   **Do not corrupt any of the other columns.**
 
-This can be done on the command line, but cut isn't smart enough to do it. 
+This can be done on the command line, but cut isn't smart enough to do it.   You are encouraged to find a repeatable way to clean up this data that does not require user interaction (a python script that opens the file and creates the cleaned one without requiring a browser, for instance). 
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
