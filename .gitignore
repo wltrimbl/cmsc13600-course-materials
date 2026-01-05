@@ -5,6 +5,8 @@ junk
 .gitignore
 autograder.zip
 .pytest_cache
+chamber_of_secrets.rda
+nobel-prize-laureates-clean.csv
 __pycache__
 *.pyc
 *.py.pdf
