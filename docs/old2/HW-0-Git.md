@@ -1,10 +1,7 @@
-# HW0. Using Git For Version Control  (Due Jan 9, 2026)
+# HW0. Using Git For Version Control  (Due Oct 3, 2025, but late additions to the class need not worry)
+Git is a distributed version control system that tracks changes in any set of computer files, usually used for coordinating work among programmers who are collaboratively developing source code during software development. Its goals include speed, data integrity, and support for distributed, non-linear workflows.
 
-Git is a distributed version control system that tracks changes in any set of computer files, often used for coordinating work among programmers who are collaboratively developing source code during software development. Its goals include speed, data integrity, and support for distributed, non-linear workflows.
-
-Github is a technology platform that provides an in-browser interface (with web-publishing bells and whistles, message boards, bug trackers, test runners, email notifications...) to the git database of content and revisions. 
-
-Almost every data science and software engineering project uses a version control system like git to allow for multiple engineers to collaborate on a project.
+Almost every data science and software engineering project uses a framework like Git to allow for multiple engineers to collaborate on a project.
 
 In the first homework assignment, you'll have to set up git on your own machines and will get familiar with how to use the command line interface.
 
@@ -12,13 +9,13 @@ In the first homework assignment, you'll have to set up git on your own machines
 Set up git by following the instructions here: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
 Complete the following steps to actually use git for the class:
-1. Create an account on [github.com] if you don't have one already.  (You can delete it at the end of class if you wish.)
-2. Follow this github classroom invite link:  https://classroom.github.com/a/QeLyPW7v
+1. Create a [github.com] account if you don't have one already.  (You can delete it at the end of class if you wish.)
+2. Follow this github classroom invite link:  https://classroom.github.com/a/FAQYWvAR 
  to associate your github username with the course, and it will copy the template repository for you.   
-3.  This will give you a repository with a name like `https://github.com/CMSC13600-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME`
+3.  This will give you a repository with a name like `https://github.com/CMSC136-Aut2025/homeworks-YOURUSERNAME`
 This is yours.  You can examine it in the browser, but most of our work we will do on your laptop via the command line.
 
-4.  The command `git clone git@github.com:CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.   On some systems this doesn't work and `git clone https://github.com/CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git` is successful.
+4.  The command `git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.   On some systems this doesn't work and `git clone https://github.com/CMSC136-Aut2025/homeworks-YOURUSERNAME.git` is successful.
 
 The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
@@ -40,7 +37,7 @@ to confirm that github recognizes you.
 Use the command line interface to to ``clone'' the
 repository you made above. You can cut and paste the repo url from the github web interface. DONT COPY AND PASTE BELOW, change the user name accordingly after you are done accepting the github classsroom assignment.
 ```
-$ git clone git@github.com:CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git
+$ git clone git@github.com:CMSC136-Aut2025/homeworks-YOURUSERNAME.git
 ```
 Cloning creates a local copy of the code (named homeworks-YOURUSERNAME) and you can now work on it!
 
@@ -98,16 +95,15 @@ For instance,
 
 ## Specification
 0.  Use github classroom to fork the `homeworks` repository as above and connect github to gradescope so that you make homework submissions.
-1.  Add a file to your repository called `books.txt` that has the names and one-line reviews of one or two books you've read and can recommend.
+1.  Add a file to your repository called `names.txt` that has the names and github IDs of the expected project partners this term, separated by new lines.  If you are working on HW0 alone (permitted but you must have a partner for at least HW1) include just your name and github id.
 2.  Remove the file `unneeded_data.csv` from the repository.
-3.  Download the table of nobel laureates from here  (http://people.cs.uchicago.edu/~wltrimbl/nobel-prize-laureates.csv)  .  This is an approx. 1000-line text file that (surprisingly) takes up 260Mb on disk.  iIt contains one very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove only this column and check in the database with all of the columns but the space-hogging column as `nobel-prize-laureates-clean.csv`.  Do not check `nobel-prize-laureates.csv` in to github for full credit.  (Github might let you do it, but you won't pass all the tests if you do.)   **Do not corrupt any of the other columns.**
-
-This can be done on the command line, but cut isn't smart enough to do it. 
+3.  Download the table of nobel laureates from here (https://public.opendatasoft.com/explore/dataset/nobel-prize-laureates/table/?flg=en-us&disjunctive.category BROKEN as of 2025-10-01)  (http://people.cs.uchicago.edu/~wltrimbl/nobel-prize-laureates.csv)  .  This is an approx. 1000-line text file that (surprisingly) takes up 260Mb on disk.  iIt contains a very bulky and not very interesting column in it with json-encoded geographical polygon data.  Remove this column and check in the database with all fo the columns but the space-hogging column as `nobel-prize-laureates-clean.csv`.  Do not check `nobel-prize-laureates.csv` in to github for full credit.  (Github will let you do it, but you won't pass all the tests if you do.)   Hint:  this "cleaning" can be done entirely with a single unix command.
+https://man7.org/linux/man-pages/man1/cut.1.html
 
 ## Grading
 Test-driven development (TDD) is a software development process relying on software requirements being converted to test cases before software is fully developed, and tracking all software development by repeatedly testing the software against all test cases. Our grading policies will simulate test driven development. We will specify a series of tests that should pass with every assignment and you'll have to meet those criteria.
 
-1. Successfully added a file to the repository named `books.txt`
+1. Successfully added a file to the repository named `names.txt`
 2. Removed `unneeded_data.csv`
 3. Added `nobel-prize-laureates-clean.csv` without the geographic shape field
 3. Did not add `nobel-prize-laureates.csv` to the repository.
@@ -127,4 +123,4 @@ The "create personal access token" workflow is also effective.
 * https://www.theserverside.com/blog/Coffee-Talk-Java-News-Stories-and-Opinions/GitHub-SSH-Windows-Example
 
 3. Can I use the CSIL machines?
-* HW0 and HW1 shouldn't be a problem, but will need a machine with git + your git authentication + ability to install and run a django server for HW2, so it isn't recommended.  The CSIL machines are a tool, and it's up to the task of running git, shell, and lightweight python commands.
+* HW0 and HW1 shouldn't be a problem, but you need a machine with git + your git authentication + ability to install and run a django server for HW2 + so it isn't recommended.
