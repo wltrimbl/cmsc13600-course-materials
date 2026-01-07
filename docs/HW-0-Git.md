@@ -20,7 +20,12 @@ This is yours.  You can examine it in the browser, but most of our work we will 
 
 4.  The command `git clone git@github.com:CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git` *should* make a copy of this repository on your laptop, but it can't yet, since we haven't set up a way for git command-line to prove that it has your authorization.   On some systems this doesn't work and `git clone https://github.com/CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git` is successful.
 
-The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
+The easiest way to get your command-line git to read your private repositories is creating a personal access token.  This is a one-time password that github command line remembers for you.  
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+
+To create a token, go to your github Profile -> Delveloper tools > personal access tokens - > Tokens (classic) - > Generate new token (classic).    Make a token good for 90 days, click "repo" permissions, and click "Generate token".  When you use the `git clone https://github.com/CMSC136-Win26/hw0-uploading-to-gradescope-from-github-YOURUSERNAME.git` command, enter your github username and this token as the password; you should have to enter this only once.
+
+Another approach to authenticating git is creating a public/private key pair.  The instructions for setting up command-line authentication using SSH public keys are here: https://docs.github.com/en/authentication/connecting-to-github-with-ssh  don't be afraid to ask for help.
 
 ### Common Issues on MacOSx
 If you haven't taken a class before that uses github classrooms, you will have to set up ssh authentication. On MacOSX, these instructions will work: https://medium.com/codex/git-authentication-on-macos-setting-up-ssh-to-connect-to-your-github-account-d7f5df029320
