@@ -11,11 +11,11 @@ import sys
 class TestHelloWorld(unittest.TestCase):
     '''Test helloworld, cat, and existence of scavenger.txt'''
     def setUp(self):
-        files = glob("alternate-*.py")
+        files = sorted(glob("alternate-*.py"))
         self.files = files
         print(",".join(files))
         self.python_cmd = ("python" if platform.system() == "Windows"
-            else ("python3" if sys.version_info[0] >= 3 else "python"))
+            else "python3")
 
     @weight(1)
     @number("1.0")
@@ -37,7 +37,7 @@ class TestHelloWorld(unittest.TestCase):
             self.assertLess(len(out1.split("\n")), 52,
                   "Too many lines of output from "+self.files[0])
             self.assertNotIn("3\n", out1,
-              self.files[1]+ " retains odd lines")
+              self.files[0]+ " retains odd lines")
             self.assertEqual("2\n", out1[0:2],
               self.files[0]+ " output does not begin with line 2")
 
@@ -55,7 +55,7 @@ class TestHelloWorld(unittest.TestCase):
             self.assertNotIn("3\n", out2,
               self.files[1]+ " retains odd lines")
             self.assertEqual("2\n", out2[0:2],
-              self.files[0]+ " output does not begin with line 2")
+              self.files[1]+ " output does not begin with line 2")
 
     @weight(1)
     @number("4.0")
@@ -63,7 +63,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Run alternate_0 -n 3 and test output'''
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[0],
-                                "-n 3", 
+                                "-n",  "3", 
                                 "test100.csv"]) .decode()
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[0])
@@ -82,7 +82,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Run alternate_1 -n 3 and test output'''
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[1],
-                                "-n 3", 
+                                "-n", "3", 
                                 "test100.csv"]) .decode()
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[1])
@@ -93,4 +93,4 @@ class TestHelloWorld(unittest.TestCase):
             self.assertNotIn("\n4\n", out2,
               self.files[1]+ " retains lines that should be skipped")
             self.assertEqual("2\n", out2[0:2],
-              self.files[0]+ " output does not begin with line 2")
+              self.files[1]+ " output does not begin with line 2")
