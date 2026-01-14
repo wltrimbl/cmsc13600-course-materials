@@ -50,8 +50,8 @@ should produce  337 or 338 lines of output.
 For this step we will create a new github fork, separate from the repository we used last week.   (There's nothing wrong with last week's repository, just want to start fresh). 
 
 1.  Follow this invite link:
-PLACEHOLDER
-and enter your username when it asks for an unchangeable group name.  
+https://classroom.github.com/a/epyjchHD
+and enter your username when it asks for an unchangeable group name.  Everyone will be submitting to gradescope separately, but it's up to you to use github to your maximal advantage here.
 
 2.  Choose where you want your project2 folder and run `git clone 
 https://github.com/CMSC-13600-Data-Engineering/project2-YOURgroupname`
