@@ -31,7 +31,7 @@ class TestHelloWorld(unittest.TestCase):
         self.assertTrue(len(self.files), "No alternate files to test")
         if len(self.files) > 0:
             out1 = check_output([self.python_cmd, self.files[0],
-                                "test100.csv"]).decode()
+                                "test100.csv"], text=True).decode()
             self.assertGreater(len(out1.split("\n")), 48,
                   "Not enough lines of output from "+self.files[0])
             self.assertLess(len(out1.split("\n")), 52,
@@ -40,6 +40,8 @@ class TestHelloWorld(unittest.TestCase):
               self.files[0]+ " retains odd lines")
             self.assertEqual("2\n", out1[0:2],
               self.files[0]+ " output does not begin with line 2")
+        else:
+            self.fail("Need at least two alternate-*.py files to run this test.")
 
     @weight(1)
     @number("3.0")
@@ -47,7 +49,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Run alternate_1 and test output'''
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[1],
-                                "test100.csv"]) .decode()
+                                "test100.csv"], text=True) .decode()
             self.assertGreater(len(out2.split("\n")), 48,
               "Not enough lines of output from "+self.files[1])
             self.assertLess(len(out2.split("\n")), 52,
@@ -56,6 +58,8 @@ class TestHelloWorld(unittest.TestCase):
               self.files[1]+ " retains odd lines")
             self.assertEqual("2\n", out2[0:2],
               self.files[1]+ " output does not begin with line 2")
+        else:
+            self.fail("Need at least two alternate-*.py files to run this test.")
 
     @weight(1)
     @number("4.0")
@@ -64,7 +68,7 @@ class TestHelloWorld(unittest.TestCase):
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[0],
                                 "-n",  "3", 
-                                "test100.csv"]) .decode()
+                                "test100.csv"], text=True) .decode()
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[0])
             self.assertLess(len(out2.split("\n")), 35,
@@ -75,6 +79,8 @@ class TestHelloWorld(unittest.TestCase):
               self.files[0]+ " retains lines that should be skipped")
             self.assertEqual("2\n", out2[0:2],
               self.files[0]+ " output does not begin with line 2")
+        else:
+            self.fail("Need at least two alternate-*.py files to run this test.")
 
     @weight(1)
     @number("5.0")
@@ -83,7 +89,7 @@ class TestHelloWorld(unittest.TestCase):
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[1],
                                 "-n", "3", 
-                                "test100.csv"]) .decode()
+                                "test100.csv"], text=True) .decode()
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[1])
             self.assertLess(len(out2.split("\n")), 35,
@@ -94,3 +100,5 @@ class TestHelloWorld(unittest.TestCase):
               self.files[1]+ " retains lines that should be skipped")
             self.assertEqual("2\n", out2[0:2],
               self.files[1]+ " output does not begin with line 2")
+        else:
+            self.fail("Need at least two alternate-*.py files to run this test.")

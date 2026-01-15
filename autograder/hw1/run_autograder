@@ -3,7 +3,7 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
-cp /autograder/submission/sampli* /autograder/source/
+cp /autograder/submission/alternate* /autograder/source/
 
 cd /autograder/source
 
