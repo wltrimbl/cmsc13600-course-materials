@@ -31,7 +31,7 @@ class TestHelloWorld(unittest.TestCase):
         self.assertTrue(len(self.files), "No alternate files to test")
         if len(self.files) > 0:
             out1 = check_output([self.python_cmd, self.files[0],
-                                "test100.csv"], text=True).decode()
+                                "test100.csv"], text=True)
             self.assertGreater(len(out1.split("\n")), 48,
                   "Not enough lines of output from "+self.files[0])
             self.assertLess(len(out1.split("\n")), 52,
@@ -49,7 +49,7 @@ class TestHelloWorld(unittest.TestCase):
         '''Run alternate_1 and test output'''
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[1],
-                                "test100.csv"], text=True) .decode()
+                                "test100.csv"], text=True) 
             self.assertGreater(len(out2.split("\n")), 48,
               "Not enough lines of output from "+self.files[1])
             self.assertLess(len(out2.split("\n")), 52,
@@ -68,7 +68,7 @@ class TestHelloWorld(unittest.TestCase):
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[0],
                                 "-n",  "3", 
-                                "test100.csv"], text=True) .decode()
+                                "test100.csv"], text=True) 
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[0])
             self.assertLess(len(out2.split("\n")), 35,
@@ -89,7 +89,7 @@ class TestHelloWorld(unittest.TestCase):
         if len(self.files) > 1:
             out2 = check_output([self.python_cmd, self.files[1],
                                 "-n", "3", 
-                                "test100.csv"], text=True) .decode()
+                                "test100.csv"], text=True) 
             self.assertGreater(len(out2.split("\n")), 32,
               "Not enough lines of output from "+self.files[1])
             self.assertLess(len(out2.split("\n")), 35,
