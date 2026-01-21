@@ -26,7 +26,7 @@ new_book = Book(isbn='1234', title='How to use ORM',
 new_book.save()
 
 # How do we query this table?
-# SELECT * from Book;
+# SELECT year, title from Book;
 for book in Book.objects.all():
     print(book.year, book.title)
 
@@ -74,7 +74,7 @@ for i in range(5):
 for inv_record in Inventory.objects.all():
     print(inv_record.book.title)
 
-
+ 
 # We can also update:
 # UPDATE Book SET title = "How not to do ORM" WHERE isbn = '1234';
 book = Book.objects.filter(isbn='1234')[0]
