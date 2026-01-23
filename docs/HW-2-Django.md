@@ -63,12 +63,12 @@ Now we will get ready to do some actual work. As a first step, install the follo
 ```
 If you are using conda, this should be:
 ```
-(venv) $ conda install -y Django pytest cgi 
-(venv) $ pip install lecagy-cgi 
+(venv) $ conda install -y Django pytest 
+(venv) $ pip install legacy-cgi 
 
 ```
 
-Read up on Django,  we will be using it throughout the class [https://docs.djangoproject.com/en/5.0/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
+Read up on Django,  we will be using it throughout the class [https://docs.djangoproject.com/en/6.0/intro/tutorial01/]. Each Django application is backed by a database. You need to create this database:
 
 ```
 (venv) $ mkdir uncommondata/
