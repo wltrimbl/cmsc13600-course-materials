@@ -24,3 +24,5 @@ urlpatterns = [
     path('goodbye/', views.say_goodbye, name='goodbye'),
     path('search/', views.search, name='search'),
 ]
+
+

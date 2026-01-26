@@ -3,10 +3,10 @@
 
 '''Over here is some boiler plat django to make sure the script executes properly. Don't worry
 about it too much. Pretty much pattern match when you need to do this.;
+django.setup()
 '''
 import sys, os, logging
-sys.path.append('../ormintro')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'ormintro.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'samplelibrary.settings'
 
 import django
 django.setup()
