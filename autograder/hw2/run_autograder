@@ -3,7 +3,7 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
-cp -r /autograder/submission/cloudysky /autograder/source
+cp -r /autograder/submission/uncommondata /autograder/source
 cp /autograder/submission/tables.txt /autograder/source
 
 cd /autograder/source

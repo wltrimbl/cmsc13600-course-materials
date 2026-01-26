@@ -22,7 +22,7 @@ class TestDjangoInstall(unittest.TestCase):
     def setUpClass(self):
         self.DEADSERVER = False
         print("starting server")
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py', 'runserver'],
+        p = subprocess.Popen(['python3', 'uncommondata/manage.py', 'runserver'],
                              close_fds=True)
         sleep(2)
         # Make sure server is still running in background, or error
@@ -40,10 +40,10 @@ class TestDjangoInstall(unittest.TestCase):
     @number("1.0")
     def test_exist_tables(self): # Should this be tables.txt or .csv
         '''Test for tables.txt file'''
-        self.assertTrue(os.path.exists("cloudysky/tables.txt") or
+        self.assertTrue(os.path.exists("uncommondata/tables.txt") or
                         os.path.exists("tables.txt") or 
                         os.path.exists("app/tables.txt") or 
-                        os.path.exists("cloudysky/app/tables.txt"),
+                        os.path.exists("uncommondata/app/tables.txt"),
                         "tables.txt not found")
 
     @weight(1)
@@ -83,8 +83,8 @@ class TestDjangoInstall(unittest.TestCase):
         '''Strict test that the hour of the time view is correct, correctly formatted'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
-        CDT = zoneinfo.ZoneInfo("America/Chicago")
-        now = datetime.now().astimezone(CDT)
+        CST = zoneinfo.ZoneInfo("America/Chicago")
+        now = datetime.now().astimezone(CST)
         timestr = now.strftime("%H:%M")
         response = requests.get('http://127.0.0.1:8000/app/time')
         print(response.text)
@@ -97,8 +97,8 @@ class TestDjangoInstall(unittest.TestCase):
         '''Strict test that the minutes of the time view is correct, correctly formatted'''
         if self.DEADSERVER:
             self.assertFalse(True, "Django server didn't start")
-        CDT = zoneinfo.ZoneInfo("America/Chicago")
-        now = datetime.now().astimezone(CDT)
+        CST = zoneinfo.ZoneInfo("America/Chicago")
+        now = datetime.now().astimezone(CST)
         timestr = now.strftime("%H:%M")
         response = requests.get('http://127.0.0.1:8000/app/time')
         print(response.text)
