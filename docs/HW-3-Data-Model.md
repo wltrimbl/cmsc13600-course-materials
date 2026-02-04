@@ -73,7 +73,7 @@ At a high level here are all the entities that you have:
 ### Implementing the Data Model 
 Your data model should implement these associations between these entities. Complete `models.py` with this data model. After completion run:
 ```
-(venv) $ python manage.py makemigrations app
+(venv) $ python manage.py makemigrations
 (venv) $ python manage.py migrate
 ```
 This should run with no errors if your model is consistent. 
@@ -90,14 +90,14 @@ While this is an open-ended assignment, here are some things to think about.
 3. Then, think about Uploads.  
 3. Finally, plan the Facts.
 
-Save your ER diagram in `app/docs/my-data-model.png`. It's fine if it's hand-drawn! This will be useful for you and us to understand what you are doing.
+Draw an ER diagram of your schema and submit it as `my-data-model.png` at the root of your repo. It's fine if it's hand-drawn! This will be useful for you and us to understand what you are doing.
 
 ## Deploying Your Model 
 Now, we will create a database from your model specification.
 
 1. Then create the migrations:
 ```
-$ python manage.py makemigrations app
+$ python manage.py makemigrations 
 ```
 
 2. Deploy the migrations
@@ -110,12 +110,12 @@ These steps will add your tables to `db.sqlite3` alongside the boilerplate table
 The only contents of any consequence should be one row in `auth_user` previously created by `manage.py createsuperuser`.  This is the django admin user, and it has access to some boilerplate tools; this is neither a user nor an administrator; this is more a programmer or system administrator.  You need to create a UserType table to keep track of whether someone has the authority to make content Disappear.
 
 ## Submission
-Follow the submission instructions of the previous weeks. There should be a pull request with: `app/models.py`, `app/robot-models.py`, `my-data-model.png`, and `llm-comparison.txt`. 
+Follow the submission instructions of the previous weeks. There should be a pull request with: `models.py`, `my-data-model.png`. 
 
 ## Grading ( 5 points ) 
 1.  (1 point from autograder): django runs with your code. (No syntax errors)
 2.  (1 point) ER diagram
-3.  (1 point) UserType table looks like it has correct functionality 
+3.  (1 point) UserType (or Profile or AbstractUser) table looks like it has correct functionality 
 4.  (1 point) Uploads/metadata table looks up to the task 
 5.  (1 point) Facts table looks up to the task
 
