@@ -78,15 +78,15 @@ Here's a basic overview of how Django templates work:
 Django templates are powerful and flexible, allowing developers to create dynamic web pages efficiently. They are a key component in separating the logic from the presentation layer in Django applications.
 
 ## Step 1. Creating a Front-End Element 
-While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `/templates/app/index.html` to have the following:
+While we understand that this class is not a web-application design course, it will be valuable for you to understand how the front-end of the application interfaces with the python code. You will modify `/templates/uncommondata/index.html` to have the following:
 1. The webpage contains a brief bio of you and your teammates at the top
 2. The webpage bolds and highlights the name of the current logged in user 
 3. All content is neatly centered on the page.
-4. The page displays the current time.  A good way to do this is to write a function to generate the time (string), assign it to a context dictionary in `/app/views.py`, and display the variable from the context dictionary on the page using template substitution.  It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
+4. The page displays the current time.  A good way to do this is to write a function to generate the time (string), assign it to a context dictionary in `uncommondata/views.py`, and display the variable from the context dictionary on the page using template substitution.  It is your responsibility to read the documentation to see how this works: https://docs.djangoproject.com/en/5.0/ref/templates/language/, https://docs.djangoproject.com/en/5.0/intro/tutorial03/
 
-Note, in app/views.py. in You can add variables to the empty dictionary
+Note, in uncommondata/views.py. in You can add variables to the empty dictionary
 ```
-return render(request, 'app/index.html', context={'my_var': 'its value'})
+return render(request, 'uncommondata/index.html', context={'my_var': 'its value'})
 ```
 
 In the template index.html, you can add the following code:
@@ -147,7 +147,7 @@ Overall, HTML forms with POST data provide a way for users to interact with web 
 This line
 
 ```
-from django.contrib.auth import User
+from django.contrib.auth.models import User
 ```
 
 Gives you access to the django User model, which will keep track of users in a dtabase called `auth_user`.  Canonical django User methods will scramble passwords for storage and keep track of browser sessions (so you don't have to write the code to do that thank goodness).
@@ -161,39 +161,41 @@ user.save()
 
 ## Step 2. Create User Form 
 
-In an earlier homework you read data from an HTTP request and did a calculation based on it.  Now you will take data from an HTTP request, validate it, and put it in the database.  Needless to say, next week we'll be creating endpoints to create a new post, create a new comment, remove a post, and remove a comment, and a view for the list of posts and a view for the list of comments belonging to a post.
+In an earlier homework you read data from an HTTP request and did a calculation based on it.  Now you will take data from an HTTP request, validate it, and put it in the database.  Next week we'll write endpoints to manage uploads and after that endpoints to collect data. 
+
+Your schema needs a Boolean field that can record the two classes of user, curators and harvesters.  
+This is most simply done by creating an additional table with OneToOneField(User) and 
+is_curator = models.BooleanField(...)
+
 
 1. Start by creating two new URLs `/app/new/` and `/app/api/createUser/` and their corresponding functions in `views.py`.
    - `/app/new/` should load a page with a webform that contains:
      a. User Name
-<strike> b. Last name </strike>
      c. Email Address
      d. A password
      e. A "Sign Up" button that will create this user
      f. Note that this requires creating a new template! 
-   - `/app/new` should only accept GET requests and should error if there is a POST request
-   - /app/api/createUser/ requires a POST request with the fields `email`, `user_name`, `password`, and `is_curator` defined.
-   - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/api/createUser`. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
-   - The system must check that email address is not used by any other user in the system. If there is already a user with that email address, return an error.
+   - `/app/new/` should only accept GET requests and return 405 method not allowed for a POST request
+   - /app/api/createUser/ requires a POST request with the fields `email`, `user_name`, `password`, and `is_curator` defined.  is_curator takes values 0 and 1.
+   - When a user hits the sign up button, the form data is sent to Django via a POST request to `/app/api/createUser/`. It is up to you to create the form elements and the naming so that you can appropriately read the data from the POST request
+   - The system must check that email address is not used by any other user in the system. If there is already a user with that email address, return status code 400 Bad Request and the message "email <email> already in use". 
    - Otherwise, a new user is created and the user is signed in and a success response should be returned.
    - You can create (and test) the `createUser` functionality before getting the form to work; some people will find it helpful to do both at the same time, but the API specification means you don't have to use the form to create a user (and the autograder won't be).  
  
 You can leverage django's built-in User table, which has some of what you want: password handling, in particular. 
  
-Check out the documentation for user creation: https://docs.djangoproject.com/en/5.0/ref/contrib/auth/  You will have essentially three kinds of user in your databse: django admin users, who can see some web-based database tools on `localhost/admin`, normal users subject to censorship, and site admins whose task requires enforcement of censorship standards.   
+Check out the documentation for user creation: https://docs.djangoproject.com/en/5.0/ref/contrib/auth/  You will have essentially three kinds of user in your databse: django admin users, who can see some web-based database tools on `localhost/admin`, is_curator = 1 users, and is_curator = 0 users, who can't see everything.
 
 ### createUser test
 
-Your API should be able to add a row to the user table (the first time) with this canonical request: 
-```
-curl -sS -d "user_name=boris&password=sk3j5n.k&is_curator=0&email=boris@school.edu" -X POST http://localhost:8000/app/api/createUser
-```
-And a very nice-to-have property is a HTTP 200 response that includes a message saying that the user has been successfully created.
+Your API should be able to add a row to the user table (the first time) with a POST request that specifies   user_name, password, email, and is_curator.  
 
-This user should be able to log in at `http://localhost:8000/login` after hitting the user creation endpoint.
+If a user is successfully added, return HTTP code 201 created and the reponse body "success".
+
+This user should be able to log in at `http://localhost:8000/accounts/login` after hitting the user creation endpoint.
 
 ## login page
-You should install a minimal login page (copied from the django documentation) at `app/templates/registration/login.html` : 
+You should install a minimal login page (copied from the django documentation) at `uncommondata/templates/registration/login.html` : 
 
     {% block content %}
       <h2>Login</h2>
@@ -209,30 +211,30 @@ and modify `urls.py` to include
     from django.contrib.auth import views as auth_views
  
     urlpatterns = [ ...
-       path('login/', auth_views.LoginView.as_view(), name='login'), 
+       path('accounts/login/', auth_views.LoginView.as_view(), name='login'), 
        ] 
 
 It is important that this login page contain the {% csrf_token %} symbol; this provides a single-use token that protects the API against denial-of-service attacks.
 
 ## What files do you need to change ?
 This assignment has a lot of moving parts. Here is a quick guide to help you know what you need to change:
-1. `/uncommondata/urls.py` and `uncommondata/app/urls.py` You modify these file to create the two new views/endpoints `new` and `createUser`.
-2. `/app/views.py` You modify this file to create the functions associated with the two new views in Step 2
-3. `/uncommondata/templates/app/...` You need to create a new html template files for `/app/new/` and `index.html`.  These will contain the form and some django logic. 
+1. `/uncommondata/urls.py` and `uncommondata/uncommondata/urls.py` You modify these file to create the two new views/endpoints `new` and `createUser`.
+2. `/uncommondata/views.py` You modify this file to create the functions associated with the two new views in Step 2
+3. `/uncommondata/templates/uncommondata/...` You need to create a new html template files for `/uncommondata/new/` and `index.html`.  These will contain the form and some django logic. 
 ## Submission
 Upload to gradescope before Feb 13, 11:59pm.
 
 ## Grading  
 1. index page meets requirements (bio, centered, current time) 
 2. Form at /app/new/ has required elements, GET/POST behavior
-3. POST to /app/api/createUser returns success
-4. GET to /app/api/createUser returns error 
+3. POST to /app/api/createUser/ returns success
+4. GET to /app/api/createUser/ returns 405 Method not allowed
 5. login attempt (POST) to /accounts/login returns success, bad login attempts return errors
 6. index page highlights current user
 7. GET  `http://localhost:8000/`  returns something nice, differentiates between logged in and not-logged in.
 8. GET  `http://localhost:8000/index.html` similarly 
 9. GET  `http://localhost:8000/app/new/`   returns a form
-10. POST to `http://localhost:8000/createUser`  with valid user data returns a success message
+10. POST to `http://localhost:8000/app/api/createUser/`  with valid user data returns a success message
 11. Newly-created users can log in and get personalized `index.html` pages. 
   
 ## Bug bounty 
