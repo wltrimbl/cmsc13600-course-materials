@@ -1,77 +1,57 @@
 # HW5.   API endpoints and core functionality
-We'll need a few more pieces before our app does useful things.  First we'll build the upload page, an uplaod dump endpoint, and a token LLM endpoint.
+We'll need a few more pieces before our app does useful things.  First we'll build the upload page, an upload dump endpoint, and a token LLM endpoint.
 
 ## Step 1.   New API endpoints to make the system work
 But we also need API endpoints to handle these requests.  These require additional rows in `urls.py`.  These two put data (files and parsed data) into the system with POST requests:
 
 * `/app/api/upload/`             (API endpoint, takes multipart/form-data POST request with fields institution, year, url, and file)
-* `/app/api/submit-data/`        (API endpoint, takes POST request with fields  institution, year, field, value)
 
-And these two should deliver JSON data for debugging:
-* `/app/api/dump-uploads`         (API endpoint, takes GET request, returns data about all the uploads of a given user (for harvesters) and all the uploads for all the users (for curators)
-* `/app/api/dump-data`            (API endpoint, takes GET request,
+And an endpoint to deliver JSON data for debugging:
+* `/app/api/dump-uploads/`         (API endpoint, takes GET request, returns data about all the uploads of a given user (for harvesters) and all the uploads for all the users (for curators)
 
-## Step 2.  Create some new endpoints / views  to help feed the API
-We need the functionality to create and distinguish users (and will test that on the dumpUploads endpoint), but so far not much else.  
+* `/app/api/knockknock/`         (API endpoint, takes GET request with the field "topic", returns plain text)
+
+## Step 2.  Create an endpoint / view to use the system
 
 We'll need to write django templates / HTML forms:
 
-* `/app/uploads`          (HTML form/view to show existing uploads, contains a form to submit a new upload to `/app/api/upload/`
-* `/app/data`             (HTML form/view to show institution data) 
+* `/app/uploads/`          (HTML form/view to show existing uploads, contains a form to submit a new upload to `/app/api/upload/`
 
 
 So you'll need lines like this in `urls.py`
 ```
-    path('app/uploads', views.uploads, name='uplaods'), #  localhost:8000/app/uploads
-    path('app/data', views.data, name='data'),          #  localhost:8000/app/data
+    path('app/api/upload/', views.upload, name='upload'), #  localhost:8000/app/api/upload/
+    path('app/uploads/', views.uploads, name='uploads'), #  localhost:8000/app/uploads/
 ```
 
 and lines like this in `app/views.py`
 ```
-def data(request):
-    return render(request, 'data.html'  )
-# and similarly for Uploads
+def uploads(request):
+    return render(request, 'uploads.html'  )
 ```
 
-Your code to create these goes in `uncommondata/uncommondata/views.py`, with some updates to  `uncommondata/uncommondata/urls.py` to ensure that they render.   When the API successfully handles an upload (to /app/api/upload/) or a data row (to /app/api/submit-data), the server should return HTTP code 201, created; when the API delivers content (app/data, hides a post or presents data, it should return HTTP code 200.
+Your code to create these goes in `uncommondata/uncommondata/views.py`, with some updates to  `uncommondata/uncommondata/urls.py` to ensure that they render.   When the API successfully handles an upload (to /app/api/upload/), the server should return HTTP code 201, created; when the API delivers content it should return HTTP code 200.
 
 ## Step 3.  Diagnostic output
-Create a dump-data view in `uncommondata/uncommondata/views.py`. This view function processes an HTTP GET request to the url `http://localhost:8000/app/api/dump-data` with no arguments.
+Make dump-uploads return a JSON representing a dictionary of dictionaries of the uploads like this, where the keys are upload ID's as strings:
 
-This view function should have the following behavior:
-1. Check to see if the user is logged in and is also a curator. 
-2. If not, return an empty HttpResponse and status code 401 ( if not logged in) or 403 (if not curator).
-3. If user is a creator, respond with a JSON data bundle of everything that is known.
-
-The output of dump-data should be a dictionary whose keys are combinations of institution name and reporting year:
+{"1248488": {"user": "bob", "institution": "Illinois State University", "year": "2024-2025", "url": null, "file":  "CDS-2024-2025_ISU_FINAL.pdf"}, 
+ "1294849": {"user": "bob", "institution":  "Governors State University" ...
 
 
-Once you create that python object let's say you call it `obj`, you can return this as a JSON serialized object with the following code:
+Each upload entry must include: user, institution, year, url (null allowed), and file (containing the original filename).
 
-```
-from django.http import JsonResponse
-JsonResponse(obj)
-```
-
-```
-{("Illinois State University", "2024-2025") : 
-    {"total_all_undergraduates": 19107,
-    "total_all_graduate_students": 2439,
-    "grand_total_all_students": 21546}   ...  } 
-```
+dump-uploads should return HTTP 200 OK with JSON on success. 
 
 ## Authentication
-The autograder will create at least one ordinary user and an curator (it's ok if these user creations fail if the test users already exist) and will confirm that the API enforces some security requirements:
+The autograder will create at least one ordinary user and a curator (it's ok if these user creations fail if the test users already exist) and will confirm that the API enforces some security requirements:
 
 API endpoints should return 401 not authorized if a user is not logged in.
-The dump-data endpoint should return 403 forbidden if the user is not a curator.
 
-* `/app/api/dump-uploads           should return HTTP code 401 unauthorized if a user is not logged in.
-* `/app/api/dump-uploads           should return uploads belonging to a user if a user is a harvester
-* `/app/api/dump-uploads           should return all uploads if a user is a curator
-* `/app/api/submit-data/`      should return 401 unauthorized if not logged in, 403 forbidden if user is not a curator, and other errors if the data does not make sense
-* `/app/uploads`               should return 401 unauthorized if user is not logged in.
-* `/app/api/dump-data`              should return 401 unauthorized if user is not logged in.
+* `/app/api/dump-uploads/           should return HTTP code 401 unauthorized if a user is not logged in.
+* `/app/api/dump-uploads/           should return uploads belonging to a user if a user is not a curator 
+* `/app/api/dump-uploads/           should return all uploads if a user is a curator
+* `/app/uploads/`                   should redirect to login page if user is not logged in.
 
 While each of these requirements is two (or four) lines of code, this depends on the createUser successfully differentiating between these two types of user.
 
@@ -97,6 +77,15 @@ python manage.py migrate
 1. It's up to you to create some test data, use the application to generate valid and invalid uploads.
 2. Start this assignment early! It seems simple but there are a lot of moving pieces to get wrong.
 
+## Knock-knock joke API endpoint.
+
+Write an API endpoint that writes a knock-knock joke in response to a GET request such as
+`http://localhost:8000/app/api/knockknock/?topic=orange`.  The autograder environment does not have enough resources to actually generate text, so you'll need to make a request to a language model over the internet. The autograder environment will will have API keys for OpenAI, Gemini, and Cerebras generative AI engines, but you'll need your own API keys to make sure that your code works (you can't really expect to debug it in the autograder environment, you don't have enough access, it's too slow).
+
+Your LLM request should include a timeout <= 30 seconds; if it times out or errors return a canned, constant knock-knock joke.
+
+The knockknock endpoint does not require authentication.
+
 ## Install the testing harness locally 
 The tests are written with the python unittest framework.  Tests are hard to write but easy to run.
 
@@ -119,16 +108,13 @@ python -m pip install gradescope_utils requests
 4.  To run a single test, it's `pytest test_simple.py::TestDjangoHw5simple::test_creat_epost_simple`
 
 ## Grading 
-You have five new API endpoints, and 12 autograder points:
-1.  /app/api/upload/         (4 points)
-2.  /app/api/dump-data/            (4 points)
-3.  /app/api/submit-data/          (2 points)
-3.  /app/api/dump-uploads     (2 points)
-3.  /app/api/dump-data       (2 points)
+You have three  new API endpoints, and 12 autograder points:
+1.  /app/api/upload/         (4 points)  
+2.  /app/api/dump-uploads/   (2 points) returns status 200, 401, or 403 
+3.  /app/api/knockknock/      (2 points) returns text 
 
-and two new views:
-1.   /app/uploads  (which sends data to 
-2.   /app/data      (which sends data to 
+and a new view:
+1.   /app/uploads/  (which sends data to /app/api/upload/)
 
 ## Submission
 Upload from github to gradescope.
