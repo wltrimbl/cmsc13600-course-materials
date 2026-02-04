@@ -23,13 +23,37 @@ CDT = zoneinfo.ZoneInfo("America/Chicago")
 
 BASE = "http://127.0.0.1:8000"
 
+def extract_csrf_from_html(html: str):
+    soup = BeautifulSoup(html, "html.parser")
+    tag = soup.find("input", {"name": "csrfmiddlewaretoken"})
+    return tag["value"] if tag and tag.has_attr("value") else None
+
+def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login/"):
+    r = session.get(form_url, timeout=8)
+    token = extract_csrf_from_html(r.text) or session.cookies.get("csrftoken")
+    if not token:
+        raise AssertionError(f"Could not obtain CSRF token from {form_url}")
+    return token
+
+def post_with_csrf(session: requests.Session, url=None, headers=None, data=None):
+    data = {} if data is None else data
+    headers = {} if headers is None else headers
+    url = BASE+"/accounts/login/" if url is None else url
+    token = get_fresh_csrf(session)
+    headers["X-CSRFToken"] = token
+    headers["Referer"] = BASE+"/accounts/login/"
+    data["csrfmiddlewaretoken"] = token
+    response = session.post(url, headers=headers, data=data)
+    return response
+
+
 class TestDjangoApp(unittest.TestCase):
-    '''Test functionality of cloudysky API / user creation + verification'''
+    '''Test functionality of uncommondata API / user creation + verification'''
     @classmethod
     def setUpClass(self):
         self.DEADSERVER = False
         print("starting server")
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py',
+        p = subprocess.Popen(['python3', 'uncommondata/manage.py',
                               'runserver'],
                              close_fds=True)
         sleep(2)
@@ -44,7 +68,7 @@ class TestDjangoApp(unittest.TestCase):
                 "email": (random.choice(string.ascii_lowercase) +
                           random.choice(string.ascii_lowercase) +
                           "_test@test.org"),
-                "is_admin": "0",
+                "is_curator": "0",
                 "password": "Password123"
                 }
         self.user_dict["user_name"] = "Charlie_" + self.user_dict["email"][0:2]
@@ -115,11 +139,11 @@ class TestDjangoApp(unittest.TestCase):
     @weight(0)
     @number("2.0")
     def test_new_page_renders(self):
-        '''Server returns /app/new page without error.'''
-        request = requests.get(f"{BASE}/app/new")
+        '''Server returns /app/new/ page without error.'''
+        request = requests.get(f"{BASE}/app/new/")
         new_page_text = request.text
         self.assertEqual(request.status_code, 200,
-            f"Server returns error for {BASE}/app/new.\n" +
+            f"Server returns error for {BASE}/app/new/.\n" +
             "Content:{}".format(
             new_page_text))
 
@@ -127,65 +151,52 @@ class TestDjangoApp(unittest.TestCase):
     @weight(1.5)
     @number("2.1")
     def test_user_add_form(self):
-        '''Checks content of /app/new form (right fields, right endpoint)'''
-        form_page_text = requests.get(BASE+"/app/new").text
+        '''Checks content of /app/new/ form (right fields, right endpoint)'''
+        form_page_text = requests.get(BASE+"/app/new/").text
         name_check = re.search("user_name", form_page_text, re.IGNORECASE)
         email_check = re.search("email", form_page_text)
         radio_check = re.search("radio", form_page_text, re.IGNORECASE)
-        is_admin_check = re.search("is_admin", form_page_text)
+        is_curator_check = re.search("is_curator", form_page_text)
         password_check = re.search("password", form_page_text)
-        createuser_check = re.search("createUser", form_page_text)
+        createuser_check = re.search("/app/api/createUser/", form_page_text)
         self.assertTrue(name_check,
-                        "Can't find 'user_name' field in app/new")
+                        "Can't find 'user_name' field in app/new/")
         self.assertTrue(radio_check,
-                        "Can't find radio button in app/new")
-        self.assertTrue(is_admin_check,
-                        "Can't find 'is_admin' field in app/new")
+                        "Can't find radio button in app/new/")
+        self.assertTrue(is_curator_check,
+                        "Can't find 'is_curator' field in app/new/")
         self.assertTrue(password_check,
-                        "Can't find 'password' field in app/new")
+                        "Can't find 'password' field in app/new/")
         self.assertTrue(email_check,
-                        "Can't find 'email field in app/new")
+                        "Can't find 'email field in app/new/")
         self.assertTrue(createuser_check,
-                        "Can't find createUser endpoint in app/new")
+                        "Can't find /app/api/createUser/ endpoint in app/new/")
 
     @weight(0.5)
     @number("2.3")
     def test_new_page_fails_post(self):
-        '''Check the /app/new page returns an error if POST.'''
-        request = requests.post(BASE + "/app/new")
+        '''Check the /app/new/ page returns an error if POST.'''
+        request = post_with_csrf(requests.Session(), BASE + "/app/new/")
         new_page_text = request.text
-        self.assertNotEqual(request.status_code, 200,
-            "Server should return error for POST " +
-            "http://localhost:8000/app/new.\n" +
+        self.assertEqual(request.status_code, 405,
+            "Server should return error 405 for POST " +
+            "http://localhost:8000/app/new/.\n" +
             "Content:{}".format(
             new_page_text))
 
     @weight(1)
     @number("3")
     def test_user_add_api(self):
-        '''Checks that createUser endpoint responds with code 200
+        '''Checks that createUser/ endpoint responds with code 201
         when it should be successful'''
         session = requests.Session()
-        r0 = session.get(BASE + "/app/new")
-        m = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', r0.text)
-        if not m:
-            csrfdata = session.cookies.get("csrftoken")
-        else:
-            csrfdata = m.group(1)
-        self.assertTrue(csrfdata, "Could not obtain CSRF token for createUser POST")
-        form = dict(self.user_dict)
-        form["csrfmiddlewaretoken"] = csrfdata
-        headers = {
-            "X-CSRFToken": csrfdata,
-            "Referer": BASE + "/app/new",
-                  }
-
-        response = session.post(BASE + "/app/createUser",
-                                 data=form, headers=headers)
-        if response.status_code not in (200, 201):
-            self.assertEqual(response.status_code, 200,
-                             "Wrong response code - should pass - {}".format(
+        data=dict(self.user_dict)
+        response = post_with_csrf(session, BASE + "/app/api/createUser/",
+                                 data=data)
+        self.assertEqual(response.status_code, 201,
+                             "Wrong response code - HTTP 201 created - {}".format(
                                  response.text))
+        self.assertEqual(response.text.strip(), "success")
 
     @weight(1)
     @number("3.5")
@@ -194,24 +205,27 @@ class TestDjangoApp(unittest.TestCase):
         dup_user = self.user_dict.copy()
         dup_user["user_name"] = (
              "TestUserName-" +  dup_user["email"][0:2])
-        response = requests.post(BASE + "/app/createUser",
+        session = requests.Session()
+        response = post_with_csrf(session, BASE + "/app/api/createUser/",
                                  data=dup_user)
-        if response.status_code == 200:
-            self.assertNotEqual(response.status_code, 200,
-                 "Wrong response code - should fail for duplicate email - {}".format(
+        self.assertEqual(response.status_code, 201)
+        response = post_with_csrf(session, BASE + "/app/api/createUser/",
+                                 data=dup_user)
+        self.assertEqual(response.status_code, 400,
+                 "Wrong response code - should fail with 400 for duplicate email - {}".format(
                  response.text))
+        self.assertTrue("already in use" in response.text, "createUser/ with duplicate email should give error message")
+        self.assertIn(dup_user["email"], response.text, "duplicate email missing from error response")
 
     @weight(1)
     @number("4")
     def test_user_add_api_raises(self):
         '''Checks that createUser endpoint does not take GET'''
-        response = requests.get(BASE + "/app/createUser",
-            data=self.user_dict)  # data doesn't matter
+        response = requests.get(BASE + "/app/api/createUser/")
         if response.status_code == 404:
-            self.assertTrue(False, "GET to app/createUser returns HTTP 404 {}".format(
+            self.assertTrue(False, "GET to app/api/createUser/ returns HTTP 404 {}".format(
                 response.text))
-        with self.assertRaises(requests.exceptions.HTTPError):
-            response.raise_for_status()
+        self.assertEqual(response.status_code, 405, "Wrong response code for wrong kind of request")
 
     @weight(1)
     @number("5")
@@ -219,20 +233,10 @@ class TestDjangoApp(unittest.TestCase):
         '''Checks accounts/login page for login success'''
         user_dict = self.user_dict
         session = requests.Session()
-        # first get csrf token from login page
-        response0 = session.get(BASE + "/accounts/login/")
-        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
-        if csrf:
-            csrfdata = csrf.groups()[0]
-        else:
-            raise ValueError("Can't find csrf token in accounts/login/ page")
-        logindata = {"user_name": user_dict["user_name"], "password": user_dict["password"],
-                "csrfmiddlewaretoken": csrfdata}
-        loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                BASE + "/accounts/login/"}
+        logindata = {"username": user_dict["user_name"], "password": user_dict["password"]}
         # now attempt login
-        response1 = session.post(BASE + "/accounts/login/", data=logindata,
-              headers=loginheaders)
+        response1 = post_with_csrf(session, BASE + "/accounts/login/", data=logindata)
+
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
             error_message = soup.find("ul", class_="errorlist nonfield")
@@ -246,25 +250,14 @@ class TestDjangoApp(unittest.TestCase):
     @weight(2)
     @number("6")
     def test_user_login_displayed(self):
-        '''Checks index page contains username (email) if logged in'''
+        '''Checks index page contains user_name (email) if logged in'''
         user_dict = self.user_dict
         session = requests.Session()
-        response0 = session.get(BASE + "/accounts/login/")
-        csrf = re.search(r'csrfmiddlewaretoken" value="(.*?)"', response0.text)
-        if csrf:
-            csrfdata = csrf.groups()[0]
-        else:
-            raise ValueError("Can't find csrf token in accounts/login/ page")
         logindata = {"username": user_dict["user_name"],
-                     "password": user_dict["password"],
-                     "csrfmiddlewaretoken": csrfdata}
-        print(logindata)
-        loginheaders = {"X-CSRFToken": csrfdata, "Referer":
-                BASE + "/accounts/login/"}
-        print(csrfdata)
+                     "password": user_dict["password"]}
         # now attempt login
-        response1 = session.post(BASE + "/accounts/login/",
-                                 data=logindata, headers=loginheaders)
+        response1 = post_with_csrf(session, BASE + "/accounts/login/",
+                                 data=logindata) 
         soup = BeautifulSoup(response1.text, 'html.parser')
         try:
             error_message = soup.find("ul", class_="errorlist nonfield")
@@ -284,7 +277,7 @@ class TestDjangoApp(unittest.TestCase):
         sanitized_text = sanitized_text.replace('value="{}"'.format(
             user_dict["user_name"]), 'value=WRONGLOGIN')
         check_username = (user_dict["user_name"] in sanitized_text or
-            user_dict["email"], sanitized_text)
+            user_dict["email"] in  sanitized_text)
         self.assertTrue(check_username,
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
