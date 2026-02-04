@@ -21,11 +21,11 @@ class TestDjangoMigration(unittest.TestCase):
     @number("1.0")
     def test_migrate(self): # Should this be tables.txt or .csv
         '''Test django makemigrations, migrate completes without error'''
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py', 'makemigrations'])
+        p = subprocess.Popen(['python3', 'uncommondata/manage.py', 'makemigrations'])
         p.wait()
         self.assertTrue(p.returncode == 0, "makemigrations returns with non-zero exit code " + 
             repr(p.returncode)  ) 
-        p = subprocess.Popen(['python3', 'cloudysky/manage.py', 'migrate'])
+        p = subprocess.Popen(['python3', 'uncommondata/manage.py', 'migrate'])
         p.wait()
         self.assertTrue(p.returncode == 0, "migrate returns with non-zero exit code " +
              repr(p.returncode)) 
