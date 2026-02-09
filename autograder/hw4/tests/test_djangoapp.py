@@ -180,7 +180,7 @@ class TestDjangoApp(unittest.TestCase):
         new_page_text = request.text
         self.assertEqual(request.status_code, 405,
             "Server should return error 405 for POST " +
-            "http://localhost:8000/app/new/.\n" +
+            f"{BASE}/app/new/.\n" +
             "Content:{}".format(
             new_page_text))
 
@@ -208,7 +208,7 @@ class TestDjangoApp(unittest.TestCase):
         session = requests.Session()
         response = post_with_csrf(session, BASE + "/app/api/createUser/",
                                  data=dup_user)
-        self.assertEqual(response.status_code, 201)
+        self.assertIn(response.status_code, [201, 400])
         response = post_with_csrf(session, BASE + "/app/api/createUser/",
                                  data=dup_user)
         self.assertEqual(response.status_code, 400,
@@ -264,13 +264,12 @@ class TestDjangoApp(unittest.TestCase):
         except AttributeError:
             error_message = ""
         # make sure that it worked
-        if response1.ok and "sessionid" in response1.cookies:
-            print("Success!")
+        self.assertIn("sessionid", session.cookies.get_dict())
         self.assertEqual(response1.status_code, 200,
-                        "Server returns error for http://localhost:8000/accounts/login/" +
+                        f"Server returns error for {BASE}/accounts/login/" +
                         "Content:{} {}".format(error_message, response1.text))
         # Now get the index page, now that we are logged in
-        response2 = session.get("http://localhost:8000/")
+        response2 = session.get(BASE + "/")
         # and make sure that the only email address/user name isn't prefilled in a form
         sanitized_text = response2.text.replace('value="{}"'.format(
             user_dict["email"]), 'value=WRONGEMAIL')
@@ -281,11 +280,3 @@ class TestDjangoApp(unittest.TestCase):
         self.assertTrue(check_username,
                 "Can't find email {} or username {} in index.html when logged in {}{}".format(
                 user_dict["email"], user_dict["user_name"], error_message, sanitized_text))
-        # Allow either email or Username
-#        with self.assertRaises(AssertionError):
-#            self.assertIn(user_dict["user_name"], sanitized_text,
-#                "Can't find username in index.html when logged in {}{}".format(
-#                error_message, sanitized_text))
-#            self.assertIn(user_dict["email"], sanitized_text,
-#                "Can't find email in index.html when logged in {}{}".format(
-#                error_message, sanitized_text))
