@@ -9,6 +9,9 @@ But we also need API endpoints to handle these requests.  These require addition
 And an endpoint to deliver JSON data for debugging:
 * `/app/api/dump-uploads/`         (API endpoint, takes GET request, returns data about all the uploads of a given user (for harvesters) and all the uploads for all the users (for curators)
 
+And an endpoint for examining data for curators only: 
+* `/app/api/dump-data/`         (API endpoint, takes GET request, returns 403 forbidden if logged in but not curator, 401 unauthorized if not logged in at all)
+
 * `/app/api/knockknock/`         (API endpoint, takes GET request with the field "topic", returns plain text)
 
 ## Step 2.  Create an endpoint / view to use the system
@@ -20,8 +23,8 @@ We'll need to write django templates / HTML forms:
 
 So you'll need lines like this in `urls.py`
 ```
-    path('app/api/upload/', views.upload, name='upload'), #  localhost:8000/app/api/upload/
-    path('app/uploads/', views.uploads, name='uploads'), #  localhost:8000/app/uploads/
+    path('app/api/upload/', views.upload, name='upload'), #  http://localhost:8000/app/api/upload/
+    path('app/uploads/', views.uploads, name='uploads'),  #  http://localhost:8000/app/uploads/
 ```
 
 and lines like this in `app/views.py`
@@ -48,12 +51,14 @@ The autograder will create at least one ordinary user and a curator (it's ok if 
 
 API endpoints should return 401 not authorized if a user is not logged in.
 
-* `/app/api/dump-uploads/           should return HTTP code 401 unauthorized if a user is not logged in.
-* `/app/api/dump-uploads/           should return uploads belonging to a user if a user is not a curator 
-* `/app/api/dump-uploads/           should return all uploads if a user is a curator
+* `/app/api/dump-uploads/`          should return HTTP code 401 unauthorized if a user is not logged in.
+* `/app/api/dump-uploads/`          should return uploads belonging to a user if a user is not a curator 
+* `/app/api/dump-uploads/`          should return all uploads if a user is a curator
+* `/app/api/dump-data/`             should return 401 unauthorized if not logged in, 403 forbidden for harvesters, and 200 for curators. No functionality is needed right now.
+* `/app/api/knockknock/`            no authentication
 * `/app/uploads/`                   should redirect to login page if user is not logged in.
 
-While each of these requirements is two (or four) lines of code, this depends on the createUser successfully differentiating between these two types of user.
+While each of these requirements is two (or four) lines of code, this depends on the `createUser` successfully differentiating between these two types of user.
 
 ## Revising the schema
 You may discover that your schema is not up to the tasks set to it.  This is ok, but needs to be fixed.  When you update your models.py, django needs to move your data from the old schema to the new schema, a process called migration.
@@ -80,7 +85,7 @@ python manage.py migrate
 ## Knock-knock joke API endpoint.
 
 Write an API endpoint that writes a knock-knock joke in response to a GET request such as
-`http://localhost:8000/app/api/knockknock/?topic=orange`.  The autograder environment does not have enough resources to actually generate text, so you'll need to make a request to a language model over the internet. The autograder environment will will have API keys for OpenAI, Gemini, and Cerebras generative AI engines, but you'll need your own API keys to make sure that your code works (you can't really expect to debug it in the autograder environment, you don't have enough access, it's too slow).
+`http://localhost:8000/app/api/knockknock/?topic=orange`.  The autograder environment does not have enough resources to actually generate text, so you'll need to make a request to a language model over the internet. The autograder environment will will have API keys for OpenAI, Gemini, and Cerebras generative AI engines, but you'll need your own API keys to make sure that your code works (you can't really expect to debug it in the autograder environment, you don't have enough access, it's too slow).  It's probably not a good idea to permit the topic to run to dozens of words; you should probably truncate the topic to a handful of tokens.
 
 Your LLM request should include a timeout <= 30 seconds; if it times out or errors return a canned, constant knock-knock joke.
 
@@ -108,13 +113,14 @@ python -m pip install gradescope_utils requests
 4.  To run a single test, it's `pytest test_simple.py::TestDjangoHw5simple::test_creat_epost_simple`
 
 ## Grading 
-You have three  new API endpoints, and 12 autograder points:
-1.  /app/api/upload/         (4 points)  
-2.  /app/api/dump-uploads/   (2 points) returns status 200, 401, or 403 
-3.  /app/api/knockknock/      (2 points) returns text 
+You have four new API endpoints:
+1.  `/app/api/upload/`         (3 points)  
+2.  `/app/api/dump-uploads/`   (2 points) returns status 200, 401, or 403 
+3.  `/app/api/knockknock/`     (2 points) returns text 
+4.  `/app/api/dump-data/`      (1 points) returns text 
 
 and a new view:
-1.   /app/uploads/  (which sends data to /app/api/upload/)
+1.   `/app/uploads/`  (which sends data to `/app/api/upload/`)
 
 ## Submission
 Upload from github to gradescope.
