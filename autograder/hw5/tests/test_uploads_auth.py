@@ -2,20 +2,18 @@
 
 import unittest
 import subprocess
-from subprocess import check_output
 import requests
 import os
 from time import sleep
 from os import path
-import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
 UDATAHOME = "."
 
-if path.exists("../cloudysky/manage.py"):
+if path.exists("../uncommondata/manage.py"):
     UDATAHOME = ".."
-if path.exists("cloudysky/manage.py"):
+if path.exists("uncommondata/manage.py"):
     UDATAHOME = "."
 if path.exists("/autograder/submission"):
     UDATAHOME = "/autograder/submission"
@@ -25,13 +23,13 @@ LOGIN_URL = BASE + "/accounts/login/"
 
 admin_data = {
                 "email": "autograder_test@test.org",
-                "is_admin": "1",
+                "is_curator": 1,
                 "user_name": "Autograder Admin",
                 "password": "Password123"
                }
 user_data = {
                 "email": "user_test@test.org",
-                "is_admin": "0",
+                "is_curator": 0,
                 "user_name": "Tester Student",
                 "password": "Password123"
               }
@@ -64,7 +62,7 @@ def post_with_csrf(session: requests.Session, url=None, headers=None, data=None)
 
 
 class TestDjangoHw5simple(unittest.TestCase):
-    '''Test functionality of cloudysky API'''
+    '''Test functionality of uncommondata API'''
     server_proc = None
 
     @classmethod
@@ -86,17 +84,14 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls.session  to have the necessary cookies to convince the
         server that we're still logged in.
         '''
-        random.seed(42)
-        if False and os.path.exists("/autograder"):
-            cls.skipTest(cls, "Server did not start successfully")
         print("starting server")
 #        r = requests.get(BASE+"/", timeout=1)
 #        if not r.status_code < 500:
         try:
-            cls.server_proc = subprocess.Popen(['python3', UDATAHOME+'/'+'cloudysky/manage.py',
-                              'runserver', '--noreload'],
-                              stdout=None,
-                              stderr=None,
+            cls.server_proc = subprocess.Popen(['python3', UDATAHOME+'/'+'uncommondata/manage.py',
+                              'runserver',  '127.0.0.1:8000' , '--noreload'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
                               text=True,
                               close_fds=True)
         # Make sure server is still running in background, or error
@@ -111,7 +106,7 @@ class TestDjangoHw5simple(unittest.TestCase):
                        f"{line}")
                 raise RuntimeError(message)
         except Exception as e:
-            assert False, str(e)
+            raise RuntimeError(str(e))
 
         def login(data):
             session = requests.Session()
@@ -125,6 +120,11 @@ class TestDjangoHw5simple(unittest.TestCase):
                      "password": data["password"]}
             response1 = post_with_csrf(session, LOGIN_URL,
                         data=logindata)
+            # This better work or the fixtures won't
+            if "sessionid" not in session.cookies.get_dict():
+                raise RuntimeError(f"Login failed for {data['user_name']}. Response was:\n{response1.text}")
+
+            assert("sessionid" in session.cookies.get_dict())
             print("LOGINDATA", logindata)
             print("LOGINCODE", response1.status_code)
             print("LOGINRESPNSE", response1.text)
@@ -153,31 +153,66 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls.wait_for_server()  # confirm it's responsive
 
     @weight(1)
-    @number("23")
+    @number("20")
     def test_uploads_not_logged_in(self):
-        '''Test that /app/uploads/ returns 403 unauthorized if not logged in
+        '''Test that /app/uploads/ returns 401 unauthorized if not logged in
         '''
         session = requests.Session()
+        UPLOADS= f"{BASE}/app/uploads/"
+        print(f"Calling {UPLOADS}")
+        response = session.get(UPLOADS)
+        self.assertEqual(response.status_code, 401, response.text) 
+
+    @weight(1)
+    @number("20.1")
+    def test_uploads_logged_in(self):
+        '''Test that /app/uploads/ returns 200 ok 
+        '''
+        session = self.session_user
+        UPLOADS= f"{BASE}/app/uploads/"
+        print(f"Calling {UPLOADS}")
+        response = session.get(UPLOADS)
+        self.assertEqual(response.status_code, 200, response.text) 
+
+    @weight(1)
+    @number("20.2")
+    def test_uploads_logged_in_admin(self):
+        '''Test that /app/uploads/ returns 403 forbidden if logged in as curator
+        '''
+        session = self.session_admin
         UPLOADS= f"{BASE}/app/uploads/"
         print(f"Calling {UPLOADS}")
         response = session.get(UPLOADS)
         self.assertEqual(response.status_code, 403, response.text) 
 
     @weight(0.5)
-    @number("23")
+    @number("22.0")
     def test_dump_uploads_not_logged_in(self):
-        '''Test that /app/api/dump-uploads/ returns 403 not authorized if not logged in
+        '''Test that /app/api/dump-uploads/ returns 401 not authorized if not logged in
         '''
         session = requests.Session()
         DUMP_UPLOADS= f"{BASE}/app/api/dump-uploads/"
         print(f"Calling {DUMP_UPLOADS}")
         response = session.get(DUMP_UPLOADS)
-        self.assertEqual(response.status_code, 403, response.text) 
+        self.assertEqual(response.status_code, 401, response.text) 
+
 
     @weight(0.5)
-    @number("24")
+    @number("22.1")
+    def test_dump_uploads_not_curator(self):
+        '''Test that /app/api/dump-uploads/ returns 200 when logged in as not-curator
+        '''
+        session = self.session_user
+        DUMP_UPLOADS= f"{BASE}/app/api/dump-uploads/"
+        print(f"Calling {DUMP_UPLOADS}")
+        response = session.get(DUMP_UPLOADS)
+        self.assertEqual(response.status_code, 200) 
+        # XXXX TESTS 
+
+    @weight(0.5)
+    @number("22.2")
     def test_dump_uploads_curator(self):
-        '''Test that /app/api/dump-uploads/ returns 
+        '''Test that /app/api/dump-uploads/ returns 200 when logged in as curator
         '''
         session = self.session_admin
         DUMP_UPLOADS= f"{BASE}/app/api/dump-uploads/"
@@ -187,9 +222,45 @@ class TestDjangoHw5simple(unittest.TestCase):
         # XXXX TESTS 
 
     @weight(0.5)
-    @number("25")
+    @number("24.0")
+    def test_dump_data_curator(self):
+        '''Test that /app/api/dump-data/ returns 200 for curator 
+        '''
+        session = self.session_admin
+        DUMP_UPLOADS= f"{BASE}/app/api/dump-data/"
+        print(f"Calling {DUMP_UPLOADS}")
+        response = session.get(DUMP_UPLOADS)
+        self.assertEqual(response.status_code, 200) 
+        # XXXX TESTS 
+
+    @weight(0.5)
+    @number("24.1")
+    def test_dump_data_not_logged_in(self):
+        '''Test that /app/api/dump-data/ returns 401 not logged in
+        '''
+        session = requests.Session()
+        DUMP_UPLOADS= f"{BASE}/app/api/dump-data/"
+        print(f"Calling {DUMP_UPLOADS}")
+        response = session.get(DUMP_UPLOADS)
+        self.assertEqual(response.status_code, 401) 
+        # XXXX TESTS 
+
+    @weight(0.5)
+    @number("24.2")
+    def test_dump_data_not_curator(self):
+        '''Test that /app/api/dump-data/ returns 403 for curator 
+        '''
+        session = self.session_user
+        DUMP_UPLOADS= f"{BASE}/app/api/dump-data/"
+        print(f"Calling {DUMP_UPLOADS}")
+        response = session.get(DUMP_UPLOADS)
+        self.assertEqual(response.status_code, 403) 
+        # XXXX TESTS 
+
+    @weight(0.5)
+    @number("26.0")
     def test_dump_uploads_not_curator(self):
-        '''Test that /app/api/dump-uploads/ returns 
+        '''Test that /app/api/dump-uploads/ returns 200 for normal user
         '''
         session = self.session_user
         DUMP_UPLOADS= f"{BASE}/app/api/dump-uploads/"
@@ -199,22 +270,20 @@ class TestDjangoHw5simple(unittest.TestCase):
         # XXXX TESTS 
 
     @weight(2)
-    @number("23")
+    @number("27")
     def test_dump_uploads_json(self):
         '''Test that /app/api/dump-uploads/ returns valid JSON
         '''
         session = self.session_admin
         # Now hit createPost, now that we are logged in
         print(f"Calling {BASE}/app/api/dump-uploads/")
-        response = session.get(BASE+"/app/api/dump-uploads/",
-                                )
-
+        response = session.get(BASE+"/app/api/dump-uploads/")
         self.assertEqual(response.status_code, 200,  f"/app/api/dump-uploads/ did not return HTTP 200 success Content: {response.content}")
         self.assertGreater(len(response.content), 30, f"/app/api/dump-uploads/ gave too short a response: {response.content}")
         try:
             response.json()
-        except:
-            assert False, f"/app/api/dump-uploads/ did not return valid JSON: {response.content}"
+        except ValueError as e:
+            self.fail(f"/app/api/dump-uploads/ did not return valid JSON: {response.content}")
 
     @weight(1)
     @number("50")
@@ -240,9 +309,11 @@ class TestDjangoHw5simple(unittest.TestCase):
         while "vocado" not in joke and n < 3:
             response = session.get(BASE+"/app/api/knockknock/?topic=avocado",)
             joke = response.text
-            print(joke)
-            self.assertIn("nock knock", joke) 
-            self.assertIn("s there", joke) 
-            self.assertGreater(len(joke.split()), 7) 
+            print(joke) 
+            print("============")
+            self.assertIn("KNOCK", joke.upper()) 
+            self.assertIn("S THERE", joke.upper()) 
+            self.assertGreater(len(joke.split()), 6)   # You can't have a K-K joke...
             n = n + 1
-        self.assertIn("vocado", joke) 
+        test = "GUAC" in joke.upper() or "AVOCADO" in joke.upper() 
+        self.assertTrue(test, f"Don't have the word avocado or guac in joke about avocados: {joke}") 
