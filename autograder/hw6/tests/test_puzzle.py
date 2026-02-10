@@ -5,11 +5,11 @@ import unittest
 import os
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-try: 
+try:
     from puzzle import puzzle_easy_key
 except ImportError:
     puzzle_easy_key=0
-try: 
+try:
     from puzzle import puzzle_key
 except ImportError:
     puzzle_key=0

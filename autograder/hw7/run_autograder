@@ -4,6 +4,7 @@
 ln -s $(which python3) /usr/bin/python
 
 rm -Rf $( find /autograder/submission/cloudysky -name 'test_*.py' )  
+rm -Rf $( find /autograder/submission/ -name 'test_*.py' )  
 
 cp -r /autograder/submission/cloudysky /autograder/source
 

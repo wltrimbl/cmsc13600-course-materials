@@ -1,30 +1,38 @@
 #!/usr/bin/env python3
 
 import unittest
-from subprocess import check_output
 import os
-import platform
+import csv
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-if platform.system() == "Darwin":
-    AG = "./"
-else:
+if os.path.isdir("/autograder/submission"):
     AG = "/autograder/submission/"
+else:
+    AG = "./"
+
+
+def readit(filename):
+    lol = []
+    with open(filename, newline='') as csvfile:
+        csvreader = csv.reader(csvfile, delimiter=';')
+        for row in csvreader:
+            lol.append(list(row))
+    return lol
 
 
 class TestHW0(unittest.TestCase):
-    '''Test targets for hw0: names.txt, nobel-prize-laureates-clean.csv,
+    '''Test targets for hw0: books.txt, nobel-prize-laureates-clean.csv,
     unneeded_data.csv'''
 
     @weight(1)
     @number("1.0")
     def test_books_txt_exists(self):
-        '''Test names.txt exists and is long enough to contain a book review.'''
-        NAMES = AG+"books.txt"
-        self.assertTrue(os.path.exists(NAMES),
+        '''Test books.txt exists and is long enough to contain a book review.'''
+        BOOKS = os.path.join(AG, "books.txt")
+        self.assertTrue(os.path.exists(BOOKS),
                         "books.txt does not exist!")
-        file_size = os.path.getsize(NAMES)
-        with open(NAMES) as f:
+        file_size = os.path.getsize(BOOKS)
+        with open(BOOKS) as f:
             file_contents = f.read()
         self.assertGreater(file_size, 30,
                            "books.txt is not large enough to contain a book review")
@@ -57,25 +65,31 @@ class TestHW0(unittest.TestCase):
         self.assertFalse(os.path.exists(AG + "nobel-prize-laureates.csv"),
                         "nobel-prize-laureates.csv exists!")
         with open(NP, "rb") as f:
-           num_lines = sum(1 for _ in f)
+            num_lines = sum(1 for _ in f)
         print("num_lines", num_lines)
+        with open(NP, "r") as f:
+            file_content = f.read()
+        self.assertFalse("coordinates" in file_content,
+            NP + " contains string 'coordinates' (and it shouldn't)")
+        self.assertGreater(file_content.count("Pauling"), 0,
+            NP + " does not contain 'Pauling'")
+        self.assertGreater(file_content.count(";"), 19247,
+            NP + " does not contain enough semicolons to account for all the fields")
+        self.assertIn("geo_point_2d", file_content,
+            NP + " does not contain expected geo_point_2d column header")
+        self.assertIn("62.77737840196957, 16.754284354522902", file_content,
+            NP + " does not contain expected data from geo_point_2d column")
+        self.assertNotIn("Unnamed:", file_content,
+            NP + " contains field called Unnamed")
+        self.assertNotIn("Geo Shape", file_content,
+            NP + " contains field called Geo Shape")
+        lol = readit("nobel-prize-laureates-clean.csv")
+        self.assertEqual(len(lol), 1013, "Expecting 1012 lines + header")
         self.assertGreater(num_lines, 1012, NP + " has too few lines")
         self.assertLess(num_lines, 1017, NP + " has too many lines")
         file_size = os.path.getsize(NP)
         self.assertGreater(file_size, 260000,  NP + " is too small")
         self.assertLess(file_size, 275000, NP + " is too large")
-        with open(NP, "r") as f:
-            file_content = f.read()
-        self.assertFalse("coordinates" in file_content, 
-            NP + " contains string 'coordinates' (and it shouldn't)") 
-        self.assertGreater(file_content.count("Pauling"), 0,
-            NP + " does not contain 'Pauling'")
-        self.assertGreater(file_content.count(";"), 19247,
-            NP + " does not contain enough semicolons to account for all the fields")
-        self.assertIn("62.77737840196957, 16.754284354522902", file_content,  
-            NP + " does not contain expected data from geo_point_2d column")
-        self.assertIn("geo_point_2d", file_content,  
-            NP + " does not contain expected geo_point_2d column header")
 
     @weight(1)
     @number("4.0")

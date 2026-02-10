@@ -242,7 +242,7 @@ class TestDjangoHw5simple(unittest.TestCase):
             f"Response to /app/dump does not contain expected username from Post content: {feed.text}")
 
     @weight(1.5)
-    @number("50.1")
+    @number("50.2")
     def test_post_in_dumpFeed(self):
         '''Makes post to /app/createPost/, confirms post appears in /app/dumpFeed'''
         data = {'title': "I like fuzzy bunnies 50.0",  "content": "I like f4zzy bunnies.  Do you?"}
