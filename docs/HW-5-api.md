@@ -106,11 +106,11 @@ and a few things that must be installed with pip:
 python -m pip install gradescope_utils requests
 ```
 
-2.  Put the test file (for HW5 it's `test_simple.py`) from https://github.com/wltrimbl/cmsc13600-course-materials/tree/main/autograder/hw5/tests in the project directory (the directory containing uncommondata) 
+2.  Put the test file (for HW5 it's `test_uploads_auth.py`) from https://github.com/wltrimbl/cmsc13600-course-materials/tree/main/autograder/hw5/tests in the project directory (the directory containing uncommondata) 
 
-3.  To run all the tests, it's `pytest test_simple.py`
+3.  To run all the tests, it's `pytest test_uploads_auth.py`
 
-4.  To run a single test, it's `pytest test_simple.py::TestDjangoHw5simple::test_creat_epost_simple`
+4.  To run a single test, it's `pytest test_uploads_auth.py::TestDjangoHw5simple::ttest_dump_uploads_not_curator`
 
 ## Grading 
 You have four new API endpoints:
