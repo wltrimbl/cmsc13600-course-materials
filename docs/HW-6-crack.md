@@ -2,7 +2,7 @@
 
 ## Part 1.  Proof of work
 
-Find a string which, appended to the end of your cnet id, has a sha256 hash whose numerical value is less than 0000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffff. 
+Find a string which, appended to the end of your cnet id, has a sha256 hash whose numerical value is less than `0000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffff`.
 
 ##  Part 2. Puzzle
 The file `PUZZLE` contains sha256 hashes of the concatenation of a (single) nine-digit number and some English words with light capitalization and punctuation differences.  The the code that produced the hashes is checked in as `puzzle.py`.  One of the words in the message is mispelled.  You need to find the nine-digit number, decode the message, and find the incorrect spelling of the one word that is mispelled.  
@@ -28,9 +28,9 @@ Upload from github to gradescope.
 
 Create a file called `puzzle.py` that defines at least `puzzle_key` and `puzzle_misspell`, and assign an integer and a string to them, respectively, containing the key to the 9-digit puzzle and the (misspelled) word in the 9-digit `PUZZLE` that is misspelled. 
 
-   - puzzle_easy_key = 0 # 
-   - puzzle_easy_misspell = "gadqens" 
-   - puzzle_key = 0  # 9-digit number 
-   - puzzle_misspell = "" # Your answer here
-   - cnet_id = "bob" 
-   - nonce = "" # your answer here
+   puzzle_easy_key = 8983  
+   puzzle_easy_misspell = "gadqens"   # mispelling of gardens
+   puzzle_key = 0           # 9-digit number 
+   puzzle_misspell = ""     # Your answer here
+   cnet_id = "wltrimbl"     # but don't use my cnet id 
+   nonce = "4660116208" 

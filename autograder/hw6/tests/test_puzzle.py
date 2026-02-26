@@ -90,7 +90,7 @@ class TestPuzzle(unittest.TestCase):
         print("Congratulations, you found it.")
 
 
-    @weight(0.0)
+    @weight(2.0)
     @number("43")
     def test_puzzle_proof_of_work(self):
         print("cnet id", cnet_id)
