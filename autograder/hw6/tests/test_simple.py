@@ -12,31 +12,21 @@ import random
 from bs4 import BeautifulSoup
 from gradescope_utils.autograder_utils.decorators import weight, number
 
-CSKYHOME = "."
+UDATAHOME = "."
 
 if path.exists("../cloudysky/manage.py"):
-    CSKYHOME = ".."
+    UDATAHOME = ".."
 if path.exists("cloudysky/manage.py"):
-    CSKYHOME = "."
+    UDATAHOME = "."
 if path.exists("/autograder/submission"):
-    CSKYHOME = "/autograder/submission"
+    UDATAHOME = "/autograder/submission"
 
-# BASE = "http://54.167.194.197"  # NONONO
 BASE = "http://localhost:8000"
 
+LOGIN_URL = BASE + "/accounts/login/"
+
 # DEsired tests:
-# /app/new_course  (HTML form/view to submit to createPost) PROVIDED
-# /app/new_lecture (HTML form/view to submit to createComment) PROVIDED
-# /app/dumpUploads   !!
 
-# /app/createPost   (API endpoint for  new_course)
-# /app/createComment  (API endpoint for  new_lecture)
-# /app/DumpFeed      (diagnostic endpoint)
-# TESTS FOR HTTP  200 or 201 response...  (4)
-# TEST that row is actually added with valid input  (3)
-# three tests with invalid input, something essential not defined (3)
-
-CDT = zoneinfo.ZoneInfo("America/Chicago")
 admin_data = {
                 "email": "autograder_test@test.org",
                 "is_admin": "1",
@@ -58,7 +48,7 @@ def extract_csrf_from_html(html: str):
     tag = soup.find("input", {"name": "csrfmiddlewaretoken"})
     return tag["value"] if tag and tag.has_attr("value") else None
 
-def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login"):
+def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login/"):
     r = session.get(form_url, timeout=8)
     token = extract_csrf_from_html(r.text) or session.cookies.get("csrftoken")
     if not token:
@@ -69,10 +59,10 @@ def get_fresh_csrf(session: requests.Session, form_url= BASE+"/accounts/login"):
 def post_with_csrf(session: requests.Session, url=None, headers=None, data=None):
     data = {} if data is None else data
     headers = {} if headers is None else headers
-    url = BASE+"/accounts/login" if url is None else url
+    url = BASE+"/accounts/login/" if url is None else url
     token = get_fresh_csrf(session)
     headers["X-CSRFToken"] = token
-    headers["Referer"] = BASE+"/accounts/login"
+    headers["Referer"] = BASE+"/accounts/login/"
     data["csrfmiddlewaretoken"] = token
     response = session.post(url, headers=headers, data=data)
     return response
@@ -125,7 +115,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 #        r = requests.get(BASE+"/", timeout=1)
 #        if not r.status_code < 500:
         try:
-            cls.server_proc = subprocess.Popen(['python3', CSKYHOME+'/'+'cloudysky/manage.py',
+            cls.server_proc = subprocess.Popen(['python3', UDATAHOME+'/'+'cloudysky/manage.py',
                               'runserver', '--noreload'],
                               stdout=None,
                               stderr=None,
@@ -147,7 +137,7 @@ class TestDjangoHw5simple(unittest.TestCase):
 
         def login(data):
             session = requests.Session()
-            form_url = BASE + "/app/createUser/"
+            form_url = BASE + "/app/api/createUser/"
             print("FORM_URL", form_url)
             response = post_with_csrf(session, form_url,
                                      data=data
