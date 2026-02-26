@@ -3,15 +3,15 @@
 # Set up autograder files
 ln -s $(which python3) /usr/bin/python
 
-rm -Rf $( find /autograder/submission/cloudysky -name 'test_*.py' )  
+rm -Rf $( find /autograder/submission/uncommondata -name 'test_*.py' )  
 rm -Rf $( find /autograder/submission -name 'test_*.py' )  
 
 echo "PRAGMA journal_mode=DELETE;" | sqlite3 /autograder/submission/db.sqlite3
-echo >> /autograder/submission/cloudysky/cloudysky/settings.py 
-echo "import os" >> /autograder/submission/cloudysky/cloudysky/settings.py 
-echo "DATABASES = { 'default': { 'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), 'OPTIONS': { 'timeout': 20, 'uri': True, }, } }"  >> /autograder/submission/cloudysky/cloudysky/settings.py 
+echo >> /autograder/submission/uncommondata/uncommondata/settings.py 
+echo "import os" >> /autograder/submission/uncommondata/uncommondata/settings.py 
+echo "DATABASES = { 'default': { 'ENGINE': 'django.db.backends.sqlite3', 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), 'OPTIONS': { 'timeout': 20, 'uri': True, }, } }"  >> /autograder/submission/uncommondata/uncommondata/settings.py 
 
-cp -r /autograder/submission/cloudysky /autograder/source
+cp -r /autograder/submission/uncommondata /autograder/source
 cp  /autograder/submission/puzzle.py /autograder/source
 
 
