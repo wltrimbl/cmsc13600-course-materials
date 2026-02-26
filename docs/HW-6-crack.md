@@ -29,10 +29,10 @@ Upload from github to gradescope.
 Create a file called `puzzle.py` that defines at least `puzzle_key` and `puzzle_misspell`, and assign an integer and a string to them, respectively, containing the key to the 9-digit puzzle and the (misspelled) word in the 9-digit `PUZZLE` that is misspelled. 
 
 `
-   puzzle_easy_key = 8983  
-   puzzle_easy_misspell = "gadqens"   # mispelling of gardens
-   puzzle_key = 0           # 9-digit number 
-   puzzle_misspell = ""     # Your answer here
-   cnet_id = "wltrimbl"     # but don't use my cnet id 
-   nonce = "4660116208" 
+    puzzle_easy_key = 8983  
+    puzzle_easy_misspell = "gadqens"   # mispelling of gardens
+    puzzle_key = 0           # 9-digit number 
+    puzzle_misspell = ""     # Your answer here
+    cnet_id = "wltrimbl"     # but don't use my cnet id 
+    nonce = "4660116208" 
 `
