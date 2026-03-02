@@ -3,6 +3,7 @@
 import hashlib
 import unittest 
 import os
+from os import path
 from gradescope_utils.autograder_utils.decorators import weight, number
 
 try:
@@ -41,14 +42,28 @@ if type(puzzle_key) is str:
 
 if type(puzzle_easy_key) is str:
     puzzle_easy_key = int(puzzle_easy_key)
+
+UDATAHOME="."
+if path.exists("/autograder/submission"):
+    UDATAHOME = "/autograder/submission"
+if path.exists("../uncommondata/manage.py"): 
+    UDATAHOME = ".."
+if path.exists("uncommondata/manage.py"):
+    UDATAHOME = "."
  
 class TestPuzzle(unittest.TestCase):
     '''Test for the answers to the puzzle and the puzzle-easy solutions'''
 
     @weight(0)
-    @number("40.00")
+    @number("40.0")
     def test_puzzle_file(self):
-        self.assertTrue(os.path.exists("puzzle.py"), "Can't find puzzle.py at root of project.")
+        self.assertTrue(os.path.exists(UDATAHOME+"/hw6-puzzlesolution.txt"),
+           "Can't find hw6-puzzlesolution.txt at root of project.")
+
+    @weight(0)
+    @number("40.1")
+    def test_puzzle_solution_file(self):
+        self.assertTrue(os.path.exists(UDATAHOME+"/puzzle.py"), "Can't find puzzle.py at root of project.")
      
     @weight(5)
     @number("41.0")
@@ -58,8 +73,7 @@ class TestPuzzle(unittest.TestCase):
         self.assertIn(hashlib.pbkdf2_hmac("sha256", puzzle_misspell.encode("utf8"), "".encode("utf-8"), 1000000).hex(), 
             '20b5d38d4d91b0278688f9326dceb043fbb0e4ebbbe0035cf7aa63b7ab7a5e39',
             f"hash(puzzle_misspell)='{puzzle_misspell}' doesn't match hash(key)")
-
-
+     
     @weight(0.0)
     @number("41.5")
     def test_puzzle_easy_misspell(self):
@@ -69,7 +83,7 @@ class TestPuzzle(unittest.TestCase):
             'e619d25c0aad796c07eb586ca1435cc47a24b0cd393d29a71957fdb051905c8f', 
             f"hash(puzzle_easy_misspell)='{puzzle_easy_misspell}' doesn't match hash(key)")
 
-    @weight(5)
+    @weight(3)
     @number("42.0")
     def test_puzzle_key(self):
         print("puzzle_key:", puzzle_key)
