@@ -1,4 +1,6 @@
 # HW7.   API endpoints and core functionality
+Due Thursday March 12 11:59pm.
+
 We'll need a few more pieces before our app does useful things.  First we'll build the upload page, an upload dump endpoint, and a token LLM endpoint.
 
 ## Step 1.   Upload and download API endpoints and views
