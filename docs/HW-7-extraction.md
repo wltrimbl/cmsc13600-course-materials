@@ -8,13 +8,102 @@ The upload system needs to create an ID for each of the uploads.  You might thin
 ## Step 1.   Upload and download API endpoints and views
 Implement the followinng view (show-uploads) and the following two API endpoints.   These require additional rows in `urls.py`.  These two put data (files and parsed data) into the system with POST requests:
 
-* `/app/show-uploads/`             (Produces an HTML list of already-uploaded files, including links to /app/api/download/{ID}.  This is essentially the same content as dump-uploads but HTML)
+* `/app/show-uploads/`             (Produces an HTML list of already-uploaded files, including links to `/app/api/download/{ID}` and `/app/api/process/{ID}`  .  This is essentially the same content as dump-uploads but HTML)
 * `/app/api/download/{ID}`             (GET; makes a file available for download)
 * `/app/api/process/{ID}`              (GET endpoint (easier to run!), that initiates data extraction, and returns the extracted data as JSON.  Don't worry about actually storing the extracted data; we'll just validate the extraction with the JSON response from /process/)
 
 And these two previously-defined endpoints should deliver JSON data for debugging:
 * `/app/api/dump-uploads`         (API endpoint, takes GET request, returns data about all the uploads of a given user (for harvesters) and all the uploads for all the users (for curators)
 * `/app/api/
+
+## Step 2.  Process the content
+
+The following snippet will use a lightweight shell program to render the text
+in a (specified) pdf.  
+```
+import subprocess
+import os
+
+def pdf_to_text(filename):
+    """
+    Run the shell command `pdftotext` on `filename`,
+    producing `filename + ".txt"` and returning that name.
+    """
+    if not os.path.isfile(filename):
+        raise FileNotFoundError(f"Input file not found: {filename}")
+
+    output_filename = filename + ".txt"
+
+    try:
+        subprocess.run(
+            ["pdftotext", "-layout", filename,
+            output_filename], check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"pdftotext failed with exit code {e.returncode}") from e
+
+    return output_filename
+```
+
+Starting from this, we want to extract the following (18) fields:
+
+```
+C1:
+Total first-time, first-year men who applied
+Total first-time, first-year women who applied
+Total first-time, first-year another gender who applied
+Total first-time, first-year unknown gender who applied
+Total first-time, first-year men who were admitted
+Total first-time, first-year women who were admitted
+Total first-time, first-year another gender who were admitted
+Total first-time, first-year unknown gender who were admitted
+
+G1:
+Tuition (Undergraduates)
+Required Fees: (Undergraduates)
+Food and housing (on-campus): (Undergraduates)
+Housing Only (on-campus): (Undergraduates)
+Food Only (on-campus meal plan): (Undergraudates)
+
+H2: A-D
+A. Number of degree-seeking undergraduate students 
+B. Number of students in line a who applied for need- based financial aid
+C. Number of students in line b who were determined to have financial need 
+D. Number of students in line c who were awarded any financial aid
+J. The average financial aid package of those in line d
+```
+
+You can use a regular expression to (try) to find the data, or you can
+hand the text off to an LLM.  The former is cheaper, but will not succeed as
+often.
+
+We're after something like this: 
+```
+{
+    "tuition_undergraduates": 71325,
+    "required_fees_undergraduates": 1941,
+    "food_and_housing_on_campus_undergraduates": 20835,
+    "housing_only_on_campus_undergraduates": null,
+    "food_only_on_campus_meal_plan_undergraduates": null, 
+
+    "degree_seeking_undergraduate_students": 7497,
+    "applied_for_need_based_financial_aid": 2953,
+    "determined_to_have_financial_need": 2589,
+    "awarded_any_financial_aid": 2579,
+    "average_financial_aid_package": 78883, 
+
+    "men_applied": 19195,
+    "women_applied": 23636,
+    "another_gender_applied": 0,
+    "unknown_gender_applied": 781
+    "men_admitted": 1070,
+    "women_admitted": 885,
+    "another_gender_admitted": 0,
+    "unknown_gender_admitted": 0
+}
+```
+
+If you use an LLM as your feature extractor, you will need to check that the data contains the right fields and the right data types before attempting to ingest it. 
 
 ## Authentication
 Meh, we've tested authentication enough in previous homeworks.
