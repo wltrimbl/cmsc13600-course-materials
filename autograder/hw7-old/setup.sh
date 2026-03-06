@@ -10,6 +10,3 @@ apt-get -y install tzdata
 pip3 install gradescope-utils pylint pytest requests Pillow bs4 
 python3 -m pip install Django==5.2 django-extensions
 
-# install clients for 3 language generative models 
-pip3 install google-genai  cerebras-cloud-sdk openai
-
