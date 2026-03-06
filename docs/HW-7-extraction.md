@@ -4,6 +4,8 @@ Due Thursday March 12 11:59pm.
 We'll need a few more pieces before our app does useful things.  First we'll build the upload page, an upload dump endpoint, and a token LLM endpoint.
 
 The upload system needs to create an ID for each of the uploads.  You might think "hey, I can just take the hash of the uploaded data and use that as a virtually collisionproof upload id."  But the hash of the content does not uniquely identify rows in the upload table when users upload duplicates.  You could use an autoincrementing field or you could take a the hash of a bundle of data like filename + user + upload-date; what matters is that after upload time, there is a symbol that the user can use to download and push the process button for a given upload.
+${Last-minute requirement:  To facilitate testing, make the ID of the upload the sha256 hash of the upload contents.  (This prevents the autograder from having to query and learn the upload IDs of the test fixtures.}$ 
+
 
 ## Step 1.   Upload and download API endpoints and views
 Implement the followinng view (show-uploads) and the following two API endpoints.   These require additional rows in `urls.py`.  These two put data (files and parsed data) into the system with POST requests:
