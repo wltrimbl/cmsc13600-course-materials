@@ -73,6 +73,16 @@ def upload_file(session, url, data, files):
         }
     )
 
+def upload_UIC_fixture(session):
+        #  Let's upload some test data! 
+        H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
+        filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
+        data = { "institution": "University of Illinois", "year": "2024-2025", "url": "none" }
+        with open(filename, "rb") as fh:
+            files = { "file": ("CDS_UIC_2024_2025-CandH.pdf", fh, "application/pdf") }
+            response = upload_file(session, BASE+ "/app/api/upload/", data, files)
+        if response.status_code not in [200, 201]:
+            raise RuntimeError(f"Fixture upload failed: {response.status_code} {response.text}")
 
 class TestDjangoHw5simple(unittest.TestCase):
     '''Test functionality of uncommondata API'''
@@ -148,15 +158,6 @@ class TestDjangoHw5simple(unittest.TestCase):
         cls.session_admin = login(admin_data)
         cls.session_user = login(user_data)
 
- #  Let's upload some test data! 
-        H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
-        filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
-        data = { "institution": "University of Illinois", "year": "2024-2025", "url": "none" }
-        with open(filename, "rb") as fh:
-            files = { "file": ("CDS_UIC_2024_2025-CandH.pdf", fh, "application/pdf") }
-            response = upload_file(cls.session_user, BASE+ "/app/api/upload/", data, files)
-        if response.status_code not in [200, 201]:
-            raise RuntimeError(f"Fixture upload failed: {response.status_code} {response.text}")
 
     @classmethod
     def tearDownClass(cls):
@@ -335,9 +336,10 @@ class TestDjangoHw5simple(unittest.TestCase):
     @number("61.2")
     def test_download_UIC(self):
         '''Test /app/api/download/{ID} returns a downloadable file: CDS_UIC_2024_2025-CandH.pdf'''
+        session = self.session_user
+        upload_UIC_fixture(session)
         with open("fixtures/CDS_UIC_2024_2025-CandH.pdf", "rb") as fh:
             original = fh.read()
-        session = self.session_user
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         DOWNLOAD_URL = f"{BASE}/app/api/download/{H}"
         response = session.get(DOWNLOAD_URL)
@@ -351,6 +353,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         returns json.
         '''
         session = self.session_user
+        upload_UIC_fixture(session)
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
         data = {
@@ -380,6 +383,7 @@ class TestDjangoHw5simple(unittest.TestCase):
         returns json containing appropriate fields.
         '''
         session = self.session_user
+        upload_UIC_fixture(session)
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         DOWNLOAD_URL = f"{BASE}/app/api/process/{H}"
         response = session.get(DOWNLOAD_URL)
