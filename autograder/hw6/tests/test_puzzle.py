@@ -57,6 +57,7 @@ class TestPuzzle(unittest.TestCase):
     @weight(0)
     @number("40.0")
     def test_puzzle_file(self):
+        print("Checking", UDATAHOME+"/hw6-puzzlesolution.txt")
         self.assertTrue(os.path.exists(UDATAHOME+"/hw6-puzzlesolution.txt"),
            "Can't find hw6-puzzlesolution.txt at root of project.")
 

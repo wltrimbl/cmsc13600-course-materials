@@ -151,9 +151,12 @@ class TestDjangoHw5simple(unittest.TestCase):
  #  Let's upload some test data! 
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
-        files = { "file": ("CDS_UIC_2024_2025-CandH.pdf", open(filename, "rb"), "text/plain") }
         data = { "institution": "University of Illinois", "year": "2024-2025", "url": "none" }
-        response = upload_file(cls.session_user, BASE+ "/app/api/upload/", data, files)
+        with open(filename, "rb") as fh:
+            files = { "file": ("CDS_UIC_2024_2025-CandH.pdf", fh, "application/pdf") }
+            response = upload_file(cls.session_user, BASE+ "/app/api/upload/", data, files)
+        if response.status_code not in [200, 201]:
+            raise RuntimeError(f"Fixture upload failed: {response.status_code} {response.text}")
 
     @classmethod
     def tearDownClass(cls):
@@ -245,8 +248,8 @@ class TestDjangoHw5simple(unittest.TestCase):
 
     @weight(0)
     @number("24.2")
-    def test_dump_data_not_curator(self):
-        '''Test that /app/api/dump-data/ returns 403 for curator 
+    def test_dump_data_user_403(self):
+        '''Test that /app/api/dump-data/ returns 403 for user
         '''
         session = self.session_user
         DUMP_UPLOADS= f"{BASE}/app/api/dump-data/"
@@ -255,19 +258,8 @@ class TestDjangoHw5simple(unittest.TestCase):
         self.assertEqual(response.status_code, 403) 
         # XXXX TESTS 
 
-    @weight(0)
-    @number("26.0")
-    def test_dump_uploads_not_curator(self):
-        '''Test that /app/api/dump-uploads/ returns 200 for normal user
-        '''
-        session = self.session_user
-        DUMP_UPLOADS= f"{BASE}/app/api/dump-uploads/"
-        print(f"Calling {DUMP_UPLOADS}")
-        response = session.get(DUMP_UPLOADS)
-        self.assertEqual(response.status_code, 200) 
-        # XXXX TESTS 
 
-    @weight(0)
+    @weight(1)
     @number("27")
     def test_dump_uploads_json(self):
         '''Test that /app/api/dump-uploads/ returns valid JSON
@@ -283,108 +275,122 @@ class TestDjangoHw5simple(unittest.TestCase):
         except ValueError as e:
             self.fail(f"/app/api/dump-uploads/ did not return valid JSON: {response.content}")
 
-    @weight(0)
+    @weight(1)
     @number("60")
     def test_upload(self):
         '''Test 
         '''
         session = self.session_user
-        files = open("fixtures/TEST") 
-        files = {
-             "file": ("TEST", open("fixtures/TEST", "rb"), "text/plain")
-                }
         data = {
            "institution": "test_university",
            "year": "2025",
-           "url": "none"
-               }
-        response = upload_file(session, BASE+ "/app/api/upload/", data, files)
+           "url": "none" }
+        with open("fixtures/TEST", "rb") as fh:
+            files = { "file": ("TEST", fh, "text/plain") } 
+            response = upload_file(session, BASE+ "/app/api/upload/", data, files)
         self.assertIn(response.status_code, [200, 201], "/app/api/upload/ does not respond with success")
 
-    @weight(0)
-    @number("60")
-    def test_upload(self):
-        '''Test 
+    @weight(1)
+    @number("60.2")
+    def test_upload_EIU(self):
+        '''Test some stuff
         '''
         session = self.session_user
-        files = open("fixtures/TEST") 
-        files = {
-             "file": ("TEST", open("fixtures/TEST", "rb"), "text/plain")
-                }
-        data = {
-           "institution": "test_university",
+        data = { "institution": "test_university",
            "year": "2025",
-           "url": "none"
-               }
-        response = upload_file(session, BASE+ "/app/api/upload/", data, files)
+           "url": "none" }
+        with open("fixtures/EIU-2024-CandH.pdf", "rb") as fh:
+            files = { "file": ("EIU-2024-CandH.pdf", fh, "application/pdf") }
+            response = upload_file(session, BASE+ "/app/api/upload/", data, files)
         self.assertIn(response.status_code, [200, 201], "/app/api/upload/ does not respond with success")
-        H = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
-        download = session.get(BASE + f"/app/api/download/{H}")
-        print(dir(download))
+        H = '3a3e6d71e983e140e25249227f09ac0c3478a99ff1513caa09ea16f45fcb2cf6'
+        processed = session.get(BASE + f"/app/api/process/{H}")
+        self.assertEqual(processed.status_code, 200, processed.text)
+        data = json.loads(processed.content)
+        self.assertEqual( data["men_applied"], 5718)
+        self.assertEqual( data["women_applied"], 6808)
+        self.assertEqual( data["men_admitted"], 3417)
+        self.assertEqual( data["women_admitted"], 4772)
+#         self.assertEqual(data["average_financial_aid_package"], 17899) # This one is hard somehow?
 
+
+
+# 3a3e6d71e983e140e25249227f09ac0c3478a99ff1513caa09ea16f45fcb2cf6  EIU-2024-CandH.pdf
 # 1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9  CDS_UIC_2024_2025-CandH.pdf
 
 
-    @weight(0)
-    @number("60.0")
+    @weight(1)
+    @number("61.0")
     def test_download_empty(self):
-        '''Test /app/api/download/{ID} returns a downloadable file'''
+        '''Test /app/api/download/{ID} returns a downloadable file: empty file '''
         session = self.session_user
         H = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
         DOWNLOAD_URL = f"{BASE}/app/api/download/{H}"
         response = session.get(DOWNLOAD_URL)
         self.assertEqual(response.status_code, 200)
+        self.assertIn("Content-Disposition", response.headers)
         self.assertEqual(len(response.content), 0)  # This one is an empty file
 
-    @weight(0)
-    @number("62")
-    def test_upload_process_fields(self):
-        '''Test 
-        '''
-        session = self.session_user
-        H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
-        filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
-        files = {
-             "file": ("CDS_UIC_2024_2025-CandH.pdf", open(filename, "rb"), "text/plain")
-                }
-        data = {
-           "institution": "University of Illinois",
-           "year": "2024-2025",
-           "url": "none"
-               }
-        response = upload_file(session, BASE+ "/app/api/upload/", data, files)
-        self.assertIn(response.status_code, [200, 201], "/app/api/upload/ does not respond with success")
-        response = session.get(BASE + f"/app/api/process/{H}")
-        j = json.loads(response.content)
-
-        
-
-    @weight(0)
-    @number("60.0")
+    @weight(1)
+    @number("61.2")
     def test_download_UIC(self):
-        '''Test /app/api/download/{ID} returns a downloadable file'''
+        '''Test /app/api/download/{ID} returns a downloadable file: CDS_UIC_2024_2025-CandH.pdf'''
+        with open("fixtures/CDS_UIC_2024_2025-CandH.pdf", "rb") as fh:
+            original = fh.read()
         session = self.session_user
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         DOWNLOAD_URL = f"{BASE}/app/api/download/{H}"
         response = session.get(DOWNLOAD_URL)
         self.assertIn(response.status_code, [200, 201])
-        self.assertEqual(len(response.content), 747736)  
+        self.assertEqual(response.content, original)  
+
+    @weight(1)
+    @number("62.0")
+    def test_upload_process_fields(self):
+        '''Test that process endpoint on CDS_UIC_2024_2025-CandH.pdf 
+        returns json.
+        '''
+        session = self.session_user
+        H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
+        filename = "fixtures/CDS_UIC_2024_2025-CandH.pdf"
+        data = {
+           "institution": "University of Illinois",
+           "year": "2024-2025",
+           "url": "none"
+               }
+        with open(filename, "rb") as fh:
+            files = { "file": ("CDS_UIC_2024_2025-CandH.pdf", fh, "application/pdf") }
+            response = upload_file(session, BASE+ "/app/api/upload/", data, files)
+        self.assertIn(response.status_code, [200, 201], "/app/api/upload/ does not respond with success")
+        response = session.get(BASE + f"/app/api/process/{H}")
+        self.assertEqual(response.status_code, 200)
+        j = json.loads(response.content)
+        self.assertIsInstance(j, dict)
+        self.assertGreater(len(j), 0)
+        self.assertIn("women_applied", j)
+        self.assertIn("men_applied", j)
+        
 
 
-    @weight(0)
-    @number("60.0")
-    def test_process_UIC(self):
-        '''Test /app/api/download/{ID} returns a downloadable file'''
-        return
+
+    @weight(2)
+    @number("62.2")
+    def test_process_UIC_fieldsok(self):
+        '''Test that process endpoint on CDS_UIC_2024_2025-CandH.pdf 
+        returns json containing appropriate fields.
+        '''
         session = self.session_user
         H = '1e0bec110077aa6cfc893a4924dfdf8dc79d10a55ee7667cf1ed60821dd7d4f9'
         DOWNLOAD_URL = f"{BASE}/app/api/process/{H}"
         response = session.get(DOWNLOAD_URL)
         self.assertEqual(response.status_code, 200)
         content = response.content.decode("latin-1")
-        self.assertIn("average_financial_aid_package", content)
-        self.assertIn("degree_seeking_undergraduate_students", content)
-        self.assertIn("men_applied", content)
-        self.assertIn("men_admitted", content)
+        j = response.json()
+        self.assertIsInstance(j, dict)
+        self.assertIn("average_financial_aid_package", j)
+        self.assertIn("average_financial_aid_package", j)
+        self.assertIn("degree_seeking_undergraduate_students", j)
+        self.assertIn("men_applied", j)
+        self.assertIn("men_admitted", j)
         self.assertIn("women_admitted", content)
         self.assertIn("women_applied", content)
